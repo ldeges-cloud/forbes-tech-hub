@@ -210,6 +210,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .article .body h4{font-family:var(--body);font-size:15px;font-weight:700;margin:20px 0 8px;color:#111}
 .article .body blockquote{margin:20px 0;padding:6px 0 6px 18px;border-left:3px solid var(--red);font-family:var(--display);font-size:19px;line-height:1.45;font-style:italic;color:#111}
 .article .body ul{margin:0 0 14px 18px;padding:0;font-family:Georgia,serif;font-size:16px;line-height:1.7}
+.article .body .dato{font-family:var(--body);font-size:14px;background:#F2EFE6;border-left:3px solid var(--gold);padding:10px 14px;border-radius:4px}
 .article .cierre{margin-top:18px;font-family:Georgia,serif;font-style:italic;font-size:14px;color:#6B6960}
 .article .disc{margin-top:16px;padding-top:12px;border-top:1px solid #E4E2DC;font-family:var(--body);font-size:11px;letter-spacing:1.3px;text-transform:uppercase;color:#8A887F}
 .res-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
@@ -246,6 +247,19 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .quick button:hover{border-color:var(--ink-4);color:var(--ink)}
 .quick button[aria-pressed=true]{background:var(--red);border-color:var(--red);color:#fff}
 
+.panes{display:flex;gap:4px;margin:-8px 0 22px;border-bottom:1px solid var(--line)}
+.panes button{border:0;background:transparent;padding:12px 4px;margin-right:18px;font-size:14px;font-weight:500;color:var(--ink-3);border-bottom:2px solid transparent}
+.panes button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--red)}
+.panes .new{font-size:10px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--gold);margin-left:6px}
+.memo{display:flex;gap:10px;align-items:flex-start;font-size:12px;color:var(--ink-3);margin:0 0 14px;padding:10px 12px;border:1px solid var(--line);border-radius:10px}
+.memo b{color:var(--ink-2);font-weight:500}
+.how{padding:22px}
+.how h3{font-family:var(--display);font-weight:400;font-size:20px;margin-bottom:12px}
+.how ol{margin:0;padding-left:20px;color:var(--ink-2);font-size:14px}
+.how li{margin-bottom:10px}
+.lesson{border:1px solid var(--line);border-radius:11px;padding:14px 16px;margin-bottom:10px;background:var(--field)}
+.lesson .k{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-4);margin-bottom:6px}
+.guia{white-space:pre-wrap;font-size:13px;line-height:1.6;color:var(--ink-2);max-height:420px;overflow:auto;padding:14px 16px;border:1px solid var(--line);border-radius:11px;background:var(--field)}
 .empty{padding:56px 30px;text-align:center}
 .empty .ic{width:56px;height:56px;margin:0 auto 14px;border-radius:14px;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--display);font-size:24px;color:var(--red)}
 .empty h3{font-family:var(--display);font-weight:400;font-size:22px}
@@ -317,10 +331,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
         <div class="eyebrow" id="bv-eyebrow"></div>
         <h1 class="h1" id="h-bv">Generador Brand Voice</h1>
       </div>
-      <div class="actions"><button class="btn" onclick="resetForm()">Limpiar brief</button></div>
+      <div class="actions"><button class="btn" id="b-reset" onclick="resetForm()">Limpiar brief</button></div>
+    </div>
+    <div class="panes" role="tablist" aria-label="Secciones de Brand Voice">
+      <button role="tab" data-pane="gen" aria-selected="true">Generar nota</button>
+      <button role="tab" data-pane="fix" aria-selected="false">Cargar versión corregida<span class="new">Aprende</span></button>
     </div>
 
-    <div class="layout">
+    <div class="layout" id="pane-gen">
       <!-- FORM -->
       <form class="panel" id="form" novalidate onsubmit="event.preventDefault();generar()">
         <div class="ph"><span class="t">Brief</span><span class="s" id="draft-state">Se guarda automáticamente en este navegador</span></div>
@@ -445,12 +463,14 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 
           <div class="tp on" id="tp-nota">
             <div id="res-msg"></div>
+            <div class="memo" id="memo" hidden></div>
             <div class="meter" id="meter"><div class="track"><div class="zone" id="m-zone"></div><div class="pin" id="m-pin"></div></div><div class="lab num"><b id="m-chars"></b> caracteres · rango <span id="m-range"></span></div></div>
             <article class="article" id="article"></article>
             <div class="res-actions">
               <a class="btn primary" id="a-doc" href="#" target="_blank" rel="noopener">Abrir Google Doc</a>
               <button class="btn" onclick="copyText()">Copiar texto</button>
               <button class="btn" id="b-wp" onclick="copyHTML()">Copiar para WordPress</button>
+              <button class="btn" onclick="irCorregida()">Cargar versión corregida</button>
               <button class="btn" onclick="nueva()">Nueva nota</button>
             </div>
           </div>
@@ -481,13 +501,64 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
         </div>
       </div>
     </div>
+
+    <!-- CARGAR VERSIÓN CORREGIDA -->
+    <div class="layout" id="pane-fix" hidden>
+      <form class="panel" id="form-fix" novalidate onsubmit="event.preventDefault();cargarFinal()">
+        <div class="ph"><span class="t">Versión corregida por el redactor</span><span class="s">Cada nota que se carga mejora las siguientes</span></div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">1</span><span class="step-t">¿Dónde está la versión final?</span></div>
+          <div class="field">
+            <div class="seg" role="group" aria-label="Origen de la versión final">
+              <button type="button" data-fuente="doc" aria-pressed="true">Google Doc</button>
+              <button type="button" data-fuente="docx" aria-pressed="false">Archivo Word</button>
+              <button type="button" data-fuente="texto" aria-pressed="false">Pegar texto</button>
+            </div>
+          </div>
+          <div class="field" id="fx-doc"><label for="fx-url">Enlace al Google Doc <span class="req">*</span></label><input type="text" id="fx-url" placeholder="https://docs.google.com/document/d/…"><div class="hint">Lo ideal: el mismo Doc que entregó el generador, ya corregido. Así el sistema compara su versión con la del redactor y aprende de cada cambio.</div></div>
+          <div class="field" id="fx-docx" hidden><span class="lbl">Archivo Word (.docx) <span class="req">*</span></span><div class="drop" id="fx-drop" tabindex="0" role="button" aria-label="Elegir archivo Word"><input type="file" id="fx-file" accept=".docx" hidden><div class="big" id="fx-file-name">Arrastre el .docx aquí o haga clic para elegirlo</div><div class="small">Hasta 8 MB</div></div></div>
+          <div class="field" id="fx-texto" hidden><label for="fx-txt">Texto final <span class="req">*</span><span class="counter num" id="fx-cnt"></span></label><textarea id="fx-txt" rows="10" placeholder="Pegue el titular, la bajada y el texto tal como quedaron publicados o aprobados."></textarea></div>
+          <div class="ferr" id="fx-e1">Falta la versión final.</div>
+        </div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">2</span><span class="step-t">Sobre la corrección</span></div>
+          <div class="row">
+            <div class="field"><label for="fx-red">Redactor <span class="req">*</span></label><input type="text" id="fx-red" autocomplete="name" placeholder="Nombre y apellido"><div class="ferr" id="fx-e2">Indique quién corrigió.</div></div>
+            <div class="field"><label for="fx-cli">Cliente <span class="opt">· opcional</span></label><input type="text" id="fx-cli" placeholder="Se detecta solo"></div>
+          </div>
+          <div class="field"><label for="fx-com">¿Qué cambió y por qué? <span class="opt">· opcional, pero es lo que más enseña</span></label><textarea id="fx-com" rows="3" placeholder="Ej.: el primer párrafo no tenía el dato de la inversión · las citas estaban partidas · sobraba el cierre de «compromiso»"></textarea></div>
+        </div>
+        <div class="pb" style="border-top:1px solid var(--line)">
+          <div id="fx-msg"></div>
+          <button type="submit" class="btn primary big" id="bfix">Cargar y aprender</button>
+          <div class="hint" style="text-align:center;margin-top:10px">Tarda unos 30 segundos.</div>
+        </div>
+      </form>
+
+      <div class="sticky">
+        <div class="panel" id="fx-how">
+          <div class="how">
+            <h3>Cómo aprende el generador</h3>
+            <ol>
+              <li>El redactor corrige la nota en el Google Doc que entregó el generador (entre las marcas ▼ NOTA y ▲ FIN).</li>
+              <li>Carga aquí el enlace. El sistema compara su versión con la de la IA y anota qué cambió.</li>
+              <li>La nota corregida pasa a ser una <b>referencia</b> de la edición: el redactor IA la usa como modelo en encargos parecidos.</li>
+              <li>Las lecciones se integran en la <b>guía de estilo</b> de la edición, que se aplica a todas las notas siguientes. Una sola corrección no reemplaza una regla: entra como matiz hasta que otra corrección la confirme.</li>
+            </ol>
+            <p class="hint" style="margin-top:14px">También sirven notas escritas por el equipo sin el generador: se cargan como referencia de estilo.</p>
+          </div>
+        </div>
+        <div class="panel" id="fx-load" hidden><div class="loading" aria-live="polite"><h3>Analizando la corrección</h3><div class="sub">Leyendo el documento, comparando versiones y actualizando la guía de estilo.</div><div class="bar"><i id="fx-bar"></i></div><div class="elapsed num"><span id="fx-el">0 s</span><span></span></div></div></div>
+        <div class="panel" id="fx-res" hidden><div class="pb" id="fx-res-body"></div></div>
+      </div>
+    </div>
   </section>
 
   <!-- 404 -->
   <section class="view" id="v-404"><div class="empty"><div class="ic">?</div><h3>No encontramos esa página</h3><p><a href="#/">Volver al inicio</a></p></div></section>
 </main>
 
-<div class="foot-note"><span>Forbes Tech Hub · v1.0 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
+<div class="foot-note"><span>Forbes Tech Hub · v1.1 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
 
 <!-- Acceso -->
 <div class="scrim" id="m-key" role="dialog" aria-modal="true" aria-labelledby="mk-t">
@@ -512,13 +583,13 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 'use strict';
 /* ========= Configuración ========= */
 const API = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-brandvoice';
-const VERSION = '1.0';
+const VERSION = '1.1';
 
 const PAISES = {
   pe: {code:'PE', nombre:'Perú', edicion:'Forbes Perú', activo:true, dominio:'forbes.pe', correo:'nombre@forbes.pe',
        selloWeb:'Forbes Perú Advertorial - Contenido Patrocinado', cierreWeb:'Contenido auspiciado',
        selloPrint:'Forbes Brand Voice | Contenido Patrocinado',
-       cifras:'S/ para soles y US$ para dólares; punto para miles y coma para decimales',
+       cifras:'US$10 millones (sin espacio) y S/ 45 millones; punto para miles y coma para decimales',
        urlBase:'forbes.pe/brand-voice/', idioma:'Español neutro, tercera persona, sin peruanismos coloquiales'},
   mx: {code:'MX', nombre:'México', edicion:'Forbes México', activo:false},
   co: {code:'CO', nombre:'Colombia', edicion:'Forbes Colombia', activo:false},
@@ -527,7 +598,7 @@ const PAISES = {
   ca: {code:'CA', nombre:'Centroamérica', edicion:'Forbes Centroamérica', activo:false}
 };
 const TOOLS = [
-  {id:'brand-voice', ic:'B', nombre:'Generador Brand Voice', desc:'Del brief del cliente a una nota patrocinada lista para revisión, con titulares, control de calidad y SEO.', equipo:'Comercial', activo:true},
+  {id:'brand-voice', ic:'B', nombre:'Generador Brand Voice', desc:'Del brief del cliente a una nota patrocinada lista para revisión. Aprende del estilo de la edición con cada nota que corrigen los redactores.', equipo:'Comercial', activo:true},
   {id:'checker', ic:'C', nombre:'Checker editorial', desc:'Revisión de PDF antes de imprenta: ortografía, cortes, cifras y consistencia.', equipo:'Editorial', activo:false},
   {id:'sindicados', ic:'S', nombre:'Sindicados', desc:'Traducción y adaptación de notas de Forbes US con el estilo de la edición.', equipo:'Editorial', activo:false},
   {id:'pre-diseno', ic:'P', nombre:'Checker pre-diseño', desc:'Revisión del texto en Google Docs antes de pasar a diseño, con comentarios en el documento.', equipo:'Editorial', activo:false}
@@ -662,7 +733,8 @@ function renderCtx(){
     web ? ['Sello web', '<b>'+esc(P.selloWeb)+'</b> arriba y <b>'+esc(P.cierreWeb)+'</b> al cierre'] : null,
     prn ? ['Sello impreso', '<b>'+esc(P.selloPrint)+'</b> al final'] : null,
     ['Cifras', P.cifras],
-    ['Estructura', (S.tipo==='digital' && S.ext==='larga') ? 'Intertítulos permitidos por bloques temáticos' : 'Sin intertítulos'],
+    ['Estructura', (S.tipo==='digital' && S.ext==='larga') ? '2 o 3 intertítulos por bloques temáticos' : (rango().min >= 2500 ? '1 o 2 intertítulos solo si hay bloques temáticos claros' : 'Sin intertítulos')],
+    ['Estilo', 'Guía de estilo de la edición, aprendida de notas reales y de las correcciones de los redactores'],
     (prn && S.print==='spread') ? ['Entresacado','Una frase de 15 a 25 palabras entre el primer y el segundo párrafo'] : null,
     ['Titular y bajada', 'Se complementan, nunca repiten las mismas palabras clave'],
     ['Prohibido', PROHIBIDAS.map(x=>'«'+x+'»').join(', ')]
@@ -857,7 +929,7 @@ function showResult(){
   $('versions').innerHTML = S.versions.length > 1 ? S.versions.map((x,i)=>'<button aria-pressed="'+(i===S.cur)+'" title="'+esc(x.regen||'Versión inicial')+'" onclick="setVersion('+i+')">v'+(i+1)+'</button>').join('') : '';
   if(d.doc_url){ $('a-doc').href = d.doc_url; $('a-doc').hidden = false; } else $('a-doc').hidden = true;
   if(d.aviso) $('res-msg').innerHTML = '<div class="notice ok">'+esc(d.aviso)+'</div>';
-  renderArticle(); renderMeter(); renderAlts(); renderChecks(); renderSEO();
+  renderArticle(); renderMeter(); renderAlts(); renderChecks(); renderSEO(); renderMemo();
   $('tab-seo').hidden = v.tipo === 'print';
   tab('nota');
 }
@@ -870,6 +942,7 @@ function bodyBlocks(nota){
     if(list){ out.push({t:'ul', items:list}); list = null; }
     if(/^##\s+/.test(line)) out.push({t:'h', x:line.replace(/^##\s+/,'')});
     else if(/^ENTRESACADO:/i.test(line)) out.push({t:'q', x:line.replace(/^ENTRESACADO:\s*/i,'').replace(/^["“«]|["”»]$/g,'')});
+    else if(/^DATO CLAVE:/i.test(line)) out.push({t:'d', x:line.replace(/^DATO CLAVE:\s*/i,'')});
     else out.push({t:'p', x:line});
   });
   if(list) out.push({t:'ul', items:list});
@@ -878,7 +951,7 @@ function bodyBlocks(nota){
 function articleHTML(forWP){
   const v = current(), d = v.data, P = PAISES[S.pais];
   const blocks = bodyBlocks(d.nota||'');
-  const body = blocks.map(b => b.t==='p' ? '<p>'+esc(b.x)+'</p>' : b.t==='h' ? (forWP?'<h2>':'<h4>')+esc(b.x)+(forWP?'</h2>':'</h4>') : b.t==='q' ? '<blockquote>'+esc(b.x)+'</blockquote>' : '<ul>'+b.items.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul>').join('\n');
+  const body = blocks.map(b => b.t==='p' ? '<p>'+esc(b.x)+'</p>' : b.t==='h' ? (forWP?'<h2>':'<h4>')+esc(b.x)+(forWP?'</h2>':'</h4>') : b.t==='q' ? '<blockquote>'+esc(b.x)+'</blockquote>' : b.t==='d' ? '<p class="dato"><strong>DATO CLAVE</strong> '+esc(b.x)+'</p>' : '<ul>'+b.items.map(i=>'<li>'+esc(i)+'</li>').join('')+'</ul>').join('\n');
   return {body, blocks};
 }
 function renderArticle(){
@@ -994,6 +1067,96 @@ function copySEO(){
   copyStr(['PALABRA CLAVE: '+s.keyword_principal,'SECUNDARIAS: '+(s.keywords_secundarios||[]).join(', '),'TÍTULO SEO: '+s.titulo_seo,'META: '+s.meta_description,'SLUG: '+s.slug,'ETIQUETAS: '+(s.etiquetas||[]).join(', ')].join('\n'));
 }
 function nueva(){ S.versions = []; S.cur = -1; $('r-res').hidden = true; $('r-ctx').hidden = false; resetForm(); window.scrollTo({top:0, behavior:'smooth'}); }
+
+/* ========= Memoria en el resultado ========= */
+function renderMemo(){
+  const m = (current().data||{}).memoria, el = $('memo');
+  if(!m || !m.guia_version){ el.hidden = true; return; }
+  el.hidden = false;
+  el.innerHTML = '<span>✦</span><span>Escrita con la <b>guía de estilo v'+m.guia_version+'</b> de '+esc(PAISES[S.pais].edicion)+' ('+m.n_ejemplos+' notas de referencia'+(m.n_corregidas?', '+m.n_corregidas+' corregidas por redactores':'')+')'+(m.referencias&&m.referencias.length?'. Modelos usados: <b>'+m.referencias.map(esc).join('</b> y <b>')+'</b>':'')+'.</span>';
+}
+
+/* ========= Cargar versión corregida ========= */
+S.fuente = 'doc'; S.docx = null;
+document.querySelectorAll('[data-pane]').forEach(b => b.addEventListener('click', () => pane(b.dataset.pane)));
+function pane(p){
+  document.querySelectorAll('[data-pane]').forEach(b => b.setAttribute('aria-selected', b.dataset.pane===p));
+  $('pane-gen').hidden = p!=='gen'; $('pane-fix').hidden = p!=='fix'; $('b-reset').hidden = p!=='gen';
+  if(p==='fix' && !$('fx-red').value){ try{ const w = JSON.parse(localStorage.getItem('th_red')||'null'); if(w) $('fx-red').value = w; }catch(e){} }
+}
+function irCorregida(){
+  const d = current() && current().data;
+  pane('fix'); setFuente('doc');
+  if(d && d.doc_url){ $('fx-url').value = d.doc_url; $('fx-cli').value = current().brief.cliente || ''; }
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+document.querySelectorAll('[data-fuente]').forEach(b => b.addEventListener('click', () => setFuente(b.dataset.fuente)));
+function setFuente(f){
+  S.fuente = f;
+  document.querySelectorAll('[data-fuente]').forEach(b => b.setAttribute('aria-pressed', b.dataset.fuente===f));
+  $('fx-doc').hidden = f!=='doc'; $('fx-docx').hidden = f!=='docx'; $('fx-texto').hidden = f!=='texto';
+  $('fx-e1').classList.remove('on');
+}
+const fxDrop = $('fx-drop');
+fxDrop.addEventListener('click', () => $('fx-file').click());
+fxDrop.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); $('fx-file').click(); } });
+fxDrop.addEventListener('dragover', e => { e.preventDefault(); fxDrop.classList.add('over'); });
+fxDrop.addEventListener('dragleave', () => fxDrop.classList.remove('over'));
+fxDrop.addEventListener('drop', e => { e.preventDefault(); fxDrop.classList.remove('over'); if(e.dataTransfer.files[0]) setDocx(e.dataTransfer.files[0]); });
+$('fx-file').addEventListener('change', e => { if(e.target.files[0]) setDocx(e.target.files[0]); e.target.value=''; });
+async function setDocx(f){
+  if(!/\.docx$/i.test(f.name)){ toast('Elija un archivo .docx'); return; }
+  if(f.size > 8e6){ toast('El archivo supera 8 MB'); return; }
+  S.docx = {nombre:f.name, base64: await toB64(f)};
+  $('fx-file-name').textContent = '📄 ' + f.name; $('fx-e1').classList.remove('on');
+}
+$('fx-txt').addEventListener('input', () => { const n = $('fx-txt').value.trim().length; $('fx-cnt').textContent = n ? fmtN(n)+' caracteres' : ''; });
+
+async function cargarFinal(){
+  if(S.busyFix) return;
+  const f = S.fuente, red = $('fx-red').value.trim();
+  const falta = f==='doc' ? !/docs\.google\.com\/document\/d\/|^[\w-]{25,}$/.test($('fx-url').value.trim())
+              : f==='docx' ? !S.docx : $('fx-txt').value.trim().length < 300;
+  $('fx-e1').textContent = f==='doc' ? 'Pegue el enlace del Google Doc (docs.google.com/document/d/…).' : f==='docx' ? 'Elija el archivo Word.' : 'Pegue el texto completo (mínimo 300 caracteres).';
+  $('fx-e1').classList.toggle('on', falta); $('fx-e2').classList.toggle('on', !red); $('fx-red').classList.toggle('err-in', !red);
+  if(falta || !red) return;
+  localStorage.setItem('th_red', JSON.stringify(red));
+  const payload = {modo:'final', pais:S.pais.toUpperCase(), clave:keyOf(S.pais), redactor:red, cliente:$('fx-cli').value.trim(), comentario:$('fx-com').value.trim()};
+  if(f==='doc') payload.doc_url = $('fx-url').value.trim();
+  if(f==='docx') payload.docx = S.docx;
+  if(f==='texto') payload.texto = $('fx-txt').value.trim();
+  S.busyFix = true; $('bfix').disabled = true; $('fx-msg').innerHTML = '';
+  $('fx-how').hidden = true; $('fx-res').hidden = true; $('fx-load').hidden = false;
+  const t0 = Date.now(); clearInterval(S._fx);
+  S._fx = setInterval(() => { const el = (Date.now()-t0)/1000; $('fx-el').textContent = Math.floor(el)+' s'; $('fx-bar').style.width = Math.min(92, el/35*92)+'%'; }, 400);
+  try{
+    const r = await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
+    if(r.status === 401){ localStorage.removeItem('th_key_'+S.pais); throw new Error('Su clave ya no es válida. Vuelva a ingresarla.'); }
+    const d = await r.json().catch(()=>null);
+    if(!d || d.status !== 'success') throw new Error((d && d.message) || 'No se pudo procesar la versión final (código '+r.status+').');
+    mostrarAprendizaje(d);
+    $('fx-url').value = ''; $('fx-txt').value = ''; $('fx-com').value = ''; S.docx = null; $('fx-file-name').textContent = 'Arrastre el .docx aquí o haga clic para elegirlo';
+    toast('Corrección cargada: la guía quedó en v' + d.guia_version);
+  }catch(e){
+    $('fx-how').hidden = false;
+    $('fx-msg').innerHTML = '<div class="notice err" role="alert">'+esc(e instanceof TypeError ? 'No hubo conexión con el servidor. Intente de nuevo.' : e.message)+'</div>';
+  }finally{ clearInterval(S._fx); $('fx-load').hidden = true; S.busyFix = false; $('bfix').disabled = false; }
+}
+function mostrarAprendizaje(d){
+  const lec = (d.lecciones||[]).map(x => '<li>'+esc(x)+'</li>').join('');
+  const cam = (d.cambios_guia||[]).map(x => '<li>'+esc(x)+'</li>').join('');
+  $('fx-res-body').innerHTML =
+    '<div class="eyebrow">Aprendizaje registrado</div>' +
+    '<h3 style="font-family:var(--display);font-weight:400;font-size:22px;margin-bottom:6px">'+esc(d.titular||'')+'</h3>' +
+    '<p class="hint" style="margin:0 0 16px">'+esc(d.cliente||'')+' · '+fmtN(d.caracteres)+' caracteres · '+(d.comparada_con_ia ? 'comparada con la versión de la IA'+(d.magnitud!=null?' (cambió un '+d.magnitud+'%)':'') : 'cargada como referencia de estilo (sin versión de la IA para comparar)')+'</p>' +
+    (d.resumen_cambios ? '<div class="lesson"><div class="k">Qué cambió el redactor</div>'+esc(d.resumen_cambios)+'</div>' : '') +
+    (lec ? '<div class="lesson"><div class="k">Lecciones que se llevó el generador</div><ul class="sugs" style="margin:0">'+lec+'</ul></div>' : '') +
+    (cam ? '<div class="lesson"><div class="k">Cambios en la guía de estilo · ahora v'+d.guia_version+'</div><ul class="sugs" style="margin:0">'+cam+'</ul></div>' : '') +
+    '<details style="margin-top:12px"><summary class="more" style="cursor:pointer">Ver la guía de estilo completa (v'+d.guia_version+')</summary><div class="guia" style="margin-top:10px">'+esc(d.guia||'')+'</div></details>' +
+    '<div class="res-actions"><button class="btn" onclick="otraCorreccion()">Cargar otra</button><button class="btn" onclick="pane(\'gen\')">Ir a generar</button></div>';
+  $('fx-res').hidden = false;
+}
+function otraCorreccion(){ $('fx-res').hidden = true; $('fx-how').hidden = false; window.scrollTo({top:0, behavior:'smooth'}); }
 
 /* ========= Historial ========= */
 function histKey(){ return 'th_hist_'+S.pais; }
