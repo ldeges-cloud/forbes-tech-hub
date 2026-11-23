@@ -323,6 +323,22 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .toast.on{opacity:1;transform:translateX(-50%)}
 .foot-note{max-width:1280px;margin:0 auto;padding:0 24px 30px;font-size:12px;color:var(--ink-4);display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
 
+.paste{min-height:200px;max-height:380px;overflow:auto;background:var(--field);border:1px solid #262624;border-radius:10px;padding:12px 14px;font-size:14px;line-height:1.6;color:var(--ink);outline:none}
+.paste:focus{border-color:var(--red-dim)}
+.paste:empty:before{content:attr(data-ph);color:#4A4944}
+.paste a,.paste a *{color:var(--red)}
+.paste img,.paste figure,.paste iframe,.paste video{display:none}
+.recv{display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(76,175,125,.35);background:var(--green-bg);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--ink-2);margin-top:10px}
+.recv b{color:var(--ink);font-weight:500}
+.alerta{background:var(--amber-bg);border:1px solid rgba(242,181,68,.3);color:#F2CF8A;border-radius:10px;padding:12px 14px;font-size:13px;margin-bottom:14px}
+.alerta ul{margin:6px 0 0 18px;padding:0}
+.article .body a{color:#A81518;text-decoration:underline;text-underline-offset:2px}
+.article .lea{font-family:var(--body);font-size:14px;font-weight:700;margin-top:10px;color:#111}
+.article .lea a{color:#A81518}
+.bm{display:inline-block;margin:6px 0;padding:9px 16px;border-radius:999px;border:1px dashed var(--red-dim);color:var(--red);font-weight:600;font-size:13px;cursor:grab;text-decoration:none}
+.bm:hover{background:var(--red-bg)}
+.ctxlist{margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)}
+.ctxlist li{margin-bottom:6px}
 @media (max-width:960px){.layout{grid-template-columns:minmax(0,1fr)}.sticky{position:static}.h1{font-size:32px}.crumbs{display:none}}
 @media (max-width:560px){.row,.cards,.cards.two{grid-template-columns:minmax(0,1fr)}.logo span{display:none}.meter{flex-wrap:wrap}.meter .lab{white-space:normal}.tool-head .actions{margin-left:0}.wrap{padding:22px 16px 60px}.top-in{padding:10px 16px}.article{padding:22px 18px}}
 </style>
@@ -663,10 +679,105 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
     </div>
   </section>
 
+  <!-- SINDICADOS -->
+  <section class="view" id="v-sd" aria-labelledby="h-sd">
+    <div class="tool-head"><div><div class="eyebrow" id="sd-eyebrow"></div><h1 class="h1" id="h-sd">Sindicados</h1></div><div class="actions"><a class="btn" id="man-sd" href="#" target="_blank" rel="noopener" title="Manual de uso (Google Doc)" hidden>Manual de uso ↗</a></div></div>
+    <div class="layout">
+      <form class="panel" id="form-sd" novalidate onsubmit="event.preventDefault();enviarSD()">
+        <div class="ph"><span class="t">Nota de la franquicia</span><span class="s">Forbes US o Forbes México</span></div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">1</span><span class="step-t">Nota original</span></div>
+          <div class="field">
+            <div class="seg" role="group" aria-label="Cómo llega la nota">
+              <button type="button" data-sdm="url" aria-pressed="true">Desde la URL</button>
+              <button type="button" data-sdm="pegar" aria-pressed="false">Pegar el texto</button>
+            </div>
+          </div>
+          <div id="sd-murl">
+            <div class="field"><label for="sd-url">URL de la nota <span class="req">*</span></label><input type="text" id="sd-url" inputmode="url" autocomplete="off" placeholder="https://www.forbes.com.mx/… o https://www.forbes.com/…">
+              <div class="ferr" id="sd-e1">Pegue la URL completa de la nota.</div>
+              <div class="hint" id="sd-uhint"><b>Forbes México</b>: se lee sola. <b>Forbes US</b>: abra la nota en forbes.com y use el botón «Enviar al Hub» (ver a la derecha).</div>
+              <div class="recv" id="sd-recv" hidden></div>
+            </div>
+          </div>
+          <div id="sd-mpeg" hidden>
+            <div class="field"><label for="sd-purl">URL de la nota original <span class="req">*</span></label><input type="text" id="sd-purl" inputmode="url" autocomplete="off" placeholder="Para el crédito «publicado originalmente por…»"><div class="ferr" id="sd-e2">Pegue la URL de la nota original.</div></div>
+            <div class="field"><label for="sd-ptit">Titular original <span class="opt">· opcional</span></label><input type="text" id="sd-ptit" autocomplete="off"></div>
+            <div class="field"><span class="lbl">Texto de la nota <span class="req">*</span><span class="counter num" id="sd-pcnt"></span></span><div class="paste" id="sd-ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Texto de la nota" data-ph="Copie la nota desde la página (desde el primer párrafo hasta el último) y péguela aquí. Así se conservan los enlaces, los intertítulos y las listas."></div><div class="ferr" id="sd-e3">Falta el texto de la nota (al menos unos párrafos).</div></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">2</span><span class="step-t">Redactor</span></div>
+          <div class="row">
+            <div class="field"><label for="sd-red">Nombre <span class="req">*</span></label><input type="text" id="sd-red" autocomplete="name" placeholder="Nombre y apellido"><div class="ferr" id="sd-e4">Indique quién traduce.</div></div>
+            <div class="field"><label for="sd-mail">Correo <span class="req">*</span></label><input type="email" id="sd-mail" autocomplete="email" placeholder="nombre@forbes.co"><div class="ferr" id="sd-e5">Revise el correo.</div><div class="hint">Recibe el Google Doc con permiso de edición.</div></div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">3</span><span class="step-t">Opcional</span></div>
+          <div class="field"><label for="sd-lea">«Lea también» <span class="opt">· URL de forbes.co</span></label><input type="text" id="sd-lea" inputmode="url" autocomplete="off" placeholder="Si lo deja vacío, se propone una nota reciente relacionada"><div class="ferr" id="sd-e6">Tiene que ser una nota de forbes.co.</div></div>
+          <div class="field"><label for="sd-not">Indicaciones para la traducción</label><textarea id="sd-not" rows="3" placeholder="Ej.: titular más corto · mantener «startup» sin traducir · enfocar en el impacto para Colombia"></textarea></div>
+        </div>
+        <div class="pb" style="border-top:1px solid var(--line)">
+          <div id="sd-msg"></div>
+          <button type="submit" class="btn primary big" id="bsd">Traducir y adaptar</button>
+          <div class="hint" style="text-align:center;margin-top:10px">Tarda entre 20 segundos y un minuto.</div>
+        </div>
+      </form>
+
+      <div class="sticky">
+        <div class="panel" id="sd-how"><div class="how">
+          <h3>Qué hace</h3>
+          <ul class="rules">
+            <li><span class="k">Traduce</span><span>De forma periodística y fiel al original, con el estilo de Forbes Colombia. Las notas de Forbes México se adaptan sin traducir.</span></li>
+            <li><span class="k">Cifras</span><span>US$ adelante y nunca «dólares» al final; <i>billion</i> pasa a mil millones (US$8.400 millones) y <i>trillion</i> a billones (US$4,07 billones); punto para miles y coma para decimales.</span></li>
+            <li><span class="k">Conserva</span><span>Todos los enlaces, intertítulos, listas y bloques de datos clave.</span></li>
+            <li><span class="k">Cierre</span><span>«Este artículo fue publicado originalmente por…» con el enlace, y un «Lea también» de forbes.co.</span></li>
+            <li><span class="k">Avisa</span><span>Cifras que cambian en tiempo real, datos que conviene verificar al cierre y contexto que podría necesitar el lector colombiano.</span></li>
+            <li><span class="k">Entrega</span><span>Vista previa, HTML para el CMS, SEO y un Google Doc en la carpeta de la edición.</span></li>
+          </ul>
+        </div></div>
+        <div class="panel" id="sd-bmp"><div class="how">
+          <h3>Botón «Enviar al Hub» para Forbes US</h3>
+          <p class="hint" style="margin:0 0 12px;font-size:13px;color:var(--ink-3)">Forbes US no permite que otros sistemas lean sus notas. Con este botón, la nota se toma desde su navegador, con sus enlaces, y se abre aquí lista para traducir.</p>
+          <ol>
+            <li>Muestre la barra de marcadores (Ctrl+Shift+B; en Mac, ⌘+Shift+B).</li>
+            <li>Arrastre este botón a la barra:<br><a class="bm" id="sd-bm" href="#">↗ Enviar al Hub</a></li>
+            <li>Abra la nota en forbes.com y haga clic en el marcador. El Hub se abre en otra pestaña con la nota cargada.</li>
+          </ol>
+          <p class="hint" style="margin:0">Se instala una sola vez. También sirve para Forbes México y otras ediciones de la franquicia.</p>
+        </div></div>
+        <div class="panel" id="sd-load" hidden><div class="loading" aria-live="polite"><h3>Trabajando en la nota</h3><div class="sub" id="sd-ld-sub"></div><ul class="stages" id="sd-stages"></ul><div class="bar"><i id="sd-bar"></i></div><div class="elapsed num"><span id="sd-el">0 s</span><span></span></div></div></div>
+        <div class="panel" id="sd-res" hidden>
+          <div class="res-head"><span class="tag gold" id="sd-t1"></span><span class="tag" id="sd-t2"></span></div>
+          <div class="tabs sd-tabs" role="tablist">
+            <button role="tab" data-sdt="nota" aria-selected="true">Nota</button>
+            <button role="tab" data-sdt="control" aria-selected="false">Control<span class="cnt" id="sd-cnt"></span></button>
+            <button role="tab" data-sdt="cms" aria-selected="false">CMS y SEO</button>
+          </div>
+          <div class="tp on" id="sdp-nota">
+            <div id="sd-rmsg"></div>
+            <article class="article" id="sd-art"></article>
+            <div class="res-actions">
+              <a class="btn primary" id="sd-doc" href="#" target="_blank" rel="noopener">Abrir Google Doc</a>
+              <button class="btn" type="button" onclick="copySD('cms')">Copiar para el CMS</button>
+              <button class="btn" type="button" onclick="copySD('html')">Copiar HTML</button>
+              <button class="btn" type="button" onclick="nuevaSD()">Otra nota</button>
+            </div>
+            <div id="sd-ctx"></div>
+          </div>
+          <div class="tp" id="sdp-control"><ul class="checks" id="sd-checks"></ul><p class="hint" id="sd-rev" style="margin-top:14px"></p></div>
+          <div class="tp" id="sdp-cms"></div>
+        </div>
+        <div class="panel" id="sd-hist-p" hidden><div class="pb"><div class="lbl">Traducidas desde este navegador</div><div id="sd-hist"></div></div></div>
+      </div>
+    </div>
+  </section>
+
   <section class="view" id="v-404"><div class="empty"><div class="ic">?</div><h3>No encontramos esa página</h3><p><a href="#/">Volver al inicio</a></p></div></section>
 </main>
 
-<div class="foot-note"><span>Forbes Tech Hub · v1.3 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
+<div class="foot-note"><span>Forbes Tech Hub · v1.4 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
 
 <!-- Acceso -->
 <div class="scrim" id="m-key" role="dialog" aria-modal="true" aria-labelledby="mk-t">
@@ -692,7 +803,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 /* ========= Configuración ========= */
 const API = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-brandvoice';
 const API_ADM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-admin';
-const VERSION = '1.3';
+const API_SD = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-sindicados';
+const VERSION = '1.4';
 
 const PAISES = {
   pe: {code:'PE', nombre:'Perú', edicion:'Forbes Perú', activo:true, dominio:'forbes.pe', correo:'nombre@forbes.pe',
@@ -700,9 +812,12 @@ const PAISES = {
        selloPrint:'Forbes Brand Voice | Contenido Patrocinado',
        cifras:'US$10 millones (sin espacio) y S/ 45 millones; punto para miles y coma para decimales',
        manual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit',
-       urlBase:'forbes.pe/brand-voice/', idioma:'Español neutro, tercera persona, sin peruanismos coloquiales'},
+       urlBase:'forbes.pe/brand-voice/', idioma:'Español neutro, tercera persona, sin peruanismos coloquiales',
+       tools:['brand-voice','checker']},
   mx: {code:'MX', nombre:'México', edicion:'Forbes México', activo:false},
-  co: {code:'CO', nombre:'Colombia', edicion:'Forbes Colombia', activo:false},
+  co: {code:'CO', nombre:'Colombia', edicion:'Forbes Colombia', activo:true, dominio:'forbes.co', correo:'nombre@forbes.co',
+       cifras:'US$8.400 millones y US$4,07 billones; punto para miles y coma para decimales',
+       tools:['sindicados'], verifica:'sindicados'},
   cl: {code:'CL', nombre:'Chile', edicion:'Forbes Chile', activo:false},
   rd: {code:'RD', nombre:'República Dominicana', edicion:'Forbes República Dominicana', activo:false},
   ca: {code:'CA', nombre:'Centroamérica', edicion:'Forbes Centroamérica', activo:false}
@@ -710,7 +825,7 @@ const PAISES = {
 const TOOLS = [
   {id:'brand-voice', ic:'B', nombre:'Generador Brand Voice', desc:'Del brief del cliente a una nota patrocinada lista para revisión. Aprende del estilo de la edición con cada nota que corrigen los redactores.', equipo:'Comercial', activo:true},
   {id:'checker', ic:'C', nombre:'Checker editorial', desc:'Revisión del PDF de la revista antes de imprenta: ortografía, tipeo, gramática y nombres propios. El reporte llega por correo.', equipo:'Editorial', activo:true},
-  {id:'sindicados', ic:'S', nombre:'Sindicados', desc:'Traducción y adaptación de notas de Forbes US con el estilo de la edición.', equipo:'Editorial', activo:false},
+  {id:'sindicados', ic:'S', nombre:'Sindicados', desc:'De la URL de una nota de Forbes US o Forbes México a la versión de la edición: traducción, cifras, enlaces, SEO y «Lea también».', equipo:'Editorial', activo:true},
   {id:'pre-diseno', ic:'P', nombre:'Checker pre-diseño', desc:'Revisión del texto en Google Docs antes de pasar a diseño, con comentarios en el documento.', equipo:'Editorial', activo:false}
 ];
 const FORMATOS = {
@@ -733,11 +848,19 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtN = n => String(Math.round(Number(n)||0)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
 const keyOf = p => localStorage.getItem('th_key_'+p) || '';
+const toolOn = (p, t) => t.activo && (!PAISES[p].tools || PAISES[p].tools.includes(t.id));
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2200)}
 
 /* ========= Router ========= */
 function route(){
-  const parts = location.hash.replace(/^#\/?/,'').split('/').filter(Boolean);
+  const hq = location.hash.split('?');
+  if(hq[1]){
+    // Nota enviada con el botón «Enviar al Hub» (#/co/sindicados?in=<base64>)
+    const inn = new URLSearchParams(hq[1]).get('in');
+    if(inn){ try{ JSON.parse(decodeURIComponent(escape(atob(inn)))); sessionStorage.setItem('th_sd_in', decodeURIComponent(escape(atob(inn)))); }catch(e){ setTimeout(()=>toast('No se pudo leer la nota enviada'), 300); } }
+    history.replaceState(null, '', hq[0]);
+  }
+  const parts = hq[0].replace(/^#\/?/,'').split('/').filter(Boolean);
   document.querySelectorAll('.view').forEach(v=>v.classList.remove('on'));
   closeHist();
   const [p, tool] = parts;
@@ -754,6 +877,8 @@ function route(){
   if(S._draftFor !== p){ S._draftFor = p; loadDraft(); }
   $('chip-pais').hidden = false; $('chip-txt').textContent = P.edicion;
   if(!tool){ renderPais(p); return show('v-pais', [[P.nombre]]); }
+  if(!TOOLS.some(t => t.id === tool && toolOn(p, t))) return show('v-404', []);
+  if(tool === 'sindicados'){ renderSD(); return show('v-sd', [[P.nombre,'#/'+p],['Sindicados']]); }
   if(tool === 'brand-voice'){ renderBV(); return show('v-bv', [[P.nombre,'#/'+p],['Brand Voice']]); }
   if(tool === 'checker'){ renderCK(); return show('v-ck', [[P.nombre,'#/'+p],['Checker editorial']]); }
   show('v-404', []);
@@ -773,22 +898,20 @@ function renderHome(){
     '<button class="pais" '+(P.activo?'onclick="location.hash=\'#/'+k+'\'"':'disabled')+'>'+
     '<span class="tag '+(P.activo?'live':'')+'">'+(P.activo?'Disponible':'Próximamente')+'</span>'+
     '<span class="code">'+P.code+'</span><span class="name">'+esc(P.nombre)+'</span>'+
-    '<span class="meta">'+(P.activo?TOOLS.filter(t=>t.activo).length+' herramientas activas':'En preparación')+'</span></button>').join('') +
+    '<span class="meta">'+(P.activo?(n => n + (n === 1 ? ' herramienta activa' : ' herramientas activas'))(TOOLS.filter(t=>toolOn(k,t)).length):'En preparación')+'</span></button>').join('') +
     '<button class="pais pais-admin" onclick="location.hash=\'#/admin\'"><span class="tag gold">Restringido</span><span class="code">AD</span><span class="name">Admin</span><span class="meta">Uso de las herramientas y memoria de cada edición</span></button>';
 }
 function renderPais(p){
   const P = PAISES[p];
   $('pais-eyebrow').textContent = P.edicion; $('h-pais').textContent = 'Herramientas de '+P.edicion;
-  $('grid-tools').innerHTML = TOOLS.map(t =>
-    '<button class="tool" '+(t.activo?'onclick="location.hash=\'#/'+p+'/'+t.id+'\'"':'disabled')+'>'+
-    '<span class="tag '+(t.activo?'live':'')+'">'+(t.activo?'Activa':'Próximamente')+'</span>'+
+  const orden = TOOLS.slice().sort((a,b) => toolOn(p,b) - toolOn(p,a));
+  $('grid-tools').innerHTML = orden.map(t => (on => 
+    '<button class="tool" '+(on?'onclick="location.hash=\'#/'+p+'/'+t.id+'\'"':'disabled')+'>'+
+    '<span class="tag '+(on?'live':'')+'">'+(on?'Activa':'Próximamente')+'</span>'+
     '<span class="ic">'+t.ic+'</span><h3>'+esc(t.nombre)+'</h3><p>'+esc(t.desc)+'</p>'+
-    '<span class="foot">Equipo '+esc(t.equipo)+'</span></button>').join('');
-  $('ctx-pais').innerHTML =
-    '<div><dt>Sitio</dt><dd>'+esc(P.dominio)+'</dd></div>'+
-    '<div><dt>Sello web</dt><dd>'+esc(P.selloWeb)+'</dd></div>'+
-    '<div><dt>Sello impreso</dt><dd>'+esc(P.selloPrint)+'</dd></div>'+
-    '<div><dt>Cifras y moneda</dt><dd>'+esc(P.cifras)+'</dd></div>' +
+    '<span class="foot">Equipo '+esc(t.equipo)+'</span></button>')(toolOn(p,t))).join('');
+  const dd = (k, v) => v ? '<div><dt>'+k+'</dt><dd>'+esc(v)+'</dd></div>' : '';
+  $('ctx-pais').innerHTML = dd('Sitio', P.dominio) + dd('Sello web', P.selloWeb) + dd('Sello impreso', P.selloPrint) + dd('Cifras y moneda', P.cifras) +
     (P.manual ? '<div><dt>Manual de uso</dt><dd><a href="'+P.manual+'" target="_blank" rel="noopener" style="color:var(--red)">Abrir el manual →</a></dd></div>' : '');
 }
 
@@ -802,7 +925,7 @@ async function submitKey(){
   try{
     const r = p === 'admin'
       ? await fetch(API_ADM, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', clave:k})})
-      : await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', pais:p.toUpperCase(), clave:k})});
+      : await fetch(PAISES[p].verifica === 'sindicados' ? API_SD : API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', pais:p.toUpperCase(), clave:k})});
     if(r.status === 401 || r.status === 403){ throw new Error('clave'); }
     const d = await r.json().catch(()=>({}));
     if(d.status !== 'ok') throw new Error(d.message || 'clave');
@@ -1164,8 +1287,8 @@ function renderSEO(){
     '<div class="seo-row"><div class="lbl">Etiquetas</div><div class="pills">'+(s.etiquetas||[]).map(k=>'<span>'+esc(k)+'</span>').join('')+'</div></div>' +
     '<button class="btn big" onclick="copySEO()">Copiar todo el SEO</button>';
 }
-document.querySelectorAll('[role=tab]').forEach(b => b.addEventListener('click', () => tab(b.dataset.tab)));
-function tab(t){ document.querySelectorAll('[role=tab]').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===t)); document.querySelectorAll('.tp').forEach(p=>p.classList.toggle('on', p.id==='tp-'+t)); }
+document.querySelectorAll('#r-res [role=tab]').forEach(b => b.addEventListener('click', () => tab(b.dataset.tab)));
+function tab(t){ document.querySelectorAll('#r-res [role=tab]').forEach(b=>b.setAttribute('aria-selected', b.dataset.tab===t)); document.querySelectorAll('#r-res .tp').forEach(p=>p.classList.toggle('on', p.id==='tp-'+t)); }
 document.querySelectorAll('#quick button').forEach(b => b.addEventListener('click', () => b.setAttribute('aria-pressed', b.getAttribute('aria-pressed')!=='true')));
 
 /* ========= Copiar ========= */
@@ -1352,9 +1475,189 @@ function renderCKHist(){
   $('ck-hist').innerHTML = h.map(x => '<div class="hist" style="cursor:default"><div class="tt" style="font-size:15px">'+esc(x.mes+' '+x.anio)+' · '+esc(x.archivo)+'</div><div class="mm">'+new Date(x.at).toLocaleString('es-PE',{dateStyle:'medium',timeStyle:'short'})+' · reporte a '+esc(x.email)+'</div></div>').join('');
 }
 
+/* ========= Sindicados ========= */
+S.sdm = 'url'; S.sdIn = null; S.sdRes = null; S.sdBusy = false;
+const SD_STAGES = [
+  {t:'Leyendo la nota original', s:4},
+  {t:'Traduciendo y adaptando al estilo de la edición', s:14},
+  {t:'Control de cifras, enlaces y SEO', s:6},
+  {t:'Creando el Google Doc', s:4}
+];
+const urlOk = u => /^https?:\/\/[^\s\/]+\.[^\s\/]+\/\S+/i.test(String(u||'').trim());
+const hostDe = u => (String(u||'').match(/^https?:\/\/([^\/?#:]+)/i) || [,''])[1].toLowerCase().replace(/^www\./,'');
+/* Se ejecuta en la página de la nota (forbes.com), en el navegador del redactor. Sin comentarios de línea: va dentro de un marcador. */
+function sdGrab(HUB){
+  var d = document, q = function(s){ return d.querySelector(s); };
+  var m = function(p){ var e = q('meta[property="'+p+'"],meta[name="'+p+'"]'); return e ? (e.getAttribute('content') || '') : ''; };
+  var root = q('.article-body') || q('[class*="article-body"]') || q('[itemprop="articleBody"]') || q('.entry-content') || q('article') || d.body;
+  var c = root.cloneNode(true);
+  c.querySelectorAll('script,style,noscript,iframe,figure,aside,nav,form,button,svg,video,[class*="newsletter"],[class*="recirc"],[class*="related"],[class*="promo"],[class*="embed"],[class*="ad-"],[class*="-ad"]').forEach(function(x){ x.remove(); });
+  var e = function(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); };
+  var inl = function(n){ var o = ''; n.childNodes.forEach(function(k){
+    if(k.nodeType === 3) o += e(k.nodeValue);
+    else if(k.nodeType === 1){ var t = k.tagName;
+      if(t === 'A' && k.href && /^https?:/.test(k.href)) o += '<a href="'+e(k.href).replace(/"/g,'&quot;')+'">'+inl(k)+'</a>';
+      else if(t === 'LI') o += '<li>'+inl(k)+'</li>';
+      else if(t === 'BR') o += '<br>';
+      else o += inl(k); } }); return o; };
+  var blocks = [];
+  c.querySelectorAll('p,h2,h3,h4,ul,ol,blockquote').forEach(function(b){
+    if(b.parentElement && b.parentElement.closest('p,h2,h3,h4,ul,ol,blockquote')) return;
+    var t = b.tagName.toLowerCase(), h = inl(b).trim();
+    if(h.replace(/<[^>]+>/g,'').trim()) blocks.push('<'+t+'>'+h+'</'+t+'>'); });
+  var html = blocks.join('\n');
+  if(html.replace(/<[^>]+>/g,'').length < 300){ alert('Forbes Tech Hub: no se encontró el texto de la nota en esta página. Copie la nota y péguela en el Hub.'); return; }
+  var h1 = q('h1'), au = q('[class*="author-name"],a[rel="author"],.contrib-link,[class*="byline"] a'), fc = q('figure figcaption,[class*="credit"]');
+  var canon = q('link[rel="canonical"]');
+  var data = {v:1, url:(canon && canon.href) || location.href.split('#')[0], c:{titulo:(h1 && h1.innerText.trim()) || m('og:title'), bajada:m('og:description'), autor:(au && au.innerText.trim()) || m('author'), fecha:m('article:published_time'), imagen:m('og:image'), credito:(fc && fc.innerText.trim()) || '', cuerpo_html:html}};
+  window.open(HUB + '?in=' + encodeURIComponent(btoa(unescape(encodeURIComponent(JSON.stringify(data))))), '_blank');
+}
+function renderSD(){
+  const P = PAISES[S.pais];
+  $('sd-eyebrow').textContent = P.edicion + ' · Equipo editorial';
+  $('man-sd').hidden = !P.sdManual; if(P.sdManual) $('man-sd').href = P.sdManual;
+  $('sd-mail').placeholder = P.correo || 'nombre@forbes.co';
+  const hub = location.origin + location.pathname + '#/' + S.pais + '/sindicados';
+  $('sd-bm').href = 'javascript:' + encodeURIComponent('(' + sdGrab.toString() + ')(' + JSON.stringify(hub) + ')');
+  $('sd-bm').textContent = '↗ Enviar al Hub · ' + P.edicion;
+  try{ const w = JSON.parse(localStorage.getItem('th_sd_who')||'null'); if(w){ if(!$('sd-red').value) $('sd-red').value = w.nom||''; if(!$('sd-mail').value) $('sd-mail').value = w.mail||''; } }catch(e){}
+  const inn = sessionStorage.getItem('th_sd_in');
+  if(inn){ sessionStorage.removeItem('th_sd_in'); try{ const d = JSON.parse(inn); if(d && d.c && d.url){ S.sdIn = d; setSDM('url'); $('sd-url').value = d.url; nuevaSD(true); } }catch(e){} }
+  pintarRecv(); renderSDHist();
+}
+function pintarRecv(){
+  const r = $('sd-recv'), d = S.sdIn;
+  if(!d){ r.hidden = true; $('sd-url').readOnly = false; $('sd-uhint').hidden = false; return; }
+  const n = d.c.cuerpo_html.replace(/<[^>]+>/g,'').length, l = (d.c.cuerpo_html.match(/<a /g)||[]).length;
+  r.innerHTML = '<span style="color:var(--green)">✓</span><div style="flex:1"><b>Nota recibida de '+esc(hostDe(d.url))+'</b><br>'+esc(d.c.titulo||'(sin titular)')+'<br><span class="num">'+fmtN(n)+' caracteres · '+l+(l===1?' enlace':' enlaces')+(d.c.autor?' · '+esc(d.c.autor):'')+'</span></div><button type="button" class="mini" onclick="quitarRecv()">Quitar</button>';
+  r.hidden = false; $('sd-url').readOnly = true; $('sd-uhint').hidden = true; $('sd-e1').classList.remove('on');
+}
+function quitarRecv(){ S.sdIn = null; $('sd-url').value = ''; pintarRecv(); $('sd-url').focus(); }
+document.querySelectorAll('[data-sdm]').forEach(b => b.addEventListener('click', () => setSDM(b.dataset.sdm)));
+function setSDM(m){ S.sdm = m; document.querySelectorAll('[data-sdm]').forEach(b => b.setAttribute('aria-pressed', b.dataset.sdm === m)); $('sd-murl').hidden = m !== 'url'; $('sd-mpeg').hidden = m !== 'pegar'; }
+$('sd-bm').addEventListener('click', e => { e.preventDefault(); toast('Arrástrelo a la barra de marcadores del navegador'); });
+$('sd-ed').addEventListener('input', () => { const n = $('sd-ed').innerText.trim().length; $('sd-pcnt').textContent = n ? fmtN(n) + ' caracteres' : ''; if(n >= 300) $('sd-e3').classList.remove('on'); });
+document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.addEventListener('click', () => sdTab(b.dataset.sdt)));
+function sdTab(t){ document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.sdt === t)); document.querySelectorAll('#sd-res .tp').forEach(p => p.classList.toggle('on', p.id === 'sdp-'+t)); }
+async function enviarSD(){
+  if(S.sdBusy) return;
+  const P = PAISES[S.pais], nom = $('sd-red').value.trim(), mail = $('sd-mail').value.trim(), lea = $('sd-lea').value.trim();
+  const err = (id, on, inp) => { $(id).classList.toggle('on', !!on); if(inp) $(inp).classList.toggle('err-in', !!on); return !!on; };
+  let url = '', contenido = null, bad = false;
+  if(S.sdm === 'url'){
+    url = $('sd-url').value.trim();
+    if(S.sdIn){ contenido = S.sdIn.c; }
+    else if(urlOk(url) && !/(^|\.)forbes\.com\.mx$/.test(hostDe(url))){
+      $('sd-e1').textContent = hostDe(url).endsWith('forbes.com') ? 'Las notas de forbes.com no se pueden leer desde aquí: ábrala en el navegador y use el botón «Enviar al Hub», o elija «Pegar el texto».' : 'Esta edición no se lee automáticamente: use el botón «Enviar al Hub» desde la nota, o elija «Pegar el texto».';
+      bad = err('sd-e1', true, 'sd-url') || bad;
+    } else { $('sd-e1').textContent = 'Pegue la URL completa de la nota.'; bad = err('sd-e1', !urlOk(url), 'sd-url') || bad; }
+  } else {
+    url = $('sd-purl').value.trim();
+    bad = err('sd-e2', !urlOk(url), 'sd-purl') || bad;
+    const txt = $('sd-ed').innerText.trim();
+    bad = err('sd-e3', txt.length < 300) || bad;
+    contenido = {titulo: $('sd-ptit').value.trim(), cuerpo_html: $('sd-ed').innerHTML};
+  }
+  bad = err('sd-e4', !nom, 'sd-red') || bad;
+  bad = err('sd-e5', !validEmail(mail), 'sd-mail') || bad;
+  bad = err('sd-e6', lea && !/^https?:\/\/(www\.)?forbes\.co\//i.test(lea), 'sd-lea') || bad;
+  if(bad){ const f = document.querySelector('#form-sd .ferr.on'); if(f) f.scrollIntoView({behavior:'smooth', block:'center'}); return; }
+  localStorage.setItem('th_sd_who', JSON.stringify({nom, mail}));
+  const body = {pais:S.pais.toUpperCase(), clave:keyOf(S.pais), url, redactor:nom, email:mail, lea_url:lea, notas:$('sd-not').value.trim()};
+  if(contenido) body.contenido = contenido;
+  S.sdBusy = true; $('bsd').disabled = true; $('bsd').textContent = 'Trabajando…'; $('sd-msg').innerHTML = '';
+  $('sd-how').hidden = true; $('sd-bmp').hidden = true; $('sd-res').hidden = true; $('sd-load').hidden = false;
+  $('sd-ld-sub').textContent = contenido ? 'Nota de ' + hostDe(url) : 'Leyendo la nota en ' + hostDe(url);
+  const t0 = Date.now(), total = SD_STAGES.reduce((a,x)=>a+x.s,0);
+  const tick = () => { const el = (Date.now()-t0)/1000; let acc = 0;
+    $('sd-stages').innerHTML = SD_STAGES.map((x,i) => { const st = el >= acc + x.s && i < SD_STAGES.length-1 ? 'done' : el >= acc ? 'on' : ''; acc += x.s; return '<li class="'+st+'"><span class="b">'+(st==='done'?'✓':'')+'</span>'+esc(x.t)+'</li>'; }).join('');
+    $('sd-bar').style.width = Math.min(95, el/total*100) + '%'; $('sd-el').textContent = Math.round(el) + ' s'; };
+  tick(); const iv = setInterval(tick, 500);
+  const ctrl = new AbortController(), to = setTimeout(() => ctrl.abort(), 280000);
+  try{
+    const r = await fetch(API_SD, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:ctrl.signal});
+    const d = await r.json().catch(() => null);
+    if(r.status === 401){ localStorage.removeItem('th_key_'+S.pais); S.pendingRoute = location.hash; openKey(S.pais); throw new Error('Su clave ya no es válida. Vuelva a ingresarla.'); }
+    if(!d || d.status !== 'success') throw new Error((d && d.message) || 'El servidor no pudo completar la traducción (código '+r.status+'). Intente de nuevo; si se repite, Lucas ya recibió el aviso.');
+    S.sdRes = d; guardarSDHist(d); mostrarSD();
+    toast('Nota lista');
+  }catch(e){
+    $('sd-load').hidden = true; $('sd-how').hidden = false; $('sd-bmp').hidden = false;
+    $('sd-msg').innerHTML = '<div class="notice err" role="alert">'+esc(e.name === 'AbortError' ? 'La traducción tardó demasiado. Intente de nuevo en unos minutos.' : e instanceof TypeError ? 'No hay conexión con el servidor del Hub. Revise su conexión e intente de nuevo.' : e.message)+'</div>';
+  }finally{ clearInterval(iv); clearTimeout(to); S.sdBusy = false; $('bsd').disabled = false; $('bsd').textContent = 'Traducir y adaptar'; }
+}
+function mdSD(md){
+  const lk = s => esc(s).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, (m, a, u) => '<a href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+a+'</a>');
+  const out = []; let list = null;
+  String(md||'').split(/\n+/).map(x => x.trim()).filter(Boolean).forEach(l => {
+    if(/^[-•*]\s+/.test(l)){ (list = list || []).push(l.replace(/^[-•*]\s+/,'')); return; }
+    if(list){ out.push('<ul>'+list.map(i => '<li>'+lk(i)+'</li>').join('')+'</ul>'); list = null; }
+    if(/^#{2,4}\s+/.test(l)) out.push('<h4>'+lk(l.replace(/^#{2,4}\s+/,''))+'</h4>');
+    else if(/^>\s*/.test(l)) out.push('<blockquote>'+lk(l.replace(/^>\s*/,''))+'</blockquote>');
+    else out.push('<p>'+lk(l)+'</p>');
+  });
+  if(list) out.push('<ul>'+list.map(i => '<li>'+lk(i)+'</li>').join('')+'</ul>');
+  return out.join('');
+}
+function mostrarSD(){
+  const d = S.sdRes; if(!d) return;
+  $('sd-load').hidden = true; $('sd-how').hidden = true; $('sd-bmp').hidden = true; $('sd-res').hidden = false;
+  $('sd-t1').textContent = d.origen || 'Franquicia'; $('sd-t2').textContent = d.categoria || 'Sin categoría';
+  $('sd-doc').href = d.doc_url || '#'; $('sd-doc').hidden = !d.doc_url;
+  const al = (d.alertas||[]).filter(Boolean);
+  $('sd-rmsg').innerHTML = (d.aviso ? '<div class="notice ok">'+esc(d.aviso)+'</div>' : '') +
+    (al.length ? '<div class="alerta"><b>Verificar al cierre</b><ul>'+al.map(x => '<li>'+esc(x)+'</li>').join('')+'</ul></div>' : '');
+  $('sd-art').innerHTML = '<div class="sello">'+esc(PAISES[S.pais].edicion)+' · '+esc(d.categoria||'')+'</div><h2>'+esc(d.titular)+'</h2>'+(d.bajada ? '<p class="dek">'+esc(d.bajada)+'</p>' : '')+
+    '<div class="body">'+mdSD(d.cuerpo)+'</div>'+
+    '<p class="cierre"><a href="'+esc(d.url)+'" target="_blank" rel="noopener" style="color:inherit">'+esc(d.atribucion || 'Este artículo fue publicado originalmente por ' + d.origen)+'</a></p>'+
+    (d.lea_tambien ? '<p class="lea">Lea también: <a href="'+esc(d.lea_tambien.url)+'" target="_blank" rel="noopener">'+esc(d.lea_tambien.titulo)+'</a></p>' : '<p class="lea" style="color:#8A887F">Lea también: agregue una nota relacionada de forbes.co.</p>');
+  const cx = (d.notas_contexto||[]).filter(Boolean);
+  $('sd-ctx').innerHTML = cx.length ? '<div class="lbl" style="margin-top:22px">Contexto que podría necesitar el lector colombiano</div><ul class="ctxlist">'+cx.map(x => '<li>'+esc(x)+'</li>').join('')+'</ul><p class="hint">Son sugerencias: el texto no las incluye. Agréguelas solo si aportan.</p>' : '';
+  const ch = d.checks || [], malos = ch.filter(c => !c.ok).length;
+  $('sd-cnt').textContent = malos || '✓'; $('sd-cnt').classList.toggle('bad', malos > 0);
+  $('sd-checks').innerHTML = ch.map(c => '<li class="'+(c.ok?'ok':'warn')+'"><span class="ic">'+(c.ok?'✓':'!')+'</span><div><div>'+esc(c.t)+'</div><div class="d">'+esc(c.d)+'</div></div></li>').join('');
+  $('sd-rev').textContent = (d.revisada ? 'El control automático encontró detalles y la nota pasó por una segunda revisión de la IA. ' : '') + 'Estos chequeos los hace el sistema; no reemplazan la lectura del redactor ni del editor de turno.';
+  const s = d.seo || {}, o = d.original || {};
+  const row = (l, v, c, mono) => '<div class="seo-row"><div class="lbl">'+l+'</div><div class="v'+(mono?' mono':'')+'"><span>'+esc(v||'—')+'</span>'+(c||'')+(v?'<button class="mini" type="button" data-copy="'+esc(v)+'">Copiar</button>':'')+'</div></div>';
+  const cnt = (n, a, b) => '<span class="c num" style="color:'+(n>=a&&n<=b?'var(--green)':'var(--amber)')+'">'+n+' · '+a+' a '+b+'</span>';
+  const ts = (s.titulo_seo||'').length, me = (s.meta||'').length;
+  $('sdp-cms').innerHTML = row('Titular', d.titular) + row('Sumario', d.bajada) + row('Categoría', d.categoria) +
+    row('Autor original', o.autor) + row('Crédito de foto', d.credito_foto) +
+    '<div class="seo-row"><div class="lbl">Imagen destacada</div><div class="v"><span>'+(o.imagen ? '<a href="'+esc(o.imagen)+'" target="_blank" rel="noopener" style="color:var(--red)">Abrir la imagen del original</a>' : 'Tomarla de la nota original')+'</span></div></div>' +
+    '<div class="lbl" style="margin:22px 0 10px">SEO</div>' +
+    row('Título SEO', s.titulo_seo, cnt(ts, 55, 65)) + row('Frase clave', s.keyphrase) + row('Slug', s.slug, '', true) + row('Meta descripción', s.meta, cnt(me, 150, 155));
+  $('sdp-cms').querySelectorAll('[data-copy]').forEach(b => b.addEventListener('click', () => copyStr(b.dataset.copy)));
+  sdTab('nota');
+  if(window.innerWidth <= 960) $('sd-res').scrollIntoView({behavior:'smooth'});
+}
+function copySD(modo){
+  const d = S.sdRes; if(!d) return;
+  if(modo === 'html') return copyStr(d.cms_html);
+  try{
+    const item = new ClipboardItem({'text/html':new Blob([d.cms_html],{type:'text/html'}), 'text/plain':new Blob([d.cms_html],{type:'text/plain'})});
+    navigator.clipboard.write([item]).then(() => toast('Copiado: el titular y el sumario van en sus campos del CMS'));
+  }catch(e){ copyStr(d.cms_html); }
+}
+function nuevaSD(silencioso){
+  S.sdRes = null; $('sd-res').hidden = true; $('sd-load').hidden = true; $('sd-how').hidden = false; $('sd-bmp').hidden = false; $('sd-msg').innerHTML = '';
+  if(silencioso === true) return;
+  S.sdIn = null; $('sd-url').value = ''; $('sd-purl').value = ''; $('sd-ptit').value = ''; $('sd-ed').innerHTML = ''; $('sd-pcnt').textContent = ''; $('sd-lea').value = ''; $('sd-not').value = '';
+  pintarRecv(); window.scrollTo({top:0, behavior:'smooth'});
+}
+function guardarSDHist(d){
+  try{ const h = JSON.parse(localStorage.getItem('th_sd_hist_'+S.pais)||'[]'); h.unshift({at:new Date().toISOString(), d}); localStorage.setItem('th_sd_hist_'+S.pais, JSON.stringify(h.slice(0,10))); }catch(e){}
+  renderSDHist();
+}
+function renderSDHist(){
+  let h = []; try{ h = JSON.parse(localStorage.getItem('th_sd_hist_'+S.pais)||'[]'); }catch(e){}
+  $('sd-hist-p').hidden = !h.length;
+  $('sd-hist').innerHTML = h.map((x,i) => '<button class="hist" type="button" onclick="verSDHist('+i+')"><div class="tt" style="font-size:15px">'+esc(x.d.titular)+'</div><div class="mm">'+new Date(x.at).toLocaleString('es-CO',{dateStyle:'medium',timeStyle:'short'})+' · '+esc(x.d.origen||'')+'</div></button>').join('');
+}
+function verSDHist(i){ let h = []; try{ h = JSON.parse(localStorage.getItem('th_sd_hist_'+S.pais)||'[]'); }catch(e){} if(!h[i]) return; S.sdRes = h[i].d; mostrarSD(); window.scrollTo({top:0, behavior:'smooth'}); }
+
 /* ========= Admin ========= */
-const COL = {nota:'#EE1E23', ajuste:'#F2B544', correccion:'#4CAF7D', checker:'#5B8DEF'};
-const TIPO = {nota:'Nota nueva', ajuste:'Ajuste', correccion:'Corrección', checker:'Revisión del Checker'};
+const COL = {nota:'#EE1E23', ajuste:'#F2B544', correccion:'#4CAF7D', checker:'#5B8DEF', sindicados:'#B58BE8'};
+const TIPO = {nota:'Nota nueva', ajuste:'Ajuste', correccion:'Corrección', checker:'Revisión del Checker', sindicados:'Sindicado'};
 async function cargarAdmin(forzar){
   if(S.adm && !forzar && Date.now() - S.adm.at < 120000){ pintarAdmin(); return; }
   $('adm-msg').innerHTML = ''; $('adm-when').textContent = 'Cargando…'; $('adm-refresh').disabled = true;
@@ -1376,7 +1679,7 @@ async function cargarAdmin(forzar){
 }
 function nombreEd(c){ const P = PAISES[String(c).toLowerCase()]; return P ? P.edicion : c; }
 const tsLima = f => { const t = Date.parse(String(f||'').replace(' ', 'T') + ':00-05:00'); return isNaN(t) ? null : t; };
-const tipoDe = r => r.herramienta === 'checker' ? 'checker' : r.modo === 'correccion' ? 'correccion' : r.modo === 'regenerar' ? 'ajuste' : 'nota';
+const tipoDe = r => r.herramienta === 'checker' ? 'checker' : r.herramienta === 'sindicados' ? 'sindicados' : r.modo === 'correccion' ? 'correccion' : r.modo === 'regenerar' ? 'ajuste' : 'nota';
 const numOr = v => (v === '' || v == null || isNaN(Number(v))) ? null : Number(v);
 const prom = a => { const v = a.filter(x => x != null); return v.length ? v.reduce((s,x)=>s+x,0)/v.length : null; };
 function pintarAdmin(){
@@ -1394,12 +1697,13 @@ function pintarAdmin(){
     ['Personas activas', fmtN(new Set(act.map(r => (r.persona||'').trim().toLowerCase()).filter(Boolean)).size), per, ''],
     ['Notas Brand Voice', fmtN(cnt('nota')), cnt('ajuste') ? 'más ' + fmtN(cnt('ajuste')) + (cnt('ajuste') === 1 ? ' ajuste' : ' ajustes') : 'sin ajustes', ''],
     ['Correcciones cargadas', fmtN(cnt('correccion')), 'enseñan al generador', ''],
-    ['Revisiones del Checker', fmtN(cnt('checker')), fmtN(act.filter(r=>r.t==='checker').reduce((s,r)=>s+(r.car||0),0)) + ' páginas', '']
+    ['Revisiones del Checker', fmtN(cnt('checker')), fmtN(act.filter(r=>r.t==='checker').reduce((s,r)=>s+(r.car||0),0)) + ' páginas', ''],
+    ['Sindicados', fmtN(cnt('sindicados')), act.filter(r=>r.t==='sindicados' && r.score === 0).length + ' sin observaciones', '']
   ];
   $('adm-kpis').innerHTML = kp.map(k => '<div class="kpi"><div class="k">'+k[0]+'</div><div class="v num">'+k[1]+'</div><div class="s '+k[3]+'">'+esc(k[2])+'</div></div>').join('');
   $('adm-lede').textContent = act.length
     ? (dias ? 'En los ' + per : 'Desde el inicio') + ' el Hub se usó ' + fmtN(act.length) + ' veces' + (pais ? ' en ' + nombreEd(pais) : '') + ', por ' + fmtN(new Set(act.map(r => (r.persona||'').trim().toLowerCase()).filter(Boolean)).size) + ' personas.'
-    : 'Todavía no hay usos registrados ' + (dias ? 'en los ' + per : '') + (pais ? ' en ' + nombreEd(pais) : '') + '. Aparecen en cuanto alguien genera una nota, carga una corrección o envía una revista al Checker.';
+    : 'Todavía no hay usos registrados ' + (dias ? 'en los ' + per : '') + (pais ? ' en ' + nombreEd(pais) : '') + '. Aparecen en cuanto alguien genera una nota, carga una corrección, envía una revista al Checker o traduce un sindicado.';
 
   // Brand Voice
   const bv = act.filter(r => r.t === 'nota' || r.t === 'ajuste'), co = act.filter(r => r.t === 'correccion');
@@ -1427,15 +1731,16 @@ function pintarAdmin(){
 
   // Personas
   const pm = new Map();
-  act.forEach(r => { const k = (r.persona||'(sin nombre)').trim(); const p = pm.get(k) || {persona:k, pais:r.pais, nota:0, ajuste:0, correccion:0, checker:0, total:0, ultimo:0, fecha:''}; p[r.t]++; p.total++; if(r.ts > p.ultimo){ p.ultimo = r.ts; p.fecha = r.fecha; } pm.set(k, p); });
+  act.forEach(r => { const k = (r.persona||'(sin nombre)').trim(); const p = pm.get(k) || {persona:k, pais:r.pais, nota:0, ajuste:0, correccion:0, checker:0, sindicados:0, total:0, ultimo:0, fecha:''}; p[r.t]++; p.total++; if(r.ts > p.ultimo){ p.ultimo = r.ts; p.fecha = r.fecha; } pm.set(k, p); });
   const pers = [...pm.values()].sort((a,b) => b.total - a.total || b.ultimo - a.ultimo);
-  $('adm-personas').innerHTML = pers.length ? '<table class="adm-table"><thead><tr><th>Persona</th><th>Edición</th><th class="n">Notas</th><th class="n">Ajustes</th><th class="n">Correcciones</th><th class="n">Checker</th><th class="n">Total</th><th>Último uso</th></tr></thead><tbody>'+
-    pers.map(p => '<tr><td>'+esc(p.persona)+'</td><td>'+esc(p.pais)+'</td><td class="n">'+p.nota+'</td><td class="n">'+p.ajuste+'</td><td class="n">'+p.correccion+'</td><td class="n">'+p.checker+'</td><td class="n"><b>'+p.total+'</b></td><td>'+esc(p.fecha)+'</td></tr>').join('')+'</tbody></table>'
+  $('adm-personas').innerHTML = pers.length ? '<table class="adm-table"><thead><tr><th>Persona</th><th>Edición</th><th class="n">Notas</th><th class="n">Ajustes</th><th class="n">Correcciones</th><th class="n">Checker</th><th class="n">Sindicados</th><th class="n">Total</th><th>Último uso</th></tr></thead><tbody>'+
+    pers.map(p => '<tr><td>'+esc(p.persona)+'</td><td>'+esc(p.pais)+'</td><td class="n">'+p.nota+'</td><td class="n">'+p.ajuste+'</td><td class="n">'+p.correccion+'</td><td class="n">'+p.checker+'</td><td class="n">'+p.sindicados+'</td><td class="n"><b>'+p.total+'</b></td><td>'+esc(p.fecha)+'</td></tr>').join('')+'</tbody></table>'
     : '<p class="adm-empty">Nadie usó el Hub en este período.</p>';
 
   // Recientes
   const rec = act.slice().sort((a,b) => b.ts - a.ts).slice(0, 30);
-  const res = r => r.t === 'checker' ? (r.score ?? '—') + ' observaciones · ' + (r.car ?? '—') + ' págs.' + (r.dentro_rango === 'incompleto' ? ' · incompleta' : '')
+  const res = r => r.t === 'sindicados' ? (r.tipo ? r.tipo + ' · ' : '') + (r.score ? r.score + (r.score === 1 ? ' observación' : ' observaciones') + ' del control' : 'sin observaciones del control')
+    : r.t === 'checker' ? (r.score ?? '—') + ' observaciones · ' + (r.car ?? '—') + ' págs.' + (r.dentro_rango === 'incompleto' ? ' · incompleta' : '')
     : r.t === 'correccion' ? (r.score == null ? 'Cargada como referencia' : 'Cambió un ' + r.score + ' %') + (r.formato ? ' · ' + r.formato : '')
     : 'Calidad ' + (r.score ?? '—') + '/100 · ' + (r.dentro_rango === 'sí' ? 'dentro de la extensión' : 'fuera de la extensión');
   $('adm-recientes').innerHTML = rec.length ? '<table class="adm-table"><thead><tr><th>Fecha</th><th>Qué</th><th>Quién</th><th>Cliente o edición</th><th>Resultado</th><th>Documento</th></tr></thead><tbody>'+
@@ -1446,9 +1751,9 @@ function dibujarSemanas(todos){
   const el = $('adm-chart'), D = 864e5, L = 5*36e5;
   const lunes = ts => { const d = new Date(ts - L); const dow = (d.getUTCDay()+6)%7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()-dow); };
   const hoy = lunes(Date.now()), sem = [];
-  for(let k = 11; k >= 0; k--){ const ini = hoy - k*7*D, d = new Date(ini); sem.push({ini, lab: String(d.getUTCDate()).padStart(2,'0')+'/'+String(d.getUTCMonth()+1).padStart(2,'0'), nota:0, ajuste:0, correccion:0, checker:0}); }
+  for(let k = 11; k >= 0; k--){ const ini = hoy - k*7*D, d = new Date(ini); sem.push({ini, lab: String(d.getUTCDate()).padStart(2,'0')+'/'+String(d.getUTCMonth()+1).padStart(2,'0'), nota:0, ajuste:0, correccion:0, checker:0, sindicados:0}); }
   todos.forEach(r => { const w = sem.find(s => s.ini === lunes(r.ts)); if(w) w[r.t]++; });
-  const keys = ['nota','ajuste','correccion','checker'], tot = s => keys.reduce((a,k)=>a+s[k],0), max = Math.max(1, ...sem.map(tot));
+  const keys = ['nota','ajuste','correccion','checker','sindicados'], tot = s => keys.reduce((a,k)=>a+s[k],0), max = Math.max(1, ...sem.map(tot));
   if(!sem.some(s => tot(s))){ el.innerHTML = '<p class="adm-empty">Todavía no hay usos registrados en las últimas 12 semanas.</p>'; return; }
   const W = Math.max(300, el.clientWidth || 700), H = 220, ml = 30, mb = 24, mt = 8, iw = W - ml - 6, bw = iw/12, ih = H - mb - mt;
   const top = Math.ceil(max / 4) * 4 || 4, y = v => mt + ih - v/top*ih;
