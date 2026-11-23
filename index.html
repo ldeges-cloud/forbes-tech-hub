@@ -332,7 +332,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
         <div class="eyebrow" id="bv-eyebrow"></div>
         <h1 class="h1" id="h-bv">Generador Brand Voice</h1>
       </div>
-      <div class="actions"><button class="btn" id="b-reset" onclick="resetForm()">Limpiar brief</button></div>
+      <div class="actions"><a class="btn" id="man-bv" href="#" target="_blank" rel="noopener" title="Manual de uso (Google Doc)">Manual de uso ↗</a><button class="btn" id="b-reset" onclick="resetForm()">Limpiar brief</button></div>
     </div>
     <div class="panes" role="tablist" aria-label="Secciones de Brand Voice">
       <button role="tab" data-pane="gen" aria-selected="true">Generar nota</button>
@@ -558,7 +558,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
   <!-- 404 -->
   <!-- CHECKER -->
   <section class="view" id="v-ck" aria-labelledby="h-ck">
-    <div class="tool-head"><div><div class="eyebrow" id="ck-eyebrow"></div><h1 class="h1" id="h-ck">Checker editorial</h1></div></div>
+    <div class="tool-head"><div><div class="eyebrow" id="ck-eyebrow"></div><h1 class="h1" id="h-ck">Checker editorial</h1></div><div class="actions"><a class="btn" id="man-ck" href="#" target="_blank" rel="noopener" title="Manual de uso (Google Doc)">Manual de uso ↗</a></div></div>
     <div class="layout">
       <form class="panel" id="form-ck" novalidate onsubmit="event.preventDefault();enviarCK()">
         <div class="ph"><span class="t">Revisión del PDF de la revista</span><span class="s">El reporte llega por correo</span></div>
@@ -638,6 +638,7 @@ const PAISES = {
        selloWeb:'Forbes Perú Advertorial - Contenido Patrocinado', cierreWeb:'Contenido auspiciado',
        selloPrint:'Forbes Brand Voice | Contenido Patrocinado',
        cifras:'US$10 millones (sin espacio) y S/ 45 millones; punto para miles y coma para decimales',
+       manual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit',
        urlBase:'forbes.pe/brand-voice/', idioma:'Español neutro, tercera persona, sin peruanismos coloquiales'},
   mx: {code:'MX', nombre:'México', edicion:'Forbes México', activo:false},
   co: {code:'CO', nombre:'Colombia', edicion:'Forbes Colombia', activo:false},
@@ -720,7 +721,8 @@ function renderPais(p){
     '<div><dt>Sitio</dt><dd>'+esc(P.dominio)+'</dd></div>'+
     '<div><dt>Sello web</dt><dd>'+esc(P.selloWeb)+'</dd></div>'+
     '<div><dt>Sello impreso</dt><dd>'+esc(P.selloPrint)+'</dd></div>'+
-    '<div><dt>Cifras y moneda</dt><dd>'+esc(P.cifras)+'</dd></div>';
+    '<div><dt>Cifras y moneda</dt><dd>'+esc(P.cifras)+'</dd></div>' +
+    (P.manual ? '<div><dt>Manual de uso</dt><dd><a href="'+P.manual+'" target="_blank" rel="noopener" style="color:var(--red)">Abrir el manual →</a></dd></div>' : '');
 }
 
 /* ========= Acceso ========= */
@@ -755,6 +757,7 @@ function rango(){
 function renderBV(){
   const P = PAISES[S.pais];
   $('bv-eyebrow').textContent = P.edicion + ' · Equipo comercial';
+  $('man-bv').href = P.manual || '#'; $('man-bv').hidden = !P.manual;
   $('f-email').placeholder = P.correo;
   syncForm(); renderCtx(); updateSteps();
   if(S.versions.length) showResult(); else { $('r-ctx').hidden=false; $('r-res').hidden=true; }
@@ -1214,6 +1217,7 @@ S.ckFile = null;
 function renderCK(){
   const P = PAISES[S.pais], hoy = new Date();
   $('ck-eyebrow').textContent = P.edicion + ' · Equipo editorial';
+  $('man-ck').href = P.manual || '#'; $('man-ck').hidden = !P.manual;
   $('ck-mail').placeholder = P.correo || 'nombre@forbes.pe';
   if(!$('ck-mes').options.length){
     $('ck-mes').innerHTML = MESES.map((m,i)=>'<option'+(i===hoy.getMonth()?' selected':'')+'>'+m+'</option>').join('');
