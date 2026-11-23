@@ -152,6 +152,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 
 /* Right column */
 .sticky{position:sticky;top:84px}
+.sticky > .panel:not([hidden]) ~ .panel:not([hidden]){margin-top:14px}
 .applied{padding:22px}
 .applied h3{font-family:var(--display);font-weight:400;font-size:20px;margin-bottom:4px}
 .applied .sub{font-size:13px;color:var(--ink-3);margin-bottom:16px}
@@ -555,10 +556,57 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
   </section>
 
   <!-- 404 -->
+  <!-- CHECKER -->
+  <section class="view" id="v-ck" aria-labelledby="h-ck">
+    <div class="tool-head"><div><div class="eyebrow" id="ck-eyebrow"></div><h1 class="h1" id="h-ck">Checker editorial</h1></div></div>
+    <div class="layout">
+      <form class="panel" id="form-ck" novalidate onsubmit="event.preventDefault();enviarCK()">
+        <div class="ph"><span class="t">Revisión del PDF de la revista</span><span class="s">El reporte llega por correo</span></div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">1</span><span class="step-t">PDF de la edición</span></div>
+          <div class="drop" id="ck-drop" tabindex="0" role="button" aria-label="Elegir el PDF"><input type="file" id="ck-file" accept="application/pdf,.pdf" hidden><div class="big" id="ck-name">Arrastre el PDF aquí o haga clic para elegirlo</div><div class="small">El PDF final de la revista, tal como va a imprenta</div></div>
+          <div class="ferr" id="ck-e1">Elija el PDF de la edición.</div>
+        </div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">2</span><span class="step-t">Datos de la edición</span></div>
+          <div class="row">
+            <div class="field"><label for="ck-mes">Mes <span class="req">*</span></label><select id="ck-mes"></select></div>
+            <div class="field"><label for="ck-anio">Año <span class="req">*</span></label><select id="ck-anio"></select></div>
+          </div>
+          <div class="row">
+            <div class="field"><label for="ck-nom">Editor <span class="req">*</span></label><input type="text" id="ck-nom" autocomplete="name" placeholder="Nombre y apellido"><div class="ferr" id="ck-e2">Indique quién pide la revisión.</div></div>
+            <div class="field"><label for="ck-mail">Correo <span class="req">*</span></label><input type="email" id="ck-mail" autocomplete="email" placeholder="nombre@forbes.pe"><div class="ferr" id="ck-e3">Revise el correo.</div></div>
+          </div>
+        </div>
+        <div class="pb" style="border-top:1px solid var(--line)">
+          <div id="ck-msg"></div>
+          <div id="ck-up" hidden style="margin-bottom:14px"><div class="hint" id="ck-up-t">Subiendo el PDF…</div><div class="bar"><i id="ck-bar"></i></div></div>
+          <button type="submit" class="btn primary big" id="bck">Enviar a revisión</button>
+          <div class="hint" style="text-align:center;margin-top:10px">Puede cerrar la página después de enviar: el reporte llega por correo.</div>
+        </div>
+      </form>
+      <div class="sticky">
+        <div class="panel" id="ck-ok" hidden><div class="pb" id="ck-ok-body"></div></div>
+        <div class="panel"><div class="how">
+          <h3>Qué revisa</h3>
+          <ul class="rules">
+            <li><span class="k">Detecta</span><span>Errores reales de ortografía, tipeo, gramática y nombres propios, con la página, el texto exacto y la corrección sugerida.</span></li>
+            <li><span class="k">No marca</span><span>Cortes de palabra al final de línea, folios, títulos o destacados que repiten el cuerpo, usos que acepta la RAE ni cuestiones de estilo.</span></li>
+            <li><span class="k">Cómo lee</span><span>Lee el PDF como una persona, columna por columna, en bloques de cuatro páginas.</span></li>
+            <li><span class="k">Entrega</span><span>Un reporte en Google Sheets, guardado en la carpeta de la edición, y un correo con el resumen por tipo de error.</span></li>
+            <li><span class="k">Tiempo</span><span>Según el tamaño de la revista, desde algunos minutos hasta tres horas.</span></li>
+          </ul>
+          <p class="hint" style="margin-top:14px">La IA puede equivocarse u omitir errores: verifique cada observación antes de corregir. Si alguna parte no se pudo revisar, el correo lo avisa y Lucas recibe una alerta.</p>
+        </div></div>
+        <div class="panel" id="ck-hist-p" hidden><div class="pb"><div class="lbl">Enviados desde este navegador</div><div id="ck-hist"></div></div></div>
+      </div>
+    </div>
+  </section>
+
   <section class="view" id="v-404"><div class="empty"><div class="ic">?</div><h3>No encontramos esa página</h3><p><a href="#/">Volver al inicio</a></p></div></section>
 </main>
 
-<div class="foot-note"><span>Forbes Tech Hub · v1.1 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
+<div class="foot-note"><span>Forbes Tech Hub · v1.2 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
 
 <!-- Acceso -->
 <div class="scrim" id="m-key" role="dialog" aria-modal="true" aria-labelledby="mk-t">
@@ -583,7 +631,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 'use strict';
 /* ========= Configuración ========= */
 const API = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-brandvoice';
-const VERSION = '1.1';
+const VERSION = '1.2';
 
 const PAISES = {
   pe: {code:'PE', nombre:'Perú', edicion:'Forbes Perú', activo:true, dominio:'forbes.pe', correo:'nombre@forbes.pe',
@@ -599,7 +647,7 @@ const PAISES = {
 };
 const TOOLS = [
   {id:'brand-voice', ic:'B', nombre:'Generador Brand Voice', desc:'Del brief del cliente a una nota patrocinada lista para revisión. Aprende del estilo de la edición con cada nota que corrigen los redactores.', equipo:'Comercial', activo:true},
-  {id:'checker', ic:'C', nombre:'Checker editorial', desc:'Revisión de PDF antes de imprenta: ortografía, cortes, cifras y consistencia.', equipo:'Editorial', activo:false},
+  {id:'checker', ic:'C', nombre:'Checker editorial', desc:'Revisión del PDF de la revista antes de imprenta: ortografía, tipeo, gramática y nombres propios. El reporte llega por correo.', equipo:'Editorial', activo:true},
   {id:'sindicados', ic:'S', nombre:'Sindicados', desc:'Traducción y adaptación de notas de Forbes US con el estilo de la edición.', equipo:'Editorial', activo:false},
   {id:'pre-diseno', ic:'P', nombre:'Checker pre-diseño', desc:'Revisión del texto en Google Docs antes de pasar a diseño, con comentarios en el documento.', equipo:'Editorial', activo:false}
 ];
@@ -640,6 +688,7 @@ function route(){
   $('chip-pais').hidden = false; $('chip-txt').textContent = P.edicion;
   if(!tool){ renderPais(p); return show('v-pais', [[P.nombre]]); }
   if(tool === 'brand-voice'){ renderBV(); return show('v-bv', [[P.nombre,'#/'+p],['Brand Voice']]); }
+  if(tool === 'checker'){ renderCK(); return show('v-ck', [[P.nombre,'#/'+p],['Checker editorial']]); }
   show('v-404', []);
 }
 function show(id, crumbs){
@@ -657,7 +706,7 @@ function renderHome(){
     '<button class="pais" '+(P.activo?'onclick="location.hash=\'#/'+k+'\'"':'disabled')+'>'+
     '<span class="tag '+(P.activo?'live':'')+'">'+(P.activo?'Disponible':'Próximamente')+'</span>'+
     '<span class="code">'+P.code+'</span><span class="name">'+esc(P.nombre)+'</span>'+
-    '<span class="meta">'+(P.activo?'1 herramienta activa':'En preparación')+'</span></button>').join('');
+    '<span class="meta">'+(P.activo?TOOLS.filter(t=>t.activo).length+' herramientas activas':'En preparación')+'</span></button>').join('');
 }
 function renderPais(p){
   const P = PAISES[p];
@@ -1157,6 +1206,76 @@ function mostrarAprendizaje(d){
   $('fx-res').hidden = false;
 }
 function otraCorreccion(){ $('fx-res').hidden = true; $('fx-how').hidden = false; window.scrollTo({top:0, behavior:'smooth'}); }
+
+/* ========= Checker editorial ========= */
+const API_CK = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-checker';
+const MESES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+S.ckFile = null;
+function renderCK(){
+  const P = PAISES[S.pais], hoy = new Date();
+  $('ck-eyebrow').textContent = P.edicion + ' · Equipo editorial';
+  $('ck-mail').placeholder = P.correo || 'nombre@forbes.pe';
+  if(!$('ck-mes').options.length){
+    $('ck-mes').innerHTML = MESES.map((m,i)=>'<option'+(i===hoy.getMonth()?' selected':'')+'>'+m+'</option>').join('');
+    const y = hoy.getFullYear(); $('ck-anio').innerHTML = [y-1,y,y+1].map(a=>'<option'+(a===y?' selected':'')+'>'+a+'</option>').join('');
+  }
+  try{ const w = JSON.parse(localStorage.getItem('th_ck_who')||'null'); if(w){ if(!$('ck-nom').value) $('ck-nom').value = w.nom||''; if(!$('ck-mail').value) $('ck-mail').value = w.mail||''; } }catch(e){}
+  renderCKHist();
+}
+const ckDrop = $('ck-drop');
+ckDrop.addEventListener('click', () => $('ck-file').click());
+ckDrop.addEventListener('keydown', e => { if(e.key==='Enter'||e.key===' '){ e.preventDefault(); $('ck-file').click(); } });
+ckDrop.addEventListener('dragover', e => { e.preventDefault(); ckDrop.classList.add('over'); });
+ckDrop.addEventListener('dragleave', () => ckDrop.classList.remove('over'));
+ckDrop.addEventListener('drop', e => { e.preventDefault(); ckDrop.classList.remove('over'); if(e.dataTransfer.files[0]) setCKFile(e.dataTransfer.files[0]); });
+$('ck-file').addEventListener('change', e => { if(e.target.files[0]) setCKFile(e.target.files[0]); e.target.value=''; });
+function setCKFile(f){
+  if(!/\.pdf$/i.test(f.name) && f.type !== 'application/pdf'){ toast('Elija un archivo PDF'); return; }
+  S.ckFile = f; $('ck-name').textContent = '📄 ' + f.name + ' · ' + (f.size/1048576).toFixed(1).replace('.',',') + ' MB';
+  $('ck-e1').classList.remove('on'); ckDrop.classList.remove('err-in');
+}
+function enviarCK(){
+  if(S.ckBusy) return;
+  const nom = $('ck-nom').value.trim(), mail = $('ck-mail').value.trim();
+  const e1 = !S.ckFile, e2 = !nom, e3 = !validEmail(mail);
+  $('ck-e1').classList.toggle('on', e1); ckDrop.classList.toggle('err-in', e1);
+  $('ck-e2').classList.toggle('on', e2); $('ck-nom').classList.toggle('err-in', e2);
+  $('ck-e3').classList.toggle('on', e3); $('ck-mail').classList.toggle('err-in', e3);
+  if(e1||e2||e3) return;
+  localStorage.setItem('th_ck_who', JSON.stringify({nom, mail}));
+  const fd = new FormData();
+  fd.append('pais', S.pais.toUpperCase()); fd.append('clave', keyOf(S.pais));
+  fd.append('editor_nombre', nom); fd.append('editor_email', mail);
+  fd.append('mes_edicion', $('ck-mes').value); fd.append('anio_edicion', $('ck-anio').value);
+  fd.append('pdf', S.ckFile, S.ckFile.name);
+  S.ckBusy = true; $('bck').disabled = true; $('ck-msg').innerHTML = ''; $('ck-up').hidden = false; $('ck-bar').style.width = '0';
+  const xhr = new XMLHttpRequest();
+  xhr.open('POST', API_CK);
+  xhr.upload.onprogress = e => { if(e.lengthComputable){ const p = Math.round(e.loaded/e.total*100); $('ck-bar').style.width = p+'%'; $('ck-up-t').textContent = p < 100 ? 'Subiendo el PDF… '+p+'%' : 'PDF subido. Confirmando…'; } };
+  const fin = (ok, msg, d) => {
+    S.ckBusy = false; $('bck').disabled = false; $('ck-up').hidden = true;
+    if(!ok){ $('ck-msg').innerHTML = '<div class="notice err" role="alert">'+esc(msg)+'</div>'; return; }
+    const reg = {at:new Date().toISOString(), archivo:d.archivo, mes:d.mes, anio:d.anio, email:d.email};
+    try{ const h = JSON.parse(localStorage.getItem('th_ck_hist_'+S.pais)||'[]'); h.unshift(reg); localStorage.setItem('th_ck_hist_'+S.pais, JSON.stringify(h.slice(0,10))); }catch(e){}
+    $('ck-ok-body').innerHTML = '<div class="eyebrow">PDF recibido</div><h3 style="font-family:var(--display);font-weight:400;font-size:22px;margin-bottom:8px">'+esc(d.edicion)+' · '+esc(d.mes)+' '+esc(d.anio)+'</h3><p style="margin:0 0 6px;color:var(--ink-2)">'+esc(d.archivo)+'</p><p class="hint" style="margin:0">La revisión ya empezó. El reporte llega a <b>'+esc(d.email)+'</b>; según el tamaño de la revista, puede tardar hasta tres horas. También recibirá un acuse de recibo en unos minutos.</p>';
+    $('ck-ok').hidden = false; S.ckFile = null; $('ck-name').textContent = 'Arrastre el PDF aquí o haga clic para elegirlo';
+    renderCKHist(); toast('PDF enviado a revisión');
+  };
+  xhr.onload = () => {
+    let d = null; try{ d = JSON.parse(xhr.responseText); }catch(e){}
+    if(xhr.status === 401){ localStorage.removeItem('th_key_'+S.pais); fin(false, 'Su clave ya no es válida. Vuelva a ingresarla.'); openKey(S.pais); return; }
+    if(xhr.status === 413) return fin(false, 'El PDF es demasiado pesado para subirlo. Exporte una versión comprimida (calidad para pantalla) e intente de nuevo.');
+    if(xhr.status !== 200 || !d || d.status !== 'recibido') return fin(false, (d && d.message) || 'No se pudo enviar el PDF (código '+xhr.status+').');
+    fin(true, '', d);
+  };
+  xhr.onerror = () => fin(false, 'Se cortó la conexión mientras se subía el PDF. Intente de nuevo.');
+  xhr.send(fd);
+}
+function renderCKHist(){
+  let h = []; try{ h = JSON.parse(localStorage.getItem('th_ck_hist_'+S.pais)||'[]'); }catch(e){}
+  $('ck-hist-p').hidden = !h.length;
+  $('ck-hist').innerHTML = h.map(x => '<div class="hist" style="cursor:default"><div class="tt" style="font-size:15px">'+esc(x.mes+' '+x.anio)+' · '+esc(x.archivo)+'</div><div class="mm">'+new Date(x.at).toLocaleString('es-PE',{dateStyle:'medium',timeStyle:'short'})+' · reporte a '+esc(x.email)+'</div></div>').join('');
+}
 
 /* ========= Historial ========= */
 function histKey(){ return 'th_hist_'+S.pais; }
