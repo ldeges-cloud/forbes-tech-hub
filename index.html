@@ -261,6 +261,39 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .lesson{border:1px solid var(--line);border-radius:11px;padding:14px 16px;margin-bottom:10px;background:var(--field)}
 .lesson .k{font-size:10px;letter-spacing:1.4px;text-transform:uppercase;color:var(--ink-4);margin-bottom:6px}
 .guia{white-space:pre-wrap;font-size:13px;line-height:1.6;color:var(--ink-2);max-height:420px;overflow:auto;padding:14px 16px;border:1px solid var(--line);border-radius:11px;background:var(--field)}
+.pais-admin{border-style:dashed}
+.adm-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:18px 0 22px}
+.adm-bar select{width:auto;min-width:150px}
+.adm-bar .hint{margin:0}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:18px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px}
+.kpi .k{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-3)}
+.kpi .v{font-family:var(--display);font-size:34px;line-height:1.1;margin-top:6px}
+.kpi .s{font-size:12px;color:var(--ink-3);margin-top:6px}
+.kpi .s.up{color:var(--green)} .kpi .s.down{color:var(--amber)}
+.adm-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin-bottom:18px}
+.adm-card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px 20px;margin-bottom:14px}
+.adm-card h2{font-family:var(--display);font-weight:400;font-size:21px;margin:0 0 2px}
+.adm-card .sub{font-size:12px;color:var(--ink-3);margin:0 0 12px}
+.adm-stat{display:flex;justify-content:space-between;gap:12px;padding:9px 0;border-bottom:1px solid var(--line);font-size:14px}
+.adm-stat:last-child{border-bottom:0}
+.adm-stat span:first-child{color:var(--ink-3)}
+.adm-stat b{font-weight:600;font-variant-numeric:tabular-nums}
+.adm-chart{position:relative;min-height:230px}
+.adm-legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--ink-3);margin:2px 0 8px}
+.adm-legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.adm-tip{position:absolute;pointer-events:none;background:#1C1C1A;border:1px solid var(--line-2);border-radius:8px;padding:7px 9px;font-size:12px;white-space:nowrap;z-index:3}
+.adm-table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.adm-table th{text-align:left;font-size:11px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-3);font-weight:600;padding:7px 8px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+.adm-table td{padding:8px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-2)}
+.adm-table .n{text-align:right}
+.adm-table a{color:var(--red)}
+.adm-wrap{overflow-x:auto}
+.adm-empty{color:var(--ink-3);font-size:14px;padding:16px 0}
+.mem{border:1px solid var(--line);border-radius:11px;padding:14px 16px;background:var(--field);margin-bottom:10px}
+.mem-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.mem-h b{font-family:var(--display);font-weight:400;font-size:19px}
+.mem .guia{margin-top:10px}
 .empty{padding:56px 30px;text-align:center}
 .empty .ic{width:56px;height:56px;margin:0 auto 14px;border-radius:14px;border:1px solid var(--line);display:grid;place-items:center;font-family:var(--display);font-size:24px;color:var(--red)}
 .empty h3{font-family:var(--display);font-weight:400;font-size:22px}
@@ -555,6 +588,33 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
     </div>
   </section>
 
+  <!-- ADMIN -->
+  <section class="view" id="v-adm" aria-labelledby="h-adm">
+    <div class="eyebrow">Forbes Tech Hub · Admin</div>
+    <h1 class="h1" id="h-adm">Uso de las herramientas</h1>
+    <p class="lede" id="adm-lede">Cuánto se usa el Hub, quién lo usa y cuánto aprendió cada edición.</p>
+    <div class="adm-bar">
+      <select id="adm-dias" aria-label="Período"><option value="7">Últimos 7 días</option><option value="30" selected>Últimos 30 días</option><option value="90">Últimos 90 días</option><option value="0">Desde el inicio</option></select>
+      <select id="adm-pais" aria-label="Edición"><option value="">Todas las ediciones</option></select>
+      <button class="btn" id="adm-refresh" onclick="cargarAdmin(true)">Actualizar</button>
+      <span class="hint" id="adm-when"></span>
+    </div>
+    <div id="adm-msg"></div>
+    <div class="kpis" id="adm-kpis"></div>
+    <div class="adm-card" id="adm-semanas-card">
+      <h2>Usos por semana</h2><p class="sub">Últimas 12 semanas, de lunes a domingo (hora de Lima)</p>
+      <div class="adm-legend"><span><i style="background:#EE1E23"></i>Notas nuevas</span><span><i style="background:#F2B544"></i>Ajustes</span><span><i style="background:#4CAF7D"></i>Correcciones</span><span><i style="background:#5B8DEF"></i>Revisiones del Checker</span></div>
+      <div class="adm-chart" id="adm-chart"></div>
+    </div>
+    <div class="adm-grid">
+      <div class="adm-card" style="margin:0"><h2>Brand Voice · calidad</h2><p class="sub">Notas nuevas y ajustes del período</p><div id="adm-bv"></div></div>
+      <div class="adm-card" style="margin:0"><h2>Checker · resultados</h2><p class="sub">Revisiones del período</p><div id="adm-ck"></div></div>
+    </div>
+    <div class="adm-card"><h2>Memoria de cada edición</h2><p class="sub">Guía de estilo vigente y notas que usa el generador como modelo</p><div id="adm-mem"></div></div>
+    <div class="adm-card"><h2>Quién lo usa</h2><p class="sub">Del período elegido, de más a menos usos</p><div class="adm-wrap" id="adm-personas"></div></div>
+    <div class="adm-card"><h2>Últimos usos</h2><p class="sub">Los 30 más recientes del período</p><div class="adm-wrap" id="adm-recientes"></div></div>
+  </section>
+
   <!-- 404 -->
   <!-- CHECKER -->
   <section class="view" id="v-ck" aria-labelledby="h-ck">
@@ -606,7 +666,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
   <section class="view" id="v-404"><div class="empty"><div class="ic">?</div><h3>No encontramos esa página</h3><p><a href="#/">Volver al inicio</a></p></div></section>
 </main>
 
-<div class="foot-note"><span>Forbes Tech Hub · v1.2 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
+<div class="foot-note"><span>Forbes Tech Hub · v1.3 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
 
 <!-- Acceso -->
 <div class="scrim" id="m-key" role="dialog" aria-modal="true" aria-labelledby="mk-t">
@@ -631,7 +691,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 'use strict';
 /* ========= Configuración ========= */
 const API = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-brandvoice';
-const VERSION = '1.2';
+const API_ADM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-admin';
+const VERSION = '1.3';
 
 const PAISES = {
   pe: {code:'PE', nombre:'Perú', edicion:'Forbes Perú', activo:true, dominio:'forbes.pe', correo:'nombre@forbes.pe',
@@ -681,6 +742,11 @@ function route(){
   closeHist();
   const [p, tool] = parts;
   if(!p){ renderHome(); return show('v-home', []); }
+  if(p === 'admin'){
+    if(!keyOf('admin')){ S.pendingRoute = location.hash; openKey('admin'); if(!S.pais){ renderHome(); show('v-home', []); } return; }
+    S.pais = null; $('chip-pais').hidden = true;
+    show('v-adm', [['Admin']]); cargarAdmin(false); return;
+  }
   const P = PAISES[p];
   if(!P || !P.activo) return show('v-404', []);
   if(!keyOf(p)){ S.pendingRoute = location.hash; openKey(p); if(!S.pais) { renderHome(); show('v-home', []); } return; }
@@ -707,7 +773,8 @@ function renderHome(){
     '<button class="pais" '+(P.activo?'onclick="location.hash=\'#/'+k+'\'"':'disabled')+'>'+
     '<span class="tag '+(P.activo?'live':'')+'">'+(P.activo?'Disponible':'Próximamente')+'</span>'+
     '<span class="code">'+P.code+'</span><span class="name">'+esc(P.nombre)+'</span>'+
-    '<span class="meta">'+(P.activo?TOOLS.filter(t=>t.activo).length+' herramientas activas':'En preparación')+'</span></button>').join('');
+    '<span class="meta">'+(P.activo?TOOLS.filter(t=>t.activo).length+' herramientas activas':'En preparación')+'</span></button>').join('') +
+    '<button class="pais pais-admin" onclick="location.hash=\'#/admin\'"><span class="tag gold">Restringido</span><span class="code">AD</span><span class="name">Admin</span><span class="meta">Uso de las herramientas y memoria de cada edición</span></button>';
 }
 function renderPais(p){
   const P = PAISES[p];
@@ -726,22 +793,26 @@ function renderPais(p){
 }
 
 /* ========= Acceso ========= */
-function openKey(p){ S.keyPais = p; $('mk-e').textContent = PAISES[p].edicion; $('f-key').value=''; $('e-key').classList.remove('on'); $('m-key').classList.add('on'); setTimeout(()=>$('f-key').focus(),50); }
+function openKey(p){ S.keyPais = p; $('mk-e').textContent = p === 'admin' ? 'Admin · Forbes Tech Hub' : PAISES[p].edicion; $('f-key').value=''; $('e-key').classList.remove('on'); $('m-key').classList.add('on'); setTimeout(()=>$('f-key').focus(),50); }
 function closeKey(){ $('m-key').classList.remove('on'); if(!S.pais) location.hash = '#/'; }
 async function submitKey(){
   const k = $('f-key').value.trim(), p = S.keyPais, b = $('bkey');
   if(!k){ $('e-key').textContent='Ingrese la clave.'; $('e-key').classList.add('on'); return; }
   b.disabled = true; b.textContent = 'Verificando…';
   try{
-    const r = await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', pais:p.toUpperCase(), clave:k})});
+    const r = p === 'admin'
+      ? await fetch(API_ADM, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', clave:k})})
+      : await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', pais:p.toUpperCase(), clave:k})});
     if(r.status === 401 || r.status === 403){ throw new Error('clave'); }
     const d = await r.json().catch(()=>({}));
     if(d.status !== 'ok') throw new Error(d.message || 'clave');
     localStorage.setItem('th_key_'+p, k);
+    // La clave de administración también abre todas las ediciones activas
+    if(p === 'admin') Object.keys(PAISES).forEach(c => { if(PAISES[c].activo && !keyOf(c)) localStorage.setItem('th_key_'+c, k); });
     $('m-key').classList.remove('on');
     location.hash = S.pendingRoute || '#/'+p; route();
   }catch(e){
-    $('e-key').textContent = e.message === 'clave' ? 'La clave no es correcta para esta edición.' : 'No se pudo verificar la clave. Revise su conexión e intente de nuevo.';
+    $('e-key').textContent = e.message === 'clave' ? (p === 'admin' ? 'Esa no es la clave de administración.' : 'La clave no es correcta para esta edición.') : 'No se pudo verificar la clave. Revise su conexión e intente de nuevo.';
     if(e instanceof TypeError) $('e-key').textContent = 'No hay conexión con el servidor del Hub. Intente en unos minutos.';
     $('e-key').classList.add('on');
   }finally{ b.disabled=false; b.textContent='Entrar'; }
@@ -1280,6 +1351,126 @@ function renderCKHist(){
   $('ck-hist-p').hidden = !h.length;
   $('ck-hist').innerHTML = h.map(x => '<div class="hist" style="cursor:default"><div class="tt" style="font-size:15px">'+esc(x.mes+' '+x.anio)+' · '+esc(x.archivo)+'</div><div class="mm">'+new Date(x.at).toLocaleString('es-PE',{dateStyle:'medium',timeStyle:'short'})+' · reporte a '+esc(x.email)+'</div></div>').join('');
 }
+
+/* ========= Admin ========= */
+const COL = {nota:'#EE1E23', ajuste:'#F2B544', correccion:'#4CAF7D', checker:'#5B8DEF'};
+const TIPO = {nota:'Nota nueva', ajuste:'Ajuste', correccion:'Corrección', checker:'Revisión del Checker'};
+async function cargarAdmin(forzar){
+  if(S.adm && !forzar && Date.now() - S.adm.at < 120000){ pintarAdmin(); return; }
+  $('adm-msg').innerHTML = ''; $('adm-when').textContent = 'Cargando…'; $('adm-refresh').disabled = true;
+  try{
+    const r = await fetch(API_ADM, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({clave:keyOf('admin')})});
+    if(r.status === 401){ localStorage.removeItem('th_key_admin'); S.pendingRoute = '#/admin'; openKey('admin'); return; }
+    const d = await r.json();
+    if(d.status !== 'ok') throw new Error(d.message || 'Respuesta inesperada');
+    S.adm = {at: Date.now(), data: d};
+    const ps = [...new Set(d.registro.map(x => x.pais).concat(d.memoria.map(m => m.pais)).filter(Boolean))].sort();
+    const sel = $('adm-pais'), cur = sel.value;
+    sel.innerHTML = '<option value="">Todas las ediciones</option>' + ps.map(c => '<option value="'+esc(c)+'">'+esc(nombreEd(c))+'</option>').join('');
+    sel.value = ps.includes(cur) ? cur : '';
+    pintarAdmin();
+  }catch(e){
+    $('adm-msg').innerHTML = '<div class="notice err" role="alert">No se pudieron cargar los datos de uso. '+esc(e instanceof TypeError ? 'Revise su conexión.' : e.message)+'</div>';
+    $('adm-when').textContent = '';
+  }finally{ $('adm-refresh').disabled = false; }
+}
+function nombreEd(c){ const P = PAISES[String(c).toLowerCase()]; return P ? P.edicion : c; }
+const tsLima = f => { const t = Date.parse(String(f||'').replace(' ', 'T') + ':00-05:00'); return isNaN(t) ? null : t; };
+const tipoDe = r => r.herramienta === 'checker' ? 'checker' : r.modo === 'correccion' ? 'correccion' : r.modo === 'regenerar' ? 'ajuste' : 'nota';
+const numOr = v => (v === '' || v == null || isNaN(Number(v))) ? null : Number(v);
+const prom = a => { const v = a.filter(x => x != null); return v.length ? v.reduce((s,x)=>s+x,0)/v.length : null; };
+function pintarAdmin(){
+  const d = S.adm.data, dias = Number($('adm-dias').value), pais = $('adm-pais').value, now = Date.now(), D = 864e5;
+  $('adm-when').textContent = 'Actualizado ' + new Date(S.adm.at).toLocaleTimeString('es-PE', {hour:'2-digit', minute:'2-digit'});
+  const todos = d.registro.map((r,i) => Object.assign({}, r, {i, ts: tsLima(r.fecha), t: tipoDe(r), score: numOr(r.score), car: numOr(r.caracteres), dur: numOr(r.duracion_s)})).filter(r => r.ts != null && (!pais || r.pais === pais));
+  const enPer = (r, desde, hasta) => r.ts > desde && r.ts <= hasta;
+  const act = dias ? todos.filter(r => enPer(r, now - dias*D, now)) : todos;
+  const prev = dias ? todos.filter(r => enPer(r, now - 2*dias*D, now - dias*D)) : [];
+  const per = dias ? 'últimos ' + dias + ' días' : 'desde el inicio';
+  const cnt = t => act.filter(r => r.t === t).length;
+  const delta = dias ? (act.length - prev.length) : null;
+  const kp = [
+    ['Usos', fmtN(act.length), delta == null ? per : (delta > 0 ? '+' : '') + fmtN(delta) + ' frente al período anterior', delta > 0 ? 'up' : delta < 0 ? 'down' : ''],
+    ['Personas activas', fmtN(new Set(act.map(r => (r.persona||'').trim().toLowerCase()).filter(Boolean)).size), per, ''],
+    ['Notas Brand Voice', fmtN(cnt('nota')), cnt('ajuste') ? 'más ' + fmtN(cnt('ajuste')) + (cnt('ajuste') === 1 ? ' ajuste' : ' ajustes') : 'sin ajustes', ''],
+    ['Correcciones cargadas', fmtN(cnt('correccion')), 'enseñan al generador', ''],
+    ['Revisiones del Checker', fmtN(cnt('checker')), fmtN(act.filter(r=>r.t==='checker').reduce((s,r)=>s+(r.car||0),0)) + ' páginas', '']
+  ];
+  $('adm-kpis').innerHTML = kp.map(k => '<div class="kpi"><div class="k">'+k[0]+'</div><div class="v num">'+k[1]+'</div><div class="s '+k[3]+'">'+esc(k[2])+'</div></div>').join('');
+  $('adm-lede').textContent = act.length
+    ? (dias ? 'En los ' + per : 'Desde el inicio') + ' el Hub se usó ' + fmtN(act.length) + ' veces' + (pais ? ' en ' + nombreEd(pais) : '') + ', por ' + fmtN(new Set(act.map(r => (r.persona||'').trim().toLowerCase()).filter(Boolean)).size) + ' personas.'
+    : 'Todavía no hay usos registrados ' + (dias ? 'en los ' + per : '') + (pais ? ' en ' + nombreEd(pais) : '') + '. Aparecen en cuanto alguien genera una nota, carga una corrección o envía una revista al Checker.';
+
+  // Brand Voice
+  const bv = act.filter(r => r.t === 'nota' || r.t === 'ajuste'), co = act.filter(r => r.t === 'correccion');
+  const pctR = bv.length ? Math.round(bv.filter(r => r.dentro_rango === 'sí').length / bv.length * 100) + ' %' : '—';
+  const cal = prom(bv.map(r => r.score)), dur = prom(bv.map(r => r.dur)), cam = prom(co.map(r => r.score));
+  const stat = (a, b) => '<div class="adm-stat"><span>'+a+'</span><b>'+b+'</b></div>';
+  $('adm-bv').innerHTML = stat('Dentro de la extensión pedida', pctR) + stat('Calidad promedio según el editor IA (0 a 100)', cal == null ? '—' : Math.round(cal)) +
+    stat('Tiempo promedio por nota', dur == null ? '—' : (Math.round(dur/6)/10).toString().replace('.', ',') + ' min') +
+    stat('Cuánto cambian los redactores la nota de la IA (menos es mejor)', cam == null ? '—' : Math.round(cam) + ' %');
+  const ck = act.filter(r => r.t === 'checker');
+  $('adm-ck').innerHTML = stat('Revisiones', fmtN(ck.length)) + stat('Observaciones encontradas', fmtN(ck.reduce((s,r)=>s+(r.score||0),0))) +
+    stat('Páginas revisadas', fmtN(ck.reduce((s,r)=>s+(r.car||0),0))) + stat('Revisiones incompletas', fmtN(ck.filter(r => r.dentro_rango === 'incompleto').length));
+
+  // Semanas
+  dibujarSemanas(todos);
+
+  // Memoria
+  const mem = d.memoria.filter(m => !pais || m.pais === pais);
+  $('adm-mem').innerHTML = mem.length ? mem.map(m => '<div class="mem"><div class="mem-h"><b>'+esc(nombreEd(m.pais))+'</b><span class="tag gold">Guía v'+esc(m.guia_version)+'</span></div>'+
+    '<div class="adm-stat"><span>Notas de referencia</span><b>'+fmtN(m.referencias)+'</b></div>'+
+    '<div class="adm-stat"><span>De ellas, corregidas por redactores</span><b>'+fmtN(m.corregidas)+'</b></div>'+
+    '<div class="adm-stat"><span>Última corrección cargada</span><b>'+(m.ultima_correccion ? new Date(m.ultima_correccion).toLocaleDateString('es-PE',{dateStyle:'medium'}) : 'Ninguna todavía')+'</b></div>'+
+    (m.guia ? '<details class="guia"><summary class="more" style="cursor:pointer">Ver la guía de estilo vigente</summary><div class="guia" style="white-space:pre-wrap;font-size:13px;color:var(--ink-2);margin-top:8px">'+esc(m.guia)+'</div></details>' : '')+'</div>').join('')
+    : '<p class="adm-empty">Ninguna edición tiene memoria cargada.</p>';
+
+  // Personas
+  const pm = new Map();
+  act.forEach(r => { const k = (r.persona||'(sin nombre)').trim(); const p = pm.get(k) || {persona:k, pais:r.pais, nota:0, ajuste:0, correccion:0, checker:0, total:0, ultimo:0, fecha:''}; p[r.t]++; p.total++; if(r.ts > p.ultimo){ p.ultimo = r.ts; p.fecha = r.fecha; } pm.set(k, p); });
+  const pers = [...pm.values()].sort((a,b) => b.total - a.total || b.ultimo - a.ultimo);
+  $('adm-personas').innerHTML = pers.length ? '<table class="adm-table"><thead><tr><th>Persona</th><th>Edición</th><th class="n">Notas</th><th class="n">Ajustes</th><th class="n">Correcciones</th><th class="n">Checker</th><th class="n">Total</th><th>Último uso</th></tr></thead><tbody>'+
+    pers.map(p => '<tr><td>'+esc(p.persona)+'</td><td>'+esc(p.pais)+'</td><td class="n">'+p.nota+'</td><td class="n">'+p.ajuste+'</td><td class="n">'+p.correccion+'</td><td class="n">'+p.checker+'</td><td class="n"><b>'+p.total+'</b></td><td>'+esc(p.fecha)+'</td></tr>').join('')+'</tbody></table>'
+    : '<p class="adm-empty">Nadie usó el Hub en este período.</p>';
+
+  // Recientes
+  const rec = act.slice().sort((a,b) => b.ts - a.ts).slice(0, 30);
+  const res = r => r.t === 'checker' ? (r.score ?? '—') + ' observaciones · ' + (r.car ?? '—') + ' págs.' + (r.dentro_rango === 'incompleto' ? ' · incompleta' : '')
+    : r.t === 'correccion' ? (r.score == null ? 'Cargada como referencia' : 'Cambió un ' + r.score + ' %') + (r.formato ? ' · ' + r.formato : '')
+    : 'Calidad ' + (r.score ?? '—') + '/100 · ' + (r.dentro_rango === 'sí' ? 'dentro de la extensión' : 'fuera de la extensión');
+  $('adm-recientes').innerHTML = rec.length ? '<table class="adm-table"><thead><tr><th>Fecha</th><th>Qué</th><th>Quién</th><th>Cliente o edición</th><th>Resultado</th><th>Documento</th></tr></thead><tbody>'+
+    rec.map(r => '<tr><td>'+esc(r.fecha)+'</td><td><span style="color:'+COL[r.t]+'">●</span> '+esc(TIPO[r.t])+'</td><td>'+esc(r.persona)+'</td><td>'+esc(r.cliente)+'</td><td>'+esc(res(r))+'</td><td>'+(/^https:\/\//.test(r.doc_url||'') ? '<a href="'+esc(r.doc_url)+'" target="_blank" rel="noopener">Abrir</a>' : '—')+'</td></tr>').join('')+'</tbody></table>'
+    : '<p class="adm-empty">Sin usos en este período.</p>';
+}
+function dibujarSemanas(todos){
+  const el = $('adm-chart'), D = 864e5, L = 5*36e5;
+  const lunes = ts => { const d = new Date(ts - L); const dow = (d.getUTCDay()+6)%7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()-dow); };
+  const hoy = lunes(Date.now()), sem = [];
+  for(let k = 11; k >= 0; k--){ const ini = hoy - k*7*D, d = new Date(ini); sem.push({ini, lab: String(d.getUTCDate()).padStart(2,'0')+'/'+String(d.getUTCMonth()+1).padStart(2,'0'), nota:0, ajuste:0, correccion:0, checker:0}); }
+  todos.forEach(r => { const w = sem.find(s => s.ini === lunes(r.ts)); if(w) w[r.t]++; });
+  const keys = ['nota','ajuste','correccion','checker'], tot = s => keys.reduce((a,k)=>a+s[k],0), max = Math.max(1, ...sem.map(tot));
+  if(!sem.some(s => tot(s))){ el.innerHTML = '<p class="adm-empty">Todavía no hay usos registrados en las últimas 12 semanas.</p>'; return; }
+  const W = Math.max(300, el.clientWidth || 700), H = 220, ml = 30, mb = 24, mt = 8, iw = W - ml - 6, bw = iw/12, ih = H - mb - mt;
+  const top = Math.ceil(max / 4) * 4 || 4, y = v => mt + ih - v/top*ih;
+  let svg = '<svg width="100%" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="Usos por semana y por tipo, últimas 12 semanas">';
+  for(let g = 0; g <= 4; g++){ const v = top*g/4, yy = y(v); svg += '<line x1="'+ml+'" x2="'+(W-6)+'" y1="'+yy+'" y2="'+yy+'" stroke="#232321"/><text x="'+(ml-6)+'" y="'+(yy+4)+'" fill="#8A887F" font-size="11" text-anchor="end">'+v+'</text>'; }
+  sem.forEach((s,i) => {
+    let acc = 0; const x = ml + i*bw + bw*0.18, w = bw*0.64;
+    keys.forEach(k => { if(!s[k]) return; const y0 = y(acc), y1 = y(acc + s[k]); svg += '<rect x="'+x+'" y="'+y1+'" width="'+w+'" height="'+(y0-y1)+'" fill="'+COL[k]+'" rx="2"/>'; acc += s[k]; });
+    if(i % Math.ceil(12 / Math.max(1, Math.floor(iw/48))) === (11 % Math.ceil(12 / Math.max(1, Math.floor(iw/48))))) svg += '<text x="'+(x+w/2)+'" y="'+(H-6)+'" fill="#8A887F" font-size="11" text-anchor="middle">'+s.lab+'</text>';
+    svg += '<rect class="hit" data-i="'+i+'" x="'+(ml+i*bw)+'" y="'+mt+'" width="'+bw+'" height="'+ih+'" fill="transparent"/>';
+  });
+  el.innerHTML = svg + '</svg><div class="adm-tip" hidden></div>';
+  const tip = el.querySelector('.adm-tip');
+  el.querySelectorAll('.hit').forEach(h => {
+    h.addEventListener('pointermove', ev => { const s = sem[+h.dataset.i]; tip.innerHTML = '<b>Semana del '+s.lab+'</b>' + keys.map(k => '<div><span style="color:'+COL[k]+'">●</span> '+TIPO[k]+': '+s[k]+'</div>').join(''); tip.hidden = false;
+      const rb = el.getBoundingClientRect(); tip.style.left = Math.max(0, Math.min(ev.clientX - rb.left + 12, el.clientWidth - tip.offsetWidth - 4)) + 'px'; tip.style.top = Math.max(0, ev.clientY - rb.top - 30) + 'px'; });
+    h.addEventListener('pointerleave', () => { tip.hidden = true; });
+  });
+}
+$('adm-dias').addEventListener('change', () => S.adm && pintarAdmin());
+$('adm-pais').addEventListener('change', () => S.adm && pintarAdmin());
+window.addEventListener('resize', () => { if(S.adm && $('v-adm').classList.contains('on')){ clearTimeout(S._rz); S._rz = setTimeout(pintarAdmin, 200); } });
 
 /* ========= Historial ========= */
 function histKey(){ return 'th_hist_'+S.pais; }
