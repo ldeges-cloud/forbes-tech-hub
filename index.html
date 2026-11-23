@@ -684,7 +684,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
     <div class="tool-head"><div><div class="eyebrow" id="sd-eyebrow"></div><h1 class="h1" id="h-sd">Sindicados</h1></div><div class="actions"><a class="btn" id="man-sd" href="#" target="_blank" rel="noopener" title="Manual de uso (Google Doc)" hidden>Manual de uso ↗</a></div></div>
     <div class="layout">
       <form class="panel" id="form-sd" novalidate onsubmit="event.preventDefault();enviarSD()">
-        <div class="ph"><span class="t">Nota de la franquicia</span><span class="s">Forbes US o Forbes México</span></div>
+        <div class="ph"><span class="t">Nota de la franquicia</span><span class="s">Forbes US o una edición del grupo</span></div>
         <div class="step">
           <div class="step-h"><span class="step-n">1</span><span class="step-t">Nota original</span></div>
           <div class="field">
@@ -694,9 +694,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
             </div>
           </div>
           <div id="sd-murl">
-            <div class="field"><label for="sd-url">URL de la nota <span class="req">*</span></label><input type="text" id="sd-url" inputmode="url" autocomplete="off" placeholder="https://www.forbes.com.mx/… o https://www.forbes.com/…">
+            <div class="field"><label for="sd-url">URL de la nota <span class="req">*</span></label><input type="text" id="sd-url" inputmode="url" autocomplete="off" placeholder="https://www.forbes.com/… o la nota de otra edición">
               <div class="ferr" id="sd-e1">Pegue la URL completa de la nota.</div>
-              <div class="hint" id="sd-uhint"><b>Forbes México</b>: se lee sola. <b>Forbes US</b>: abra la nota en forbes.com y use el botón «Enviar al Hub» (ver a la derecha).</div>
+              <div class="hint" id="sd-uhint"><b>Forbes US</b>: abra la nota en forbes.com y use el botón «Enviar al Hub» (ver a la derecha). <b>México, Perú, Chile, República Dominicana y Centroamérica</b>: basta con pegar la URL.</div>
               <div class="recv" id="sd-recv" hidden></div>
             </div>
           </div>
@@ -729,7 +729,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
         <div class="panel" id="sd-how"><div class="how">
           <h3>Qué hace</h3>
           <ul class="rules">
-            <li><span class="k">Traduce</span><span>De forma periodística y fiel al original, con el estilo de Forbes Colombia. Las notas de Forbes México se adaptan sin traducir.</span></li>
+            <li><span class="k">Traduce</span><span>Las notas de Forbes US, de forma periodística y fiel al original, con el estilo de Forbes Colombia. Las de las ediciones del grupo se adaptan sin traducir.</span></li>
             <li><span class="k">Cifras</span><span>US$ adelante y nunca «dólares» al final; <i>billion</i> pasa a mil millones (US$8.400 millones) y <i>trillion</i> a billones (US$4,07 billones); punto para miles y coma para decimales.</span></li>
             <li><span class="k">Conserva</span><span>Todos los enlaces, intertítulos, listas y bloques de datos clave.</span></li>
             <li><span class="k">Cierre</span><span>«Este artículo fue publicado originalmente por…» con el enlace, y un «Lea también» de forbes.co.</span></li>
@@ -745,7 +745,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
             <li>Arrastre este botón a la barra:<br><a class="bm" id="sd-bm" href="#">↗ Enviar al Hub</a></li>
             <li>Abra la nota en forbes.com y haga clic en el marcador. El Hub se abre en otra pestaña con la nota cargada.</li>
           </ol>
-          <p class="hint" style="margin:0">Se instala una sola vez. También sirve para Forbes México y otras ediciones de la franquicia.</p>
+          <p class="hint" style="margin:0">Se instala una sola vez. También sirve para cualquier edición del grupo.</p>
         </div></div>
         <div class="panel" id="sd-load" hidden><div class="loading" aria-live="polite"><h3>Trabajando en la nota</h3><div class="sub" id="sd-ld-sub"></div><ul class="stages" id="sd-stages"></ul><div class="bar"><i id="sd-bar"></i></div><div class="elapsed num"><span id="sd-el">0 s</span><span></span></div></div></div>
         <div class="panel" id="sd-res" hidden>
@@ -825,7 +825,7 @@ const PAISES = {
 const TOOLS = [
   {id:'brand-voice', ic:'B', nombre:'Generador Brand Voice', desc:'Del brief del cliente a una nota patrocinada lista para revisión. Aprende del estilo de la edición con cada nota que corrigen los redactores.', equipo:'Comercial', activo:true},
   {id:'checker', ic:'C', nombre:'Checker editorial', desc:'Revisión del PDF de la revista antes de imprenta: ortografía, tipeo, gramática y nombres propios. El reporte llega por correo.', equipo:'Editorial', activo:true},
-  {id:'sindicados', ic:'S', nombre:'Sindicados', desc:'De la URL de una nota de Forbes US o Forbes México a la versión de la edición: traducción, cifras, enlaces, SEO y «Lea también».', equipo:'Editorial', activo:true},
+  {id:'sindicados', ic:'S', nombre:'Sindicados', desc:'De la URL de una nota de Forbes US o de otra edición del grupo a la versión de la edición: traducción, cifras, enlaces, SEO y «Lea también».', equipo:'Editorial', activo:true},
   {id:'pre-diseno', ic:'P', nombre:'Checker pre-diseño', desc:'Revisión del texto en Google Docs antes de pasar a diseño, con comentarios en el documento.', equipo:'Editorial', activo:false}
 ];
 const FORMATOS = {
@@ -1484,6 +1484,8 @@ const SD_STAGES = [
   {t:'Creando el Google Doc', s:4}
 ];
 const urlOk = u => /^https?:\/\/[^\s\/]+\.[^\s\/]+\/\S+/i.test(String(u||'').trim());
+/* Ediciones del grupo que el flujo lee solo con la URL (Forbes US va con «Enviar al Hub» o pegando el texto) */
+const SD_AUTO = /(^|\.)(forbes\.com\.mx|forbes\.pe|forbes\.cl|forbes\.do|forbescentroamerica\.com)$/;
 const hostDe = u => (String(u||'').match(/^https?:\/\/([^\/?#:]+)/i) || [,''])[1].toLowerCase().replace(/^www\./,'');
 /* Se ejecuta en la página de la nota (forbes.com), en el navegador del redactor. Sin comentarios de línea: va dentro de un marcador. */
 function sdGrab(HUB){
@@ -1547,8 +1549,9 @@ async function enviarSD(){
   if(S.sdm === 'url'){
     url = $('sd-url').value.trim();
     if(S.sdIn){ contenido = S.sdIn.c; }
-    else if(urlOk(url) && !/(^|\.)forbes\.com\.mx$/.test(hostDe(url))){
-      $('sd-e1').textContent = hostDe(url).endsWith('forbes.com') ? 'Las notas de forbes.com no se pueden leer desde aquí: ábrala en el navegador y use el botón «Enviar al Hub», o elija «Pegar el texto».' : 'Esta edición no se lee automáticamente: use el botón «Enviar al Hub» desde la nota, o elija «Pegar el texto».';
+    else if(urlOk(url) && !SD_AUTO.test(hostDe(url))){
+      const hd = hostDe(url), propia = P.dominio && (hd === P.dominio || hd.endsWith('.' + P.dominio));
+      $('sd-e1').textContent = /(^|\.)forbes\.com$/.test(hd) ? 'Las notas de forbes.com no se pueden leer desde aquí: ábrala en el navegador y use el botón «Enviar al Hub», o elija «Pegar el texto».' : propia ? 'Esa nota ya es de ' + (P.edicion || 'esta edición') + '. Pegue la URL de la nota original.' : 'La URL no es de Forbes US ni de una edición del grupo (México, Perú, Chile, República Dominicana o Centroamérica).';
       bad = err('sd-e1', true, 'sd-url') || bad;
     } else { $('sd-e1').textContent = 'Pegue la URL completa de la nota.'; bad = err('sd-e1', !urlOk(url), 'sd-url') || bad; }
   } else {
