@@ -330,6 +330,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .paste img,.paste figure,.paste iframe,.paste video{display:none}
 .recv{display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(76,175,125,.35);background:var(--green-bg);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--ink-2);margin-top:10px}
 .recv b{color:var(--ink);font-weight:500}
+.guia-us{background:#141a24;border:1px solid #2a3a55;color:var(--ink);border-radius:10px;padding:12px 14px 4px;font-size:13px;line-height:1.55;margin-bottom:14px}.guia-us ol{margin:8px 0 8px 18px;padding:0}.guia-us li{margin-bottom:6px}
+#sd-bmp summary{cursor:pointer;list-style:none}#sd-bmp summary::-webkit-details-marker{display:none}
 .alerta{background:var(--amber-bg);border:1px solid rgba(242,181,68,.3);color:#F2CF8A;border-radius:10px;padding:12px 14px;font-size:13px;margin-bottom:14px}
 .alerta ul{margin:6px 0 0 18px;padding:0}
 .article .body a{color:#A81518;text-decoration:underline;text-underline-offset:2px}
@@ -696,14 +698,15 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
           <div id="sd-murl">
             <div class="field"><label for="sd-url">URL de la nota <span class="req">*</span></label><input type="text" id="sd-url" inputmode="url" autocomplete="off" placeholder="https://www.forbes.com/… o la nota de otra edición">
               <div class="ferr" id="sd-e1">Pegue la URL completa de la nota.</div>
-              <div class="hint" id="sd-uhint"><b>Forbes US</b>: abra la nota en forbes.com y use el botón «Enviar al Hub» (ver a la derecha). <b>México, Perú, Chile, República Dominicana y Centroamérica</b>: basta con pegar la URL.</div>
+              <div class="hint" id="sd-uhint"><b>México, Perú, Chile, República Dominicana y Centroamérica</b>: con la URL alcanza. <b>Forbes US</b>: pegue la URL y el Hub le muestra cómo cargar el texto.</div>
               <div class="recv" id="sd-recv" hidden></div>
             </div>
           </div>
           <div id="sd-mpeg" hidden>
+            <div class="guia-us" id="sd-usg" hidden><b>Nota de Forbes US: cárguela copiando el texto</b><ol><li>Abra la nota en forbes.com. Si aparece <i>«Subscribe to Continue Reading»</i>, toque <i>Sign In</i> y entre con la cuenta de suscripción de Forbes: sin eso, la página no muestra la nota completa.</li><li>Seleccione con el mouse desde el primer párrafo hasta el último y cópielo (⌘ + C en Mac, Ctrl + C en Windows).</li><li>Haga clic en el recuadro «Texto de la nota» y péguelo (⌘ + V o Ctrl + V). Los enlaces se conservan.</li></ol></div>
             <div class="field"><label for="sd-purl">URL de la nota original <span class="req">*</span></label><input type="text" id="sd-purl" inputmode="url" autocomplete="off" placeholder="Para el crédito «publicado originalmente por…»"><div class="ferr" id="sd-e2">Pegue la URL de la nota original.</div></div>
             <div class="field"><label for="sd-ptit">Titular original <span class="opt">· opcional</span></label><input type="text" id="sd-ptit" autocomplete="off"></div>
-            <div class="field"><span class="lbl">Texto de la nota <span class="req">*</span><span class="counter num" id="sd-pcnt"></span></span><div class="paste" id="sd-ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Texto de la nota" data-ph="Copie la nota desde la página (desde el primer párrafo hasta el último) y péguela aquí. Así se conservan los enlaces, los intertítulos y las listas."></div><div class="ferr" id="sd-e3">Falta el texto de la nota (al menos unos párrafos).</div></div>
+            <div class="field"><span class="lbl">Texto de la nota <span class="req">*</span><span class="counter num" id="sd-pcnt"></span></span><div class="paste" id="sd-ed" contenteditable="true" role="textbox" aria-multiline="true" aria-label="Texto de la nota" data-ph="Copie la nota desde la página (desde el primer párrafo hasta el último) y péguela aquí. Así se conservan los enlaces, los intertítulos y las listas."></div><div class="ferr" id="sd-e3">Falta el texto de la nota (al menos unos párrafos).</div><div class="alerta" id="sd-pw" hidden style="margin:10px 0 0">El texto pegado parece cortado por el muro de pago de forbes.com («Subscribe to Continue Reading»). Entre con la cuenta de suscripción, recargue la nota y vuelva a copiarla.</div></div>
           </div>
         </div>
         <div class="step">
@@ -737,16 +740,15 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
             <li><span class="k">Entrega</span><span>Vista previa, HTML para el CMS, SEO y un Google Doc en la carpeta de la edición.</span></li>
           </ul>
         </div></div>
-        <div class="panel" id="sd-bmp"><div class="how">
-          <h3>Botón «Enviar al Hub» para Forbes US</h3>
-          <p class="hint" style="margin:0 0 12px;font-size:13px;color:var(--ink-3)">Forbes US no permite que otros sistemas lean sus notas. Con este botón, la nota se toma desde su navegador, con sus enlaces, y se abre aquí lista para traducir.</p>
+        <div class="panel" id="sd-bmp"><details class="how"><summary><h3 style="display:inline">Atajo opcional para Forbes US</h3><span class="hint" style="display:block;margin-top:6px">Para quien sindica seguido: evita copiar y pegar. Toque para ver cómo instalarlo.</span></summary>
+          <p class="hint" style="margin:12px 0;font-size:13px;color:var(--ink-3)">Es un favorito del navegador que toma la nota abierta en forbes.com y la trae al Hub con sus enlaces. Necesita la nota completa en pantalla (con la sesión de suscripción iniciada).</p>
           <ol>
             <li>Muestre la barra de marcadores (Ctrl+Shift+B; en Mac, ⌘+Shift+B).</li>
             <li>Arrastre este botón a la barra:<br><a class="bm" id="sd-bm" href="#">↗ Enviar al Hub</a></li>
             <li>Abra la nota en forbes.com y haga clic en el marcador. El Hub se abre en otra pestaña con la nota cargada.</li>
           </ol>
-          <p class="hint" style="margin:0">Se instala una sola vez. También sirve para cualquier edición del grupo.</p>
-        </div></div>
+          <p class="hint" style="margin:0">Se instala una sola vez. Si no logra arrastrarlo, no hace falta: copiar y pegar da el mismo resultado.</p>
+        </details></div>
         <div class="panel" id="sd-load" hidden><div class="loading" aria-live="polite"><h3>Trabajando en la nota</h3><div class="sub" id="sd-ld-sub"></div><ul class="stages" id="sd-stages"></ul><div class="bar"><i id="sd-bar"></i></div><div class="elapsed num"><span id="sd-el">0 s</span><span></span></div></div></div>
         <div class="panel" id="sd-res" hidden>
           <div class="res-head"><span class="tag gold" id="sd-t1"></span><span class="tag" id="sd-t2"></span></div>
@@ -1508,6 +1510,7 @@ function sdGrab(HUB){
     var t = b.tagName.toLowerCase(), h = inl(b).trim();
     if(h.replace(/<[^>]+>/g,'').trim()) blocks.push('<'+t+'>'+h+'</'+t+'>'); });
   var html = blocks.join('\n');
+  if(/Subscribe to Continue Reading/i.test(d.body.innerText)){ alert('Forbes Tech Hub: esta nota está cortada por el muro de pago. Toque «Sign In», entre con la cuenta de suscripción de Forbes y vuelva a usar el botón.'); return; }
   if(html.replace(/<[^>]+>/g,'').length < 300){ alert('Forbes Tech Hub: no se encontró el texto de la nota en esta página. Copie la nota y péguela en el Hub.'); return; }
   var h1 = q('h1'), au = q('[class*="author-name"],a[rel="author"],.contrib-link,[class*="byline"] a'), fc = q('figure figcaption,[class*="credit"]');
   var canon = q('link[rel="canonical"]');
@@ -1536,9 +1539,11 @@ function pintarRecv(){
 }
 function quitarRecv(){ S.sdIn = null; $('sd-url').value = ''; pintarRecv(); $('sd-url').focus(); }
 document.querySelectorAll('[data-sdm]').forEach(b => b.addEventListener('click', () => setSDM(b.dataset.sdm)));
-function setSDM(m){ S.sdm = m; document.querySelectorAll('[data-sdm]').forEach(b => b.setAttribute('aria-pressed', b.dataset.sdm === m)); $('sd-murl').hidden = m !== 'url'; $('sd-mpeg').hidden = m !== 'pegar'; }
+$('sd-url').addEventListener('input', () => { const u = $('sd-url').value.trim(); if(!S.sdIn && urlOk(u) && /(^|\.)forbes\.com$/.test(hostDe(u))) sdModoUS(u); });
+function sdModoUS(url){ setSDM('pegar'); $('sd-purl').value = url; $('sd-usg').hidden = false; $('sd-e1').classList.remove('on'); $('sd-url').classList.remove('err-in'); scrollTo({top: $('sd-usg').getBoundingClientRect().top + scrollY - 90, behavior:'smooth'}); setTimeout(() => $('sd-ed').focus(), 400); }
+function setSDM(m){ S.sdm = m; if(m !== 'pegar') $('sd-usg').hidden = true; document.querySelectorAll('[data-sdm]').forEach(b => b.setAttribute('aria-pressed', b.dataset.sdm === m)); $('sd-murl').hidden = m !== 'url'; $('sd-mpeg').hidden = m !== 'pegar'; }
 $('sd-bm').addEventListener('click', e => { e.preventDefault(); toast('Arrástrelo a la barra de marcadores del navegador'); });
-$('sd-ed').addEventListener('input', () => { const n = $('sd-ed').innerText.trim().length; $('sd-pcnt').textContent = n ? fmtN(n) + ' caracteres' : ''; if(n >= 300) $('sd-e3').classList.remove('on'); });
+$('sd-ed').addEventListener('input', () => { $('sd-pw').hidden = !/subscribe to continue reading|already a member\?\s*sign in/i.test($('sd-ed').innerText); const n = $('sd-ed').innerText.trim().length; $('sd-pcnt').textContent = n ? fmtN(n) + ' caracteres' : ''; if(n >= 300) $('sd-e3').classList.remove('on'); });
 document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.addEventListener('click', () => sdTab(b.dataset.sdt)));
 function sdTab(t){ document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.sdt === t)); document.querySelectorAll('#sd-res .tp').forEach(p => p.classList.toggle('on', p.id === 'sdp-'+t)); }
 async function enviarSD(){
@@ -1551,7 +1556,8 @@ async function enviarSD(){
     if(S.sdIn){ contenido = S.sdIn.c; }
     else if(urlOk(url) && !SD_AUTO.test(hostDe(url))){
       const hd = hostDe(url), propia = P.dominio && (hd === P.dominio || hd.endsWith('.' + P.dominio));
-      $('sd-e1').textContent = /(^|\.)forbes\.com$/.test(hd) ? 'Las notas de forbes.com no se pueden leer desde aquí: ábrala en el navegador y use el botón «Enviar al Hub», o elija «Pegar el texto».' : propia ? 'Esa nota ya es de ' + (P.edicion || 'esta edición') + '. Pegue la URL de la nota original.' : 'La URL no es de Forbes US ni de una edición del grupo (México, Perú, Chile, República Dominicana o Centroamérica).';
+      if(/(^|\.)forbes\.com$/.test(hd)){ sdModoUS(url); return; }
+      $('sd-e1').textContent = propia ? 'Esa nota ya es de ' + (P.edicion || 'esta edición') + '. Pegue la URL de la nota original.' : 'La URL no es de Forbes US ni de una edición del grupo (México, Perú, Chile, República Dominicana o Centroamérica).';
       bad = err('sd-e1', true, 'sd-url') || bad;
     } else { $('sd-e1').textContent = 'Pegue la URL completa de la nota.'; bad = err('sd-e1', !urlOk(url), 'sd-url') || bad; }
   } else {
@@ -1559,6 +1565,7 @@ async function enviarSD(){
     bad = err('sd-e2', !urlOk(url), 'sd-purl') || bad;
     const txt = $('sd-ed').innerText.trim();
     bad = err('sd-e3', txt.length < 300) || bad;
+    if(/subscribe to continue reading|already a member\?\s*sign in/i.test(txt)){ $('sd-pw').hidden = false; bad = true; }
     contenido = {titulo: $('sd-ptit').value.trim(), cuerpo_html: $('sd-ed').innerHTML};
   }
   bad = err('sd-e4', !nom, 'sd-red') || bad;
