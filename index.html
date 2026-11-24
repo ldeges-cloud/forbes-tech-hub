@@ -330,6 +330,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .paste img,.paste figure,.paste iframe,.paste video{display:none}
 .recv{display:flex;gap:12px;align-items:flex-start;border:1px solid rgba(76,175,125,.35);background:var(--green-bg);border-radius:10px;padding:12px 14px;font-size:13px;color:var(--ink-2);margin-top:10px}
 .recv b{color:var(--ink);font-weight:500}
+.bmock{position:relative;border:1px solid #2a2a28;border-radius:10px;overflow:hidden;margin:0 0 6px;background:#161615;font-size:11px}.bm-top{display:flex;align-items:center;gap:5px;padding:7px 10px;border-bottom:1px solid #2a2a28}.bm-top i{width:8px;height:8px;border-radius:50%;background:#3a3a38}.bm-top span{margin-left:8px;flex:1;background:#222;border-radius:6px;padding:3px 8px;color:var(--ink-3)}.bm-bar{display:flex;gap:8px;padding:6px 10px;color:var(--ink-3)}.bm-slot{border:1px dashed var(--red);color:var(--red);border-radius:999px;padding:1px 10px;animation:bmp 1.6s ease-in-out infinite}@keyframes bmp{50%{opacity:.45}}.bm-arrow{position:absolute;right:28px;top:30px;width:90px;height:46px;color:var(--red);opacity:.8}.bm-steps{margin:12px 0 0 18px;padding:0;font-size:13px;line-height:1.55}.bm-steps li{margin-bottom:8px}.bm-ok{display:flex;gap:10px;font-size:13px;line-height:1.55}
 .guia-us{background:#141a24;border:1px solid #2a3a55;color:var(--ink);border-radius:10px;padding:12px 14px 4px;font-size:13px;line-height:1.55;margin-bottom:14px}.guia-us ol{margin:8px 0 8px 18px;padding:0}.guia-us li{margin-bottom:6px}
 #sd-bmp summary{cursor:pointer;list-style:none}#sd-bmp summary::-webkit-details-marker{display:none}
 .alerta{background:var(--amber-bg);border:1px solid rgba(242,181,68,.3);color:#F2CF8A;border-radius:10px;padding:12px 14px;font-size:13px;margin-bottom:14px}
@@ -698,8 +699,9 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
           <div id="sd-murl">
             <div class="field"><label for="sd-url">URL de la nota <span class="req">*</span></label><input type="text" id="sd-url" inputmode="url" autocomplete="off" placeholder="https://www.forbes.com/… o la nota de otra edición">
               <div class="ferr" id="sd-e1">Pegue la URL completa de la nota.</div>
-              <div class="hint" id="sd-uhint"><b>México, Perú, Chile, República Dominicana y Centroamérica</b>: con la URL alcanza. <b>Forbes US</b>: pegue la URL y el Hub le muestra cómo cargar el texto.</div>
+              <div class="hint" id="sd-uhint"><b>México, Perú, Chile, República Dominicana y Centroamérica</b>: con la URL alcanza. <b>Forbes US</b>: abra la nota en forbes.com y toque el favorito «Enviar al Hub» (ver a la derecha).</div>
               <div class="recv" id="sd-recv" hidden></div>
+              <div class="guia-us" id="sd-usu" hidden><b>Las notas de Forbes US se cargan con el botón «Enviar al Hub»</b><ol><li>Vaya a la pestaña de la nota en forbes.com. Si pide suscripción, toque <i>Sign In</i> y entre con la cuenta.</li><li>Toque <b>«Enviar al Hub»</b> en la barra de favoritos. La nota se abre aquí, ya cargada.</li></ol><p id="sd-usu-no" style="margin:0 0 10px;color:#F2CF8A">Todavía no lo instaló en este navegador: siga los pasos del recuadro de la derecha.</p><p style="margin:0 0 10px"><a href="#" id="sd-usu-open" target="_blank" rel="noopener">Abrir la nota en forbes.com ↗</a> · <a href="#" id="sd-usu-paste">Prefiero pegar el texto</a></p></div>
             </div>
           </div>
           <div id="sd-mpeg" hidden>
@@ -729,6 +731,26 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
       </form>
 
       <div class="sticky">
+        <div class="panel" id="sd-bmp"><div class="how">
+          <div id="bm-no">
+            <span class="tag gold">Forbes US · se instala una sola vez</span>
+            <h3 style="margin-top:12px">Instale el botón «Enviar al Hub»</h3>
+            <p class="hint" style="margin:0 0 14px;font-size:13px;color:var(--ink-3)">Queda como un favorito del navegador. Con la nota de forbes.com abierta, lo toca y la nota llega aquí con su titular, autor, foto, crédito y enlaces.</p>
+            <div class="bmock" aria-hidden="true">
+              <div class="bm-top"><i></i><i></i><i></i><span>forbes.com/sites/…</span></div>
+              <div class="bm-bar"><span>★ Gmail</span><span>★ Drive</span><span class="bm-slot">suéltelo aquí</span></div>
+            </div>
+            <ol class="bm-steps">
+              <li><b>Muestre la barra de favoritos:</b> ⌘ + Shift + B en Mac, Ctrl + Shift + B en Windows. Aparece una franja debajo de la barra de direcciones.</li>
+              <li><b>Arrastre este botón hasta esa franja</b> (clic sostenido, mover y soltar):<br><a class="bm" id="sd-bm" href="#">↗ Enviar al Hub</a></li>
+              <li><b>Listo.</b> En cada nota de forbes.com, toque el favorito y la nota se abre aquí cargada.</li>
+            </ol>
+            <p class="hint" style="margin:10px 0 0">¿No logra arrastrarlo? <a href="#" id="bm-copy">Copie el código del botón</a>, haga clic derecho en la barra de favoritos → «Agregar página…», póngale de nombre «Enviar al Hub» y pegue el código en la URL.</p>
+          </div>
+          <div id="bm-si" hidden>
+            <div class="bm-ok"><span style="color:var(--green)">✓</span><div><b>Botón «Enviar al Hub» instalado en este navegador.</b><br>Para Forbes US: abra la nota en forbes.com y toque el favorito. <a href="#" id="bm-ver">Ver cómo instalarlo</a></div></div>
+          </div>
+        </div></div>
         <div class="panel" id="sd-how"><div class="how">
           <h3>Qué hace</h3>
           <ul class="rules">
@@ -740,15 +762,6 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
             <li><span class="k">Entrega</span><span>Vista previa, HTML para el CMS, SEO y un Google Doc en la carpeta de la edición.</span></li>
           </ul>
         </div></div>
-        <div class="panel" id="sd-bmp"><details class="how"><summary><h3 style="display:inline">Atajo opcional para Forbes US</h3><span class="hint" style="display:block;margin-top:6px">Para quien sindica seguido: evita copiar y pegar. Toque para ver cómo instalarlo.</span></summary>
-          <p class="hint" style="margin:12px 0;font-size:13px;color:var(--ink-3)">Es un favorito del navegador que toma la nota abierta en forbes.com y la trae al Hub con sus enlaces. Necesita la nota completa en pantalla (con la sesión de suscripción iniciada).</p>
-          <ol>
-            <li>Muestre la barra de marcadores (Ctrl+Shift+B; en Mac, ⌘+Shift+B).</li>
-            <li>Arrastre este botón a la barra:<br><a class="bm" id="sd-bm" href="#">↗ Enviar al Hub</a></li>
-            <li>Abra la nota en forbes.com y haga clic en el marcador. El Hub se abre en otra pestaña con la nota cargada.</li>
-          </ol>
-          <p class="hint" style="margin:0">Se instala una sola vez. Si no logra arrastrarlo, no hace falta: copiar y pegar da el mismo resultado.</p>
-        </details></div>
         <div class="panel" id="sd-load" hidden><div class="loading" aria-live="polite"><h3>Trabajando en la nota</h3><div class="sub" id="sd-ld-sub"></div><ul class="stages" id="sd-stages"></ul><div class="bar"><i id="sd-bar"></i></div><div class="elapsed num"><span id="sd-el">0 s</span><span></span></div></div></div>
         <div class="panel" id="sd-res" hidden>
           <div class="res-head"><span class="tag gold" id="sd-t1"></span><span class="tag" id="sd-t2"></span></div>
@@ -1527,8 +1540,8 @@ function renderSD(){
   $('sd-bm').textContent = '↗ Enviar al Hub · ' + P.edicion;
   try{ const w = JSON.parse(localStorage.getItem('th_sd_who')||'null'); if(w){ if(!$('sd-red').value) $('sd-red').value = w.nom||''; if(!$('sd-mail').value) $('sd-mail').value = w.mail||''; } }catch(e){}
   const inn = sessionStorage.getItem('th_sd_in');
-  if(inn){ sessionStorage.removeItem('th_sd_in'); try{ const d = JSON.parse(inn); if(d && d.c && d.url){ S.sdIn = d; setSDM('url'); $('sd-url').value = d.url; nuevaSD(true); } }catch(e){} }
-  pintarRecv(); renderSDHist();
+  if(inn){ sessionStorage.removeItem('th_sd_in'); try{ const d = JSON.parse(inn); if(d && d.c && d.url){ localStorage.setItem('th_sd_bm', '1'); S.sdIn = d; setSDM('url'); $('sd-url').value = d.url; nuevaSD(true); } }catch(e){} }
+  pintarRecv(); renderSDHist(); pintarBM();
 }
 function pintarRecv(){
   const r = $('sd-recv'), d = S.sdIn;
@@ -1537,12 +1550,17 @@ function pintarRecv(){
   r.innerHTML = '<span style="color:var(--green)">✓</span><div style="flex:1"><b>Nota recibida de '+esc(hostDe(d.url))+'</b><br>'+esc(d.c.titulo||'(sin titular)')+'<br><span class="num">'+fmtN(n)+' caracteres · '+l+(l===1?' enlace':' enlaces')+(d.c.autor?' · '+esc(d.c.autor):'')+'</span></div><button type="button" class="mini" onclick="quitarRecv()">Quitar</button>';
   r.hidden = false; $('sd-url').readOnly = true; $('sd-uhint').hidden = true; $('sd-e1').classList.remove('on');
 }
-function quitarRecv(){ S.sdIn = null; $('sd-url').value = ''; pintarRecv(); $('sd-url').focus(); }
+function quitarRecv(){ S.sdIn = null; $('sd-url').value = ''; sdAvisoUS(''); pintarRecv(); $('sd-url').focus(); }
 document.querySelectorAll('[data-sdm]').forEach(b => b.addEventListener('click', () => setSDM(b.dataset.sdm)));
-$('sd-url').addEventListener('input', () => { const u = $('sd-url').value.trim(); if(!S.sdIn && urlOk(u) && /(^|\.)forbes\.com$/.test(hostDe(u))) sdModoUS(u); });
+$('sd-url').addEventListener('input', () => { const u = $('sd-url').value.trim(); sdAvisoUS(!S.sdIn && urlOk(u) && /(^|\.)forbes\.com$/.test(hostDe(u)) ? u : ''); });
+function sdAvisoUS(u){ $('sd-usu').hidden = !u; if(!u) return; $('sd-usu-open').href = u; $('sd-usu-no').hidden = !!localStorage.getItem('th_sd_bm'); $('sd-e1').classList.remove('on'); $('sd-url').classList.remove('err-in'); }
+$('sd-usu-paste').addEventListener('click', e => { e.preventDefault(); const u = $('sd-url').value.trim(); $('sd-usu').hidden = true; sdModoUS(u); });
+function pintarBM(){ const si = !!localStorage.getItem('th_sd_bm'); $('bm-no').hidden = si; $('bm-si').hidden = !si; }
+$('bm-ver').addEventListener('click', e => { e.preventDefault(); $('bm-no').hidden = false; $('bm-si').hidden = true; });
+$('bm-copy').addEventListener('click', async e => { e.preventDefault(); try{ await navigator.clipboard.writeText($('sd-bm').href); toast('Código copiado. Péguelo en la URL del favorito nuevo'); }catch(x){ toast('No se pudo copiar: arrastre el botón'); } });
 function sdModoUS(url){ setSDM('pegar'); $('sd-purl').value = url; $('sd-usg').hidden = false; $('sd-e1').classList.remove('on'); $('sd-url').classList.remove('err-in'); scrollTo({top: $('sd-usg').getBoundingClientRect().top + scrollY - 90, behavior:'smooth'}); setTimeout(() => $('sd-ed').focus(), 400); }
 function setSDM(m){ S.sdm = m; if(m !== 'pegar') $('sd-usg').hidden = true; document.querySelectorAll('[data-sdm]').forEach(b => b.setAttribute('aria-pressed', b.dataset.sdm === m)); $('sd-murl').hidden = m !== 'url'; $('sd-mpeg').hidden = m !== 'pegar'; }
-$('sd-bm').addEventListener('click', e => { e.preventDefault(); toast('Arrástrelo a la barra de marcadores del navegador'); });
+$('sd-bm').addEventListener('click', e => { e.preventDefault(); toast('No lo toque aquí: arrástrelo a la barra de favoritos'); });
 $('sd-ed').addEventListener('input', () => { $('sd-pw').hidden = !/subscribe to continue reading|already a member\?\s*sign in/i.test($('sd-ed').innerText); const n = $('sd-ed').innerText.trim().length; $('sd-pcnt').textContent = n ? fmtN(n) + ' caracteres' : ''; if(n >= 300) $('sd-e3').classList.remove('on'); });
 document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.addEventListener('click', () => sdTab(b.dataset.sdt)));
 function sdTab(t){ document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.sdt === t)); document.querySelectorAll('#sd-res .tp').forEach(p => p.classList.toggle('on', p.id === 'sdp-'+t)); }
@@ -1556,7 +1574,7 @@ async function enviarSD(){
     if(S.sdIn){ contenido = S.sdIn.c; }
     else if(urlOk(url) && !SD_AUTO.test(hostDe(url))){
       const hd = hostDe(url), propia = P.dominio && (hd === P.dominio || hd.endsWith('.' + P.dominio));
-      if(/(^|\.)forbes\.com$/.test(hd)){ sdModoUS(url); return; }
+      if(/(^|\.)forbes\.com$/.test(hd)){ sdAvisoUS(url); scrollTo({top: $('sd-usu').getBoundingClientRect().top + scrollY - 120, behavior:'smooth'}); return; }
       $('sd-e1').textContent = propia ? 'Esa nota ya es de ' + (P.edicion || 'esta edición') + '. Pegue la URL de la nota original.' : 'La URL no es de Forbes US ni de una edición del grupo (México, Perú, Chile, República Dominicana o Centroamérica).';
       bad = err('sd-e1', true, 'sd-url') || bad;
     } else { $('sd-e1').textContent = 'Pegue la URL completa de la nota.'; bad = err('sd-e1', !urlOk(url), 'sd-url') || bad; }
