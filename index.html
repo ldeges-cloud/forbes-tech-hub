@@ -764,7 +764,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
         </div></div>
         <div class="panel" id="sd-load" hidden><div class="loading" aria-live="polite"><h3>Trabajando en la nota</h3><div class="sub" id="sd-ld-sub"></div><ul class="stages" id="sd-stages"></ul><div class="bar"><i id="sd-bar"></i></div><div class="elapsed num"><span id="sd-el">0 s</span><span></span></div></div></div>
         <div class="panel" id="sd-res" hidden>
-          <div class="res-head"><span class="tag gold" id="sd-t1"></span><span class="tag" id="sd-t2"></span></div>
+          <div class="res-head"><span class="tag gold" id="sd-t1"></span><span class="tag" id="sd-t2"></span><span class="tag" id="sd-t3" hidden></span></div>
           <div class="tabs sd-tabs" role="tablist">
             <button role="tab" data-sdt="nota" aria-selected="true">Nota</button>
             <button role="tab" data-sdt="control" aria-selected="false">Control<span class="cnt" id="sd-cnt"></span></button>
@@ -1564,6 +1564,7 @@ $('sd-bm').addEventListener('click', e => { e.preventDefault(); toast('No lo toq
 $('sd-ed').addEventListener('input', () => { $('sd-pw').hidden = !/subscribe to continue reading|already a member\?\s*sign in/i.test($('sd-ed').innerText); const n = $('sd-ed').innerText.trim().length; $('sd-pcnt').textContent = n ? fmtN(n) + ' caracteres' : ''; if(n >= 300) $('sd-e3').classList.remove('on'); });
 document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.addEventListener('click', () => sdTab(b.dataset.sdt)));
 function sdTab(t){ document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.sdt === t)); document.querySelectorAll('#sd-res .tp').forEach(p => p.classList.toggle('on', p.id === 'sdp-'+t)); }
+function fechaSD(x){ x = String(x || '').trim(); if(!x) return ''; const d = new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(x) || !/T/.test(x) ? x : x + 'Z'); return isNaN(d) ? '' : d.toLocaleDateString('es-CO', {timeZone:'America/Bogota', day:'numeric', month:'long', year:'numeric'}); }
 async function enviarSD(){
   if(S.sdBusy) return;
   const P = PAISES[S.pais], nom = $('sd-red').value.trim(), mail = $('sd-mail').value.trim(), lea = $('sd-lea').value.trim();
@@ -1631,6 +1632,7 @@ function mostrarSD(){
   const d = S.sdRes; if(!d) return;
   $('sd-load').hidden = true; $('sd-how').hidden = true; $('sd-bmp').hidden = true; $('sd-res').hidden = false;
   $('sd-t1').textContent = d.origen || 'Franquicia'; $('sd-t2').textContent = d.categoria || 'Sin categoría';
+  const fo = fechaSD(d.original && d.original.fecha); $('sd-t3').hidden = !fo; $('sd-t3').textContent = fo ? 'Publicada el ' + fo : '';
   $('sd-doc').href = d.doc_url || '#'; $('sd-doc').hidden = !d.doc_url;
   const al = (d.alertas||[]).filter(Boolean);
   $('sd-rmsg').innerHTML = (d.aviso ? '<div class="notice ok">'+esc(d.aviso)+'</div>' : '') +
