@@ -54,6 +54,21 @@ h1,h2,h3{margin:0;text-wrap:balance}
 .lede{color:var(--ink-2);max-width:640px;margin:12px 0 0;font-size:16px}
 
 /* Home */
+.matriz-wrap{margin-top:48px}.matriz-h{font-family:var(--display);font-weight:400;font-size:26px;margin:0}.matriz-sub{color:var(--ink-3);font-size:14px;margin:8px 0 18px;max-width:680px}
+.matriz-scroll{overflow-x:auto;background:var(--panel);border:1px solid var(--line);border-radius:var(--r)}
+.matriz{width:100%;border-collapse:collapse;min-width:760px;font-size:14px}
+.matriz th,.matriz td{padding:14px 12px;border-bottom:1px solid var(--line);text-align:center;vertical-align:middle}
+.matriz tr:last-child td{border-bottom:0}
+.matriz thead th{font-size:11px;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink-3);font-weight:600;background:var(--panel-2)}
+.matriz thead th small{display:block;font-size:10px;letter-spacing:.5px;text-transform:none;color:var(--ink-4);font-weight:400;margin-top:3px}
+.matriz th:first-child,.matriz td:first-child{text-align:left;padding-left:20px;width:42%}
+.matriz .mt-n{font-weight:600;color:var(--ink)}.matriz .mt-d{display:block;color:var(--ink-3);font-size:12px;margin-top:3px;line-height:1.45}
+.matriz .mt-e{display:inline-block;margin-left:8px;font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-4)}
+.mt-si{display:inline-flex;width:28px;height:28px;border-radius:50%;align-items:center;justify-content:center;background:var(--green-bg);color:var(--green);font-weight:700;border:1px solid rgba(76,175,125,.35)}
+a.mt-si{text-decoration:none}a.mt-si:hover{background:var(--green);color:#0A0A0A}
+.mt-no{color:var(--ink-4)}
+.matriz tr.mt-prox td{opacity:.55}
+@media (max-width:720px){.matriz{min-width:520px;font-size:13px}.matriz .mt-d{display:none}.matriz .mt-e{display:block;margin:2px 0 0}.matriz th:first-child,.matriz td:first-child{position:sticky;left:0;z-index:1;width:150px;min-width:150px;padding-left:14px;background:var(--panel)}.matriz thead th:first-child{background:var(--panel-2)}.matriz th,.matriz td{padding:12px 8px}.matriz thead th small{display:none}}
 .grid-paises{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:32px}
 .pais{position:relative;text-align:left;background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:20px;min-height:150px;display:flex;flex-direction:column;gap:6px;transition:border-color .15s,transform .15s}
 .pais:hover:not([disabled]){border-color:var(--red-dim);transform:translateY(-2px)}
@@ -366,6 +381,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
     <h1 class="h1" id="h-home">Herramientas de IA para cada edición</h1>
     <p class="lede">Un solo lugar para las herramientas editoriales y comerciales de la región. Cada edición trabaja con su propio vocabulario, sus formatos y sus reglas.</p>
     <div class="grid-paises" id="grid-paises"></div>
+    <section class="matriz-wrap" aria-labelledby="h-matriz">
+      <h2 class="matriz-h" id="h-matriz">Qué herramientas hay y qué edición las usa</h2>
+      <p class="matriz-sub">Las marcadas con ✓ ya están en uso. Si su edición necesita una herramienta que todavía no tiene, escríbale a Lucas Deges.</p>
+      <div class="matriz-scroll"><table class="matriz" id="matriz"></table></div>
+    </section>
   </section>
 
   <!-- CATÁLOGO -->
@@ -909,12 +929,20 @@ window.addEventListener('hashchange', route);
 
 /* ========= Home / catálogo ========= */
 function renderHome(){
+  renderMatriz();
   $('grid-paises').innerHTML = Object.entries(PAISES).map(([k,P]) =>
     '<button class="pais" '+(P.activo?'onclick="location.hash=\'#/'+k+'\'"':'disabled')+'>'+
     '<span class="tag '+(P.activo?'live':'')+'">'+(P.activo?'Disponible':'Próximamente')+'</span>'+
     '<span class="code">'+P.code+'</span><span class="name">'+esc(P.nombre)+'</span>'+
     '<span class="meta">'+(P.activo?(n => n + (n === 1 ? ' herramienta activa' : ' herramientas activas'))(TOOLS.filter(t=>toolOn(k,t)).length):'En preparación')+'</span></button>').join('') +
     '<button class="pais pais-admin" onclick="location.hash=\'#/admin\'"><span class="tag gold">Restringido</span><span class="code">AD</span><span class="name">Admin</span><span class="meta">Uso de las herramientas y memoria de cada edición</span></button>';
+}
+function renderMatriz(){
+  const ps = Object.entries(PAISES);
+  const head = '<thead><tr><th scope="col">Herramienta</th>' + ps.map(([k,P]) => '<th scope="col" title="'+esc(P.edicion)+'">'+P.code+'<small>'+esc(P.nombre)+'</small></th>').join('') + '</tr></thead>';
+  const filas = TOOLS.slice().sort((a,b) => b.activo - a.activo).map(t => '<tr'+(t.activo?'':' class="mt-prox"')+'><td><span class="mt-n">'+esc(t.nombre)+'</span><span class="mt-e">'+esc(t.equipo||'')+(t.activo?'':' · Próximamente')+'</span><span class="mt-d">'+esc(t.desc)+'</span></td>' +
+    ps.map(([k,P]) => '<td>' + (P.activo && toolOn(k,t) ? '<a class="mt-si" href="#/'+k+'/'+t.id+'" title="'+esc(P.edicion)+' usa '+esc(t.nombre)+'" aria-label="'+esc(P.edicion)+': sí">✓</a>' : '<span class="mt-no" aria-label="'+esc(P.edicion)+': no">—</span>') + '</td>').join('') + '</tr>').join('');
+  $('matriz').innerHTML = head + '<tbody>' + filas + '</tbody>';
 }
 function renderPais(p){
   const P = PAISES[p];
