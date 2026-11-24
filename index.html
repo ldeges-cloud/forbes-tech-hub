@@ -1564,7 +1564,7 @@ $('sd-bm').addEventListener('click', e => { e.preventDefault(); toast('No lo toq
 $('sd-ed').addEventListener('input', () => { $('sd-pw').hidden = !/subscribe to continue reading|already a member\?\s*sign in/i.test($('sd-ed').innerText); const n = $('sd-ed').innerText.trim().length; $('sd-pcnt').textContent = n ? fmtN(n) + ' caracteres' : ''; if(n >= 300) $('sd-e3').classList.remove('on'); });
 document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.addEventListener('click', () => sdTab(b.dataset.sdt)));
 function sdTab(t){ document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.sdt === t)); document.querySelectorAll('#sd-res .tp').forEach(p => p.classList.toggle('on', p.id === 'sdp-'+t)); }
-function fechaSD(x){ x = String(x || '').trim(); if(!x) return ''; const d = new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(x) || !/T/.test(x) ? x : x + 'Z'); return isNaN(d) ? '' : d.toLocaleDateString('es-CO', {timeZone:'America/Bogota', day:'numeric', month:'long', year:'numeric'}); }
+function fechaSD(x){ x = String(x || '').trim(); if(!x) return ''; const sd = x.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(sd) return new Date(+sd[1], +sd[2]-1, +sd[3]).toLocaleDateString('es-CO', {day:'numeric', month:'long', year:'numeric'}); const d = new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(x) ? x : x + 'Z'); return isNaN(d) ? '' : d.toLocaleDateString('es-CO', {timeZone:'America/Bogota', day:'numeric', month:'long', year:'numeric'}); }
 async function enviarSD(){
   if(S.sdBusy) return;
   const P = PAISES[S.pais], nom = $('sd-red').value.trim(), mail = $('sd-mail').value.trim(), lea = $('sd-lea').value.trim();
