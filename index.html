@@ -382,6 +382,21 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .sm-list li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-2)}
 .sm-list li:last-child{border-bottom:0}
 .sm-list a{color:var(--red);text-decoration:none;white-space:nowrap}
+.bc-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.bc-sum{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
+.bc-sum span{font-size:11px;border:1px solid var(--line-2);border-radius:999px;padding:3px 9px;color:var(--ink-2)}
+.bc-list{list-style:none;margin:0;padding:0;max-height:560px;overflow:auto;border-top:1px solid var(--line)}
+.bc-it{display:grid;grid-template-columns:22px 64px 1fr;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);align-items:start;cursor:pointer}
+.bc-it.off{opacity:.45}
+.bc-it input{margin-top:4px;accent-color:var(--red)}
+.bc-th{width:64px;height:64px;border-radius:8px;background:var(--field);object-fit:cover;display:block}
+.bc-th.vacio{display:grid;place-items:center;font-size:10px;color:var(--ink-4)}
+.bc-m{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--red);font-weight:600}
+.bc-tx{font-size:12.5px;color:var(--ink-2);margin:3px 0 4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.bc-n{font-size:11px;color:var(--ink-3)}
+.bc-n b{color:var(--ink);font-weight:600}
+.bc-tools{display:flex;gap:8px;justify-content:space-between;align-items:center;margin:14px 0 8px}
+.bc-tools .lbl{margin:0}
 @media (max-width:960px){.layout{grid-template-columns:minmax(0,1fr)}.sticky{position:static}.h1{font-size:32px}.crumbs{display:none}}
 @media (max-width:560px){.row,.cards,.cards.two{grid-template-columns:minmax(0,1fr)}.logo span{display:none}.meter{flex-wrap:wrap}.meter .lab{white-space:normal}.tool-head .actions{margin-left:0}.wrap{padding:22px 16px 60px}.top-in{padding:10px 16px}.article{padding:22px 18px}}
 </style>
@@ -888,10 +903,62 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
     </div>
   </section>
 
+  <section class="view" id="v-bc" aria-labelledby="h-bc">
+    <div class="tool-head"><div><div class="eyebrow" id="bc-eyebrow"></div><h1 class="h1" id="h-bc">Buscador de campañas</h1></div></div>
+    <div class="layout">
+      <form class="panel" id="form-bc" novalidate onsubmit="event.preventDefault();buscarBC()">
+        <div class="ph"><span class="t">Qué buscar</span><span class="s">Contenidos orgánicos y pauta en Meta</span></div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">1</span><span class="step-t">Campaña</span></div>
+          <div class="field"><label for="bc-pal">Palabras clave <span class="req">*</span></label><input type="text" id="bc-pal" autocomplete="off" placeholder="Banamex, #Banamex, @banamex">
+            <div class="hint">Separadas por comas. Se buscan en el texto de cada publicación y en el nombre de las campañas pautadas (ej. FRB-BANAMEX-…).</div><div class="ferr" id="bc-e1">Escriba al menos una palabra de 3 letras o más.</div></div>
+          <div class="bc-row">
+            <div class="field"><label for="bc-desde">Desde <span class="req">*</span></label><input type="date" id="bc-desde"></div>
+            <div class="field"><label for="bc-hasta">Hasta <span class="req">*</span></label><input type="date" id="bc-hasta"></div>
+          </div>
+          <div class="field"><label for="bc-alc">Dónde buscar</label><select id="bc-alc" class="sm-sel"><option value="edicion" id="bc-alc-ed">Solo en esta edición</option><option value="regional">En las seis ediciones (campaña regional)</option></select></div>
+        </div>
+        <div class="pb" style="border-top:1px solid var(--line)">
+          <div id="bc-msg"></div>
+          <button type="submit" class="btn primary big" id="bbc">Buscar</button>
+          <div class="hint" style="text-align:center;margin-top:10px">Tarda entre 5 y 30 segundos (más si es regional).</div>
+        </div>
+      </form>
+
+      <div class="sticky">
+        <div class="panel" id="bc-how"><div class="how">
+          <h3>Cómo funciona</h3>
+          <ul class="rules">
+            <li><span class="k">Busca</span><span>Las palabras en Instagram (posts y reels), Facebook (posts y reels), LinkedIn, TikTok, YouTube y X, y en los nombres de campaña de Meta Ads.</span></li>
+            <li><span class="k">Revisás</span><span>Destildá lo que apareció pero no es de la campaña antes de armar el informe.</span></li>
+            <li><span class="k">Pauta</span><span>Separada por la plataforma donde se entregó: Facebook, Instagram, Threads, WhatsApp, Audience Network o Messenger.</span></li>
+            <li><span class="k">Entrega</span><span>Una presentación de Google Slides con la marca Forbes y la imagen de cada post, más el PDF para mandar al cliente.</span></li>
+            <li><span class="k">No incluye</span><span>Historias de Instagram (no traen texto para buscarlas) ni pauta fuera de Meta.</span></li>
+          </ul>
+        </div></div>
+        <div class="panel" id="bc-load" hidden><div class="loading" aria-live="polite"><h3 id="bc-ld-t">Buscando</h3><div class="sub" id="bc-ld-sub"></div><div class="bar"><i id="bc-bar"></i></div><div class="elapsed num"><span id="bc-el">0 s</span><span></span></div></div></div>
+        <div class="panel" id="bc-res" hidden><div class="pb">
+          <div class="bc-sum" id="bc-sum"></div>
+          <div id="bc-avisos"></div>
+          <div class="bc-tools"><span class="lbl" id="bc-cnt"></span><span><a href="#" onclick="event.preventDefault();marcarBC(true)">Todos</a> · <a href="#" onclick="event.preventDefault();marcarBC(false)">Ninguno</a></span></div>
+          <ul class="bc-list" id="bc-list"></ul>
+          <div class="field" style="margin-top:16px"><label for="bc-camp">Nombre de la campaña en el informe</label><input type="text" id="bc-camp" autocomplete="off" placeholder="Ej.: Banamex · Inversión inteligente"></div>
+          <div class="bc-row">
+            <div class="field"><label for="bc-nom">Su nombre <span class="opt">· opcional</span></label><input type="text" id="bc-nom" autocomplete="name"></div>
+            <div class="field"><label for="bc-mail">Su correo <span class="opt">· opcional</span></label><input type="email" id="bc-mail" autocomplete="email" placeholder="Para editar la presentación"></div>
+          </div>
+          <div id="bc-msg2"></div>
+          <button type="button" class="btn primary big" id="bpres" onclick="presentarBC()">Armar presentación</button>
+          <div id="bc-fin" hidden style="margin-top:14px"></div>
+        </div></div>
+      </div>
+    </div>
+  </section>
+
   <section class="view" id="v-404"><div class="empty"><div class="ic">?</div><h3>No encontramos esa página</h3><p><a href="#/">Volver al inicio</a></p></div></section>
 </main>
 
-<div class="foot-note"><span>Forbes Tech Hub · v1.9 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
+<div class="foot-note"><span>Forbes Tech Hub · v2.0 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
 
 <!-- Acceso -->
 <div class="scrim" id="m-key" role="dialog" aria-modal="true" aria-labelledby="mk-t">
@@ -919,7 +986,8 @@ const API = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-brandvoice';
 const API_ADM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-admin';
 const API_SD = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-sindicados';
 const API_SM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-social';
-const VERSION = '1.9';
+const API_BC = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-campanas';
+const VERSION = '2.0';
 
 const PAISES = {
   pe: {code:'PE', nombre:'Perú', edicion:'Forbes Perú', activo:true, dominio:'forbes.pe', correo:'nombre@forbes.pe',
@@ -929,22 +997,23 @@ const PAISES = {
        manual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit', sdManual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit',
        urlBase:'forbes.pe/brand-voice/', idioma:'Español neutro, tercera persona, sin peruanismos coloquiales',
        sd:{lector:'peruano', lea:'Lee también', leaPos:'medio', cierre:'Este artículo se publicó originalmente en', pais:'Perú', locale:'es-PE', tz:'America/Lima'},
-       tools:['brand-voice','checker','sindicados','social-media']},
+       tools:['brand-voice','checker','sindicados','social-media','buscador-campanas']},
   mx: {code:'MX', nombre:'México', edicion:'Forbes México', activo:true, dominio:'forbes.com.mx', correo:'nombre@forbes.com.mx',
-       tools:['social-media'], verifica:'social'},
+       tools:['social-media','buscador-campanas'], verifica:'social'},
   co: {code:'CO', nombre:'Colombia', edicion:'Forbes Colombia', activo:true, sdManual:'https://docs.google.com/document/d/1HIXu_mCdgW2BGe7nNk2JVkTbpR3uFE72V9s676_t2cg/edit', dominio:'forbes.co', correo:'nombre@forbes.co',
        cifras:'US$8.400 millones y US$4,07 billones; punto para miles y coma para decimales',
        sd:{lector:'colombiano', lea:'Lea también', leaPos:'final', cierre:'Este artículo fue publicado originalmente por', pais:'Colombia', locale:'es-CO', tz:'America/Bogota'},
-       tools:['sindicados','social-media'], verifica:'sindicados'},
-  cl: {code:'CL', nombre:'Chile', edicion:'Forbes Chile', activo:true, dominio:'forbes.cl', tools:['social-media'], verifica:'social'},
-  rd: {code:'RD', nombre:'República Dominicana', edicion:'Forbes República Dominicana', activo:true, dominio:'forbes.do', tools:['social-media'], verifica:'social'},
-  ca: {code:'CA', nombre:'Centroamérica', edicion:'Forbes Centroamérica', activo:true, dominio:'forbescentroamerica.com', tools:['social-media'], verifica:'social'}
+       tools:['sindicados','social-media','buscador-campanas'], verifica:'sindicados'},
+  cl: {code:'CL', nombre:'Chile', edicion:'Forbes Chile', activo:true, dominio:'forbes.cl', tools:['social-media','buscador-campanas'], verifica:'social'},
+  rd: {code:'RD', nombre:'República Dominicana', edicion:'Forbes República Dominicana', activo:true, dominio:'forbes.do', tools:['social-media','buscador-campanas'], verifica:'social'},
+  ca: {code:'CA', nombre:'Centroamérica', edicion:'Forbes Centroamérica', activo:true, dominio:'forbescentroamerica.com', tools:['social-media','buscador-campanas'], verifica:'social'}
 };
 const TOOLS = [
   {id:'brand-voice', ic:'B', nombre:'Generador Brand Voice', desc:'Del brief del cliente a una nota patrocinada lista para revisión. Aprende del estilo de la edición con cada nota que corrigen los redactores.', equipo:'Comercial', activo:true},
   {id:'checker', ic:'C', nombre:'Checker editorial', desc:'Revisión del PDF de la revista antes de imprenta: ortografía, tipeo, gramática y nombres propios. El reporte llega por correo.', equipo:'Editorial', activo:true},
   {id:'sindicados', ic:'S', nombre:'Sindicados', desc:'De la URL de una nota de Forbes US o de otra edición del grupo a la versión de la edición: traducción, cifras, enlaces, SEO y «Lea también».', equipo:'Editorial', activo:true},
   {id:'social-media', ic:'R', nombre:'Reporte semanal de redes', desc:'Reporte semanal de redes con un clic: el Excel de la edición completo con Metricool, YouTube Analytics y GA4, guardado en Drive.', equipo:'Social Media', activo:true},
+  {id:'buscador-campanas', ic:'B', nombre:'Buscador de campañas', desc:'Busca una campaña por palabras clave en todas las redes y en la pauta de Meta, y arma el informe en Slides con la marca Forbes y la imagen de cada post.', equipo:'Social Media', activo:true},
   {id:'pre-diseno', ic:'P', nombre:'Checker pre-diseño', desc:'Revisión del texto en Google Docs antes de pasar a diseño, con comentarios en el documento.', equipo:'Editorial', activo:false}
 ];
 /* Equipos: cada edición tiene un acceso por equipo, con su propia clave (desde la v1.8) */
@@ -1023,6 +1092,7 @@ function route(){
   if(tool === 'brand-voice'){ renderBV(); return show('v-bv', [cP, cE, ['Brand Voice']]); }
   if(tool === 'checker'){ renderCK(); return show('v-ck', [cP, cE, ['Checker editorial']]); }
   if(tool === 'social-media'){ renderSM(); return show('v-sm', [cP, cE, ['Reporte semanal de redes']]); }
+  if(tool === 'buscador-campanas'){ renderBC(); return show('v-bc', [cP, cE, ['Buscador de campañas']]); }
   show('v-404', []);
 }
 function show(id, crumbs){
@@ -1940,6 +2010,87 @@ function pintarSMRes(d){
   $('sm-res').hidden = false;
 }
 
+/* ========= Social Media: buscador de campañas ========= */
+const bcN = n => fmtN(n);
+const bcIso = d => d.toISOString().slice(0, 10);
+function renderBC(){
+  const P = PAISES[S.pais];
+  $('bc-eyebrow').textContent = P.edicion + ' · Equipo de Social Media';
+  $('bc-alc-ed').textContent = 'Solo en ' + P.edicion;
+  if(!$('bc-desde').value){ const h = new Date(); $('bc-hasta').value = bcIso(new Date(h.getTime() - 864e5)); $('bc-desde').value = bcIso(new Date(h.getTime() - 31 * 864e5)); }
+  $('bc-nom').value = $('bc-nom').value || localStorage.getItem('th_sm_nom') || '';
+  $('bc-mail').value = $('bc-mail').value || localStorage.getItem('th_bc_mail') || '';
+}
+function bcCarga(titulo, sub, seg){
+  $('bc-how').hidden = true; $('bc-res').hidden = true; $('bc-load').hidden = false;
+  $('bc-ld-t').textContent = titulo; $('bc-ld-sub').textContent = sub;
+  const t0 = Date.now(); const iv = setInterval(() => { const el = (Date.now() - t0) / 1000; $('bc-el').textContent = Math.round(el) + ' s'; $('bc-bar').style.width = Math.min(95, el / seg * 100) + '%'; }, 400);
+  return () => { clearInterval(iv); $('bc-load').hidden = true; };
+}
+async function buscarBC(){
+  const P = PAISES[S.pais], pal = $('bc-pal').value.trim();
+  $('bc-e1').classList.toggle('on', pal.replace(/[^\p{L}\p{N}]/gu, '').length < 3); if(pal.replace(/[^\p{L}\p{N}]/gu, '').length < 3) return;
+  $('bc-msg').innerHTML = ''; $('bbc').disabled = true;
+  const reg = $('bc-alc').value === 'regional';
+  const fin = bcCarga('Buscando «' + pal + '»', (reg ? 'En las seis ediciones' : 'En ' + P.edicion) + ' · ' + $('bc-desde').value.split('-').reverse().join('/') + ' al ' + $('bc-hasta').value.split('-').reverse().join('/'), reg ? 40 : 12);
+  try{
+    const r = await fetch(API_BC, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'buscar', pais:P.code, clave:keyOf(S.pais), palabras:pal, desde:$('bc-desde').value, hasta:$('bc-hasta').value, alcance: reg ? 'regional' : 'edicion'})});
+    if(r.status === 401){ borrarClave(S.pais); S.pendingRoute = location.hash; openKey(S.pais); throw new Error('La clave venció. Vuelva a ingresarla.'); }
+    const d = await r.json().catch(() => ({}));
+    if(d.status !== 'ok') throw new Error(d.message || 'No se pudo buscar. Intente de nuevo en unos minutos.');
+    d.pauta = (d.pauta || []).filter(x => x.impresiones > 0 || x.inversion > 0);
+    S.bc = d; S.bc.sel = new Set([...d.contenidos.map(c => c.id), ...d.pauta.map(x => x.id)]);
+    if(!$('bc-camp').value) $('bc-camp').value = pal.split(',')[0].replace(/^[#@]/, '').trim().replace(/^./, c => c.toUpperCase());
+    pintarBC();
+  }catch(e){
+    $('bc-msg').innerHTML = '<div class="alerta">'+esc(e instanceof TypeError ? 'No hay conexión con el servidor del Hub. Intente en unos minutos.' : e.message)+'</div>'; $('bc-how').hidden = false;
+  }finally{ fin(); $('bbc').disabled = false; }
+}
+function pintarBC(){
+  const d = S.bc; if(!d) return;
+  const porCanal = {}; d.contenidos.forEach(c => porCanal[c.canal] = (porCanal[c.canal] || 0) + 1);
+  const camp = new Set(d.pauta.map(x => x.campana_id));
+  $('bc-sum').innerHTML = Object.entries(porCanal).map(([k, n]) => '<span>'+esc(k)+' · '+n+'</span>').join('') + (camp.size ? '<span style="border-color:var(--red-dim);color:var(--red)">Pauta en Meta · '+camp.size+(camp.size === 1 ? ' campaña' : ' campañas')+'</span>' : '');
+  $('bc-avisos').innerHTML = (d.avisos || []).length ? '<div class="alerta"><ul>'+d.avisos.map(a => '<li>'+esc(a)+'</li>').join('')+'</ul></div>' : '';
+  const it = (id, img, meta, tx, nums) => '<li class="bc-it'+(S.bc.sel.has(id) ? '' : ' off')+'" onclick="toggleBC(\''+id+'\')"><input type="checkbox" '+(S.bc.sel.has(id) ? 'checked' : '')+' tabindex="-1" aria-hidden="true">'+
+    (img ? '<img class="bc-th" loading="lazy" src="'+esc(img)+'" alt="" onerror="this.outerHTML=\'<span class=&quot;bc-th vacio&quot;>sin imagen</span>\'">' : '<span class="bc-th vacio">'+(id[0] === 'p' ? 'pauta' : 'sin imagen')+'</span>')+
+    '<div><div class="bc-m">'+meta+'</div><div class="bc-tx">'+tx+'</div><div class="bc-n">'+nums+'</div></div></li>';
+  const html = d.contenidos.map(c => it(c.id, c.imagen, esc(c.canal+' · '+(c.formato||'')+' · '+(c.fecha||'').split('-').reverse().join('/')+(d.regional ? ' · '+c.edicion.replace('Forbes ', '') : '')),
+      esc(c.texto) + (c.url ? ' <a href="'+esc(c.url)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--red)">ver ↗</a>' : ''),
+      (c.alcance ? '<b>'+bcN(c.alcance)+'</b> alcance · ' : '') + '<b>'+bcN(c.vistas)+'</b> vistas · <b>'+bcN(c.interacciones)+'</b> interacciones' + (c.clics ? ' · <b>'+bcN(c.clics)+'</b> clics' : '')))
+    .concat(d.pauta.map(x => it(x.id, '', esc(x.canal), esc(x.campana) + ' <span style="color:var(--ink-4)">· '+esc(x.cuenta || '')+'</span>',
+      '<b>'+esc(x.moneda)+' '+bcN(x.inversion)+'</b> · <b>'+bcN(x.impresiones)+'</b> impresiones · <b>'+bcN(x.alcance)+'</b> alcance · <b>'+bcN(x.clics)+'</b> clics')));
+  $('bc-list').innerHTML = html.join('') || '<li class="adm-empty" style="padding:16px 4px">No encontramos contenidos ni campañas con esas palabras en el período. Pruebe con otra forma del nombre (sin tildes, el hashtag o la cuenta).</li>';
+  contarBC(); $('bc-fin').hidden = true; $('bc-res').hidden = false;
+}
+function contarBC(){ const d = S.bc, nc = d.contenidos.filter(c => d.sel.has(c.id)).length, np = d.pauta.filter(x => d.sel.has(x.id)).length;
+  $('bc-cnt').textContent = nc + ' de ' + d.contenidos.length + (d.contenidos.length === 1 ? ' contenido' : ' contenidos') + (d.pauta.length ? ' · ' + np + ' de ' + d.pauta.length + ' filas de pauta' : '');
+  $('bpres').disabled = !(nc + np); }
+function toggleBC(id){ const s = S.bc.sel; s.has(id) ? s.delete(id) : s.add(id); pintarBC(); }
+function marcarBC(v){ const d = S.bc; d.sel = new Set(v ? [...d.contenidos.map(c => c.id), ...d.pauta.map(x => x.id)] : []); pintarBC(); }
+async function presentarBC(){
+  const P = PAISES[S.pais], d = S.bc, mail = $('bc-mail').value.trim(), nom = $('bc-nom').value.trim();
+  if(mail && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)){ $('bc-msg2').innerHTML = '<div class="alerta">Revise el correo.</div>'; return; }
+  localStorage.setItem('th_bc_mail', mail); if(nom) localStorage.setItem('th_sm_nom', nom);
+  $('bc-msg2').innerHTML = ''; $('bpres').disabled = true; $('bpres').textContent = 'Armando la presentación…';
+  const t0 = Date.now(); const iv = setInterval(() => { $('bpres').textContent = 'Armando la presentación… ' + Math.round((Date.now() - t0) / 1000) + ' s'; }, 500);
+  try{
+    const body = {modo:'presentacion', pais:P.code, clave:keyOf(S.pais), alcance: d.regional ? 'regional' : 'edicion', campana:$('bc-camp').value.trim(), palabras:d.palabras.join(', '), desde:d.desde, hasta:d.hasta,
+      contenidos:d.contenidos.filter(c => d.sel.has(c.id)), pauta:d.pauta.filter(x => d.sel.has(x.id)), total_encontrados:d.total, nombre:nom, email:mail};
+    const r = await fetch(API_BC, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
+    if(r.status === 401){ borrarClave(S.pais); S.pendingRoute = location.hash; openKey(S.pais); throw new Error('La clave venció. Vuelva a ingresarla.'); }
+    const x = await r.json().catch(() => ({}));
+    if(x.status !== 'success') throw new Error(x.message || 'No se pudo armar la presentación. Intente de nuevo; si sigue fallando, avísele a Lucas Deges.');
+    if(x.pdf_b64){ const bin = atob(x.pdf_b64), u8 = new Uint8Array(bin.length); for(let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+      S.bcPdf = URL.createObjectURL(new Blob([u8], {type:'application/pdf'})); const a = document.createElement('a'); a.href = S.bcPdf; a.download = x.nombre + '.pdf'; document.body.appendChild(a); a.click(); a.remove(); }
+    $('bc-fin').innerHTML = '<div class="alerta" style="background:rgba(76,175,125,.08);border-color:rgba(76,175,125,.35);color:var(--ink)"><b>Listo en '+x.duracion_s+' s.</b> '+(x.pdf_b64 ? 'El PDF se descargó en este equipo. ' : '')+(x.compartido ? 'La presentación quedó compartida con '+esc(x.compartido)+' para editarla.' : 'Para editar la presentación, pídale acceso a Lucas Deges o deje su correo la próxima vez.')+
+      ((x.avisos||[]).length ? '<ul>'+x.avisos.map(a => '<li>'+esc(a)+'</li>').join('')+'</ul>' : '')+'</div><div class="res-actions">'+
+      '<a class="btn primary" href="'+esc(x.slides_url)+'" target="_blank" rel="noopener">Abrir en Google Slides</a>'+(S.bcPdf ? '<a class="btn" href="'+S.bcPdf+'" download="'+esc(x.nombre)+'.pdf">Descargar PDF</a>' : '')+'</div>';
+    $('bc-fin').hidden = false;
+  }catch(e){ $('bc-msg2').innerHTML = '<div class="alerta">'+esc(e instanceof TypeError ? 'No hay conexión con el servidor del Hub. Intente en unos minutos.' : e.message)+'</div>'; }
+  finally{ clearInterval(iv); $('bpres').textContent = 'Armar presentación'; contarBC(); }
+}
+
 /* ========= Admin ========= */
 const COL = {nota:'#EE1E23', ajuste:'#F2B544', correccion:'#4CAF7D', checker:'#5B8DEF', sindicados:'#B58BE8', social:'#3FC1C9'};
 const TIPO = {nota:'Nota nueva', ajuste:'Ajuste', correccion:'Corrección', checker:'Revisión del Checker', sindicados:'Sindicado', social:'Reporte de redes'};
@@ -2045,7 +2196,7 @@ function pintarAdmin(){
 
   // Recientes
   const rec = act.slice().sort((a,b) => b.ts - a.ts).slice(0, 30);
-  const res = r => r.t === 'social' ? (r.tipo || 'Reporte de redes') + (r.score ? ' · ' + r.score + (r.score === 1 ? ' aviso' : ' avisos') : ' · completo')
+  const res = r => r.t === 'social' ? (r.modo === 'campana' ? 'Informe de campaña · ' + (r.caracteres || 0) + ' contenidos' : (r.tipo || 'Reporte de redes')) + (r.score ? ' · ' + r.score + (r.score === 1 ? ' aviso' : ' avisos') : ' · completo')
     : r.t === 'sindicados' ? (r.tipo ? r.tipo + ' · ' : '') + (r.score ? r.score + (r.score === 1 ? ' observación' : ' observaciones') + ' del control' : 'sin observaciones del control')
     : r.t === 'checker' ? (r.score ?? '—') + ' observaciones · ' + (r.car ?? '—') + ' págs.' + (r.dentro_rango === 'incompleto' ? ' · incompleta' : '')
     : r.t === 'correccion' ? (r.score == null ? 'Cargada como referencia' : 'Cambió un ' + r.score + ' %') + (r.formato ? ' · ' + r.formato : '')
