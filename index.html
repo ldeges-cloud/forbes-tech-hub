@@ -307,6 +307,20 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .adm-table a{color:var(--red)}
 .adm-wrap{overflow-x:auto}
 .adm-empty{color:var(--ink-3);font-size:14px;padding:16px 0}
+.kpi.hero{border-color:rgba(238,30,35,.45);background:linear-gradient(180deg,rgba(238,30,35,.08),var(--panel) 70%)}
+.hl-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 18px;margin:4px 0 16px}
+.hl-head .big{font-family:var(--display);font-size:48px;line-height:1}
+.hl-head .big small{font-size:20px;color:var(--ink-3);margin-left:6px}
+.hl-head p{margin:0;color:var(--ink-2);font-size:14px;max-width:560px}
+.hl-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:8px 28px}
+.hl-cols h3{font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--ink-3);font-weight:600;margin:6px 0 8px}
+.hl-row{display:grid;grid-template-columns:minmax(110px,150px) 1fr auto;gap:12px;align-items:center;padding:6px 0;font-size:13px}
+.hl-row .lb{color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hl-row .tr{height:10px;background:var(--field);border-radius:4px;overflow:hidden}
+.hl-row .tr i{display:block;height:100%;border-radius:0 4px 4px 0;min-width:2px}
+.hl-row b{font-weight:600;font-variant-numeric:tabular-nums;color:var(--ink);min-width:64px;text-align:right}
+.hl-sup{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.hl-sup summary{cursor:pointer;font-size:13px;color:var(--ink-2)}
 .mem{border:1px solid var(--line);border-radius:11px;padding:14px 16px;background:var(--field);margin-bottom:10px}
 .mem-h{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .mem-h b{font-family:var(--display);font-weight:400;font-size:19px}
@@ -651,6 +665,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
     </div>
     <div id="adm-msg"></div>
     <div class="kpis" id="adm-kpis"></div>
+    <div class="adm-card" id="adm-horas-card"><h2>Horas liberadas</h2><p class="sub">Tiempo que el equipo deja de dedicar a tareas manuales, según lo que se usó el Hub en el período</p><div id="adm-horas"></div></div>
     <div class="adm-card" id="adm-semanas-card">
       <h2>Usos por semana</h2><p class="sub">Últimas 12 semanas, de lunes a domingo (hora de Lima)</p>
       <div class="adm-legend"><span><i style="background:#EE1E23"></i>Notas nuevas</span><span><i style="background:#F2B544"></i>Ajustes</span><span><i style="background:#4CAF7D"></i>Correcciones</span><span><i style="background:#5B8DEF"></i>Revisiones del Checker</span><span><i style="background:#3FC1C9"></i>Reportes de redes</span></div>
@@ -911,7 +926,7 @@ const PAISES = {
        selloWeb:'Forbes Perú Advertorial - Contenido Patrocinado', cierreWeb:'Contenido auspiciado',
        selloPrint:'Forbes Brand Voice | Contenido Patrocinado',
        cifras:'US$10 millones (sin espacio) y S/ 45 millones; punto para miles y coma para decimales',
-       manual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit',
+       manual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit', sdManual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit',
        urlBase:'forbes.pe/brand-voice/', idioma:'Español neutro, tercera persona, sin peruanismos coloquiales',
        sd:{lector:'peruano', lea:'Lee también', leaPos:'medio', cierre:'Este artículo se publicó originalmente en', pais:'Perú', locale:'es-PE', tz:'America/Lima'},
        tools:['brand-voice','checker','sindicados']},
@@ -1884,6 +1899,19 @@ function pintarSMRes(d){
 /* ========= Admin ========= */
 const COL = {nota:'#EE1E23', ajuste:'#F2B544', correccion:'#4CAF7D', checker:'#5B8DEF', sindicados:'#B58BE8', social:'#3FC1C9'};
 const TIPO = {nota:'Nota nueva', ajuste:'Ajuste', correccion:'Corrección', checker:'Revisión del Checker', sindicados:'Sindicado', social:'Reporte de redes'};
+/* Horas liberadas: minutos que libera cada uso = tiempo manual − tiempo de revisión con el Hub.
+   Supuestos conservadores; ajustar aquí cuando los editores validen sus tiempos. */
+const AHORRO = {
+  nota:       {min:165, manual:'3 h', hub:'15 min', que:'Redactar un branded completo (texto, títulos, SEO) frente a revisar y ajustar el borrador del Hub'},
+  sindicados: {min:60,  manual:'75 min', hub:'15 min', que:'Traducir y adaptar una nota de Forbes US (cifras, enlaces, cierre, SEO) frente a revisar la versión del Hub'},
+  checker:    {porPag:3, manual:'4 min por página', hub:'1 min por página', que:'Leer la revista completa buscando erratas frente a verificar las observaciones del reporte'},
+  ajuste:     {min:0, que:'Los ajustes de una nota no suman: son parte de la misma nota'},
+  correccion: {min:0, que:'Cargar la versión corregida no suma: es trabajo extra que mejora las notas siguientes'}
+};
+const JORNADA_SEM = 40; // horas por persona a tiempo completo
+const minLib = r => r.t === 'checker' ? (r.car||0) * AHORRO.checker.porPag : (AHORRO[r.t] ? AHORRO[r.t].min : 0);
+const fmtH = m => { const h = m/60; return h < 10 ? (Math.round(h*10)/10).toString().replace('.', ',') : fmtN(h); };
+const fmtFTE = f => (Math.round(f*10)/10).toString().replace('.', ',');
 async function cargarAdmin(forzar){
   if(S.adm && !forzar && Date.now() - S.adm.at < 120000){ pintarAdmin(); return; }
   $('adm-msg').innerHTML = ''; $('adm-when').textContent = 'Cargando…'; $('adm-refresh').disabled = true;
@@ -1918,7 +1946,12 @@ function pintarAdmin(){
   const per = dias ? 'últimos ' + dias + ' días' : 'desde el inicio';
   const cnt = t => act.filter(r => r.t === t).length;
   const delta = dias ? (act.length - prev.length) : null;
+  const minAct = act.reduce((s,r)=>s+minLib(r),0), minPrev = prev.reduce((s,r)=>s+minLib(r),0);
+  const desde0 = act.length ? Math.min(...act.map(r => r.ts)) : now;
+  const semanas = dias ? dias/7 : Math.max(1, (now - desde0)/(7*D));
+  const fte = minAct/60 / (semanas*JORNADA_SEM);
   const kp = [
+    ['Horas liberadas', fmtH(minAct), minAct ? '≈ ' + fmtFTE(fte) + (fte >= 0.95 && fte < 1.05 ? ' persona' : ' personas') + ' a tiempo completo' : per, 'hero'],
     ['Usos', fmtN(act.length), delta == null ? per : (delta > 0 ? '+' : '') + fmtN(delta) + ' frente al período anterior', delta > 0 ? 'up' : delta < 0 ? 'down' : ''],
     ['Personas activas', fmtN(new Set(act.map(r => (r.persona||'').trim().toLowerCase()).filter(Boolean)).size), per, ''],
     ['Notas Brand Voice', fmtN(cnt('nota')), cnt('ajuste') ? 'más ' + fmtN(cnt('ajuste')) + (cnt('ajuste') === 1 ? ' ajuste' : ' ajustes') : 'sin ajustes', ''],
@@ -1926,7 +1959,7 @@ function pintarAdmin(){
     ['Revisiones del Checker', fmtN(cnt('checker')), fmtN(act.filter(r=>r.t==='checker').reduce((s,r)=>s+(r.car||0),0)) + ' páginas', ''],
     ['Sindicados', fmtN(cnt('sindicados')), act.filter(r=>r.t==='sindicados' && r.score === 0).length + ' sin observaciones', '']
   ];
-  $('adm-kpis').innerHTML = kp.map(k => '<div class="kpi"><div class="k">'+k[0]+'</div><div class="v num">'+k[1]+'</div><div class="s '+k[3]+'">'+esc(k[2])+'</div></div>').join('');
+  $('adm-kpis').innerHTML = kp.map(k => '<div class="kpi'+(k[3]==='hero'?' hero':'')+'"><div class="k">'+k[0]+'</div><div class="v num">'+k[1]+'</div><div class="s '+(k[3]==='hero'?'':k[3])+'">'+esc(k[2])+'</div></div>').join('');
   $('adm-lede').textContent = act.length
     ? (dias ? 'En los ' + per : 'Desde el inicio') + ' el Hub se usó ' + fmtN(act.length) + ' veces' + (pais ? ' en ' + nombreEd(pais) : '') + ', por ' + fmtN(new Set(act.map(r => (r.persona||'').trim().toLowerCase()).filter(Boolean)).size) + ' personas.'
     : 'Todavía no hay usos registrados ' + (dias ? 'en los ' + per : '') + (pais ? ' en ' + nombreEd(pais) : '') + '. Aparecen en cuanto alguien genera una nota, carga una corrección, envía una revista al Checker o traduce un sindicado.';
@@ -1943,6 +1976,9 @@ function pintarAdmin(){
   $('adm-ck').innerHTML = stat('Revisiones', fmtN(ck.length)) + stat('Observaciones encontradas', fmtN(ck.reduce((s,r)=>s+(r.score||0),0))) +
     stat('Páginas revisadas', fmtN(ck.reduce((s,r)=>s+(r.car||0),0))) + stat('Revisiones incompletas', fmtN(ck.filter(r => r.dentro_rango === 'incompleto').length));
 
+  // Horas liberadas
+  pintarHoras(act, minAct, minPrev, fte, semanas, per, pais, dias);
+
   // Semanas
   dibujarSemanas(todos);
 
@@ -1957,10 +1993,10 @@ function pintarAdmin(){
 
   // Personas
   const pm = new Map();
-  act.forEach(r => { const k = (r.persona||'(sin nombre)').trim(); const p = pm.get(k) || {persona:k, pais:r.pais, nota:0, ajuste:0, correccion:0, checker:0, sindicados:0, total:0, ultimo:0, fecha:''}; p[r.t]++; p.total++; if(r.ts > p.ultimo){ p.ultimo = r.ts; p.fecha = r.fecha; } pm.set(k, p); });
+  act.forEach(r => { const k = (r.persona||'(sin nombre)').trim(); const p = pm.get(k) || {persona:k, pais:r.pais, nota:0, ajuste:0, correccion:0, checker:0, sindicados:0, total:0, ultimo:0, fecha:''}; p[r.t]++; p.total++; p.min = (p.min||0) + minLib(r); if(r.ts > p.ultimo){ p.ultimo = r.ts; p.fecha = r.fecha; } pm.set(k, p); });
   const pers = [...pm.values()].sort((a,b) => b.total - a.total || b.ultimo - a.ultimo);
-  $('adm-personas').innerHTML = pers.length ? '<table class="adm-table"><thead><tr><th>Persona</th><th>Edición</th><th class="n">Notas</th><th class="n">Ajustes</th><th class="n">Correcciones</th><th class="n">Checker</th><th class="n">Sindicados</th><th class="n">Total</th><th>Último uso</th></tr></thead><tbody>'+
-    pers.map(p => '<tr><td>'+esc(p.persona)+'</td><td>'+esc(p.pais)+'</td><td class="n">'+p.nota+'</td><td class="n">'+p.ajuste+'</td><td class="n">'+p.correccion+'</td><td class="n">'+p.checker+'</td><td class="n">'+p.sindicados+'</td><td class="n"><b>'+p.total+'</b></td><td>'+esc(p.fecha)+'</td></tr>').join('')+'</tbody></table>'
+  $('adm-personas').innerHTML = pers.length ? '<table class="adm-table"><thead><tr><th>Persona</th><th>Edición</th><th class="n">Notas</th><th class="n">Ajustes</th><th class="n">Correcciones</th><th class="n">Checker</th><th class="n">Sindicados</th><th class="n">Total</th><th class="n">Horas liberadas</th><th>Último uso</th></tr></thead><tbody>'+
+    pers.map(p => '<tr><td>'+esc(p.persona)+'</td><td>'+esc(p.pais)+'</td><td class="n">'+p.nota+'</td><td class="n">'+p.ajuste+'</td><td class="n">'+p.correccion+'</td><td class="n">'+p.checker+'</td><td class="n">'+p.sindicados+'</td><td class="n"><b>'+p.total+'</b></td><td class="n">'+fmtH(p.min||0)+' h</td><td>'+esc(p.fecha)+'</td></tr>').join('')+'</tbody></table>'
     : '<p class="adm-empty">Nadie usó el Hub en este período.</p>';
 
   // Recientes
@@ -1973,6 +2009,23 @@ function pintarAdmin(){
   $('adm-recientes').innerHTML = rec.length ? '<table class="adm-table"><thead><tr><th>Fecha</th><th>Qué</th><th>Quién</th><th>Cliente o edición</th><th>Resultado</th><th>Documento</th></tr></thead><tbody>'+
     rec.map(r => '<tr><td>'+esc(r.fecha)+'</td><td><span style="color:'+COL[r.t]+'">●</span> '+esc(TIPO[r.t])+'</td><td>'+esc(r.persona)+'</td><td>'+esc(r.cliente)+'</td><td>'+esc(res(r))+'</td><td>'+(/^https:\/\//.test(r.doc_url||'') ? '<a href="'+esc(r.doc_url)+'" target="_blank" rel="noopener">Abrir</a>' : '—')+'</td></tr>').join('')+'</tbody></table>'
     : '<p class="adm-empty">Sin usos en este período.</p>';
+}
+function pintarHoras(act, minAct, minPrev, fte, semanas, per, pais, dias){
+  const el = $('adm-horas');
+  const sup = '<details class="hl-sup"><summary>Cómo se calcula</summary><table class="adm-table" style="margin-top:10px"><thead><tr><th>Uso</th><th>Sin el Hub</th><th>Con el Hub</th><th class="n">Libera</th><th>Qué se compara</th></tr></thead><tbody>'+
+    [['nota','Nota Brand Voice'],['sindicados','Sindicado'],['checker','Revisión del Checker'],['ajuste','Ajuste'],['correccion','Corrección cargada']].map(([k,n]) => { const a = AHORRO[k];
+      return '<tr><td><span style="color:'+COL[k]+'">●</span> '+n+'</td><td>'+(a.manual||'—')+'</td><td>'+(a.hub||'—')+'</td><td class="n">'+(k==='checker' ? a.porPag+' min por pág.' : a.min ? a.min+' min' : '0')+'</td><td>'+esc(a.que)+'</td></tr>'; }).join('')+
+    '</tbody></table><p class="hint" style="margin-top:10px">Supuestos conservadores, a validar con los editores de cada edición. La equivalencia en personas divide las horas por '+JORNADA_SEM+' h semanales en las '+fmtFTE(semanas)+' semanas del período. No incluye el tiempo de espera mientras la IA trabaja.</p></details>';
+  if(!minAct){ el.innerHTML = '<p class="adm-empty">Todavía no hay horas liberadas '+(dias ? 'en los '+per : '')+(pais ? ' en '+esc(nombreEd(pais)) : '')+'.</p>' + sup; return; }
+  const dlt = dias && minPrev ? Math.round((minAct - minPrev)/minPrev*100) : null;
+  const bars = (rows, color) => { const mx = Math.max(...rows.map(x => x.m)); return rows.map(x => '<div class="hl-row" title="'+esc(x.n)+': '+fmtH(x.m)+' h · '+fmtN(x.u)+(x.u === 1 ? ' uso' : ' usos')+'"><span class="lb">'+(x.c ? '<span style="color:'+x.c+'">●</span> ' : '')+esc(x.n)+'</span><span class="tr"><i style="width:'+(x.m/mx*100)+'%;background:'+(x.c||color)+'"></i></span><b>'+fmtH(x.m)+' h</b></div>').join(''); };
+  const porT = ['nota','sindicados','checker'].map(k => ({n: TIPO[k] === 'Revisión del Checker' ? 'Checker' : k === 'nota' ? 'Brand Voice' : 'Sindicados', c: COL[k], m: act.filter(r => r.t === k).reduce((s,r)=>s+minLib(r),0), u: act.filter(r => r.t === k).length})).filter(x => x.m > 0).sort((a,b) => b.m - a.m);
+  const em = new Map(); act.forEach(r => { const m = minLib(r); if(!m) return; const e = em.get(r.pais) || {n: nombreEd(r.pais), m:0, u:0}; e.m += m; e.u++; em.set(r.pais, e); });
+  const porE = [...em.values()].sort((a,b) => b.m - a.m);
+  el.innerHTML = '<div class="hl-head"><div class="big num">'+fmtH(minAct)+'<small>horas</small></div><p>'+
+    (dias ? 'En los '+per : 'Desde el inicio')+(pais ? ', '+esc(nombreEd(pais))+',' : '')+' el Hub le devolvió al equipo el equivalente a <b>'+fmtFTE(fte)+(fte >= 0.95 && fte < 1.05 ? ' persona' : ' personas')+' a tiempo completo</b>'+
+    (dlt == null ? '' : ' ('+(dlt > 0 ? '+' : '')+dlt+' % frente al período anterior)')+'. Es capacidad que queda libre para trabajo editorial y comercial de más valor.</p></div>'+
+    '<div class="hl-cols"><div><h3>Por herramienta</h3>'+bars(porT)+'</div>'+(!pais && porE.length > 1 ? '<div><h3>Por edición</h3>'+bars(porE, '#EE1E23')+'</div>' : '')+'</div>' + sup;
 }
 function dibujarSemanas(todos){
   const el = $('adm-chart'), D = 864e5, L = 5*36e5;
