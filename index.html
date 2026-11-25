@@ -721,7 +721,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
           <div id="sd-murl">
             <div class="field"><label for="sd-url">URL de la nota <span class="req">*</span></label><input type="text" id="sd-url" inputmode="url" autocomplete="off" placeholder="https://www.forbes.com/… o la nota de otra edición">
               <div class="ferr" id="sd-e1">Pegue la URL completa de la nota.</div>
-              <div class="hint" id="sd-uhint"><b>México, Perú, Chile, República Dominicana y Centroamérica</b>: con la URL alcanza. <b>Forbes US</b>: abra la nota en forbes.com y toque el favorito «Enviar al Hub» (ver a la derecha).</div>
+              <div class="hint" id="sd-uhint"><b id="sd-uhint-ed">México, Perú, Chile, República Dominicana y Centroamérica</b>: con la URL alcanza. <b>Forbes US</b>: abra la nota en forbes.com y toque el favorito «Enviar al Hub» (ver a la derecha).</div>
               <div class="recv" id="sd-recv" hidden></div>
               <div class="guia-us" id="sd-usu" hidden><b>Las notas de Forbes US se cargan con el botón «Enviar al Hub»</b><ol><li>Vaya a la pestaña de la nota en forbes.com. Si pide suscripción, toque <i>Sign In</i> y entre con la cuenta.</li><li>Toque <b>«Enviar al Hub»</b> en la barra de favoritos. La nota se abre aquí, ya cargada.</li></ol><p id="sd-usu-no" style="margin:0 0 10px;color:#F2CF8A">Todavía no lo instaló en este navegador: siga los pasos del recuadro de la derecha.</p><p style="margin:0 0 10px"><a href="#" id="sd-usu-open" target="_blank" rel="noopener">Abrir la nota en forbes.com ↗</a> · <a href="#" id="sd-usu-paste">Prefiero pegar el texto</a></p></div>
             </div>
@@ -742,8 +742,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
         </div>
         <div class="step">
           <div class="step-h"><span class="step-n">3</span><span class="step-t">Opcional</span></div>
-          <div class="field"><label for="sd-lea">«Lea también» <span class="opt">· URL de forbes.co</span></label><input type="text" id="sd-lea" inputmode="url" autocomplete="off" placeholder="Si lo deja vacío, se propone una nota reciente relacionada"><div class="ferr" id="sd-e6">Tiene que ser una nota de forbes.co.</div></div>
-          <div class="field"><label for="sd-not">Indicaciones para la traducción</label><textarea id="sd-not" rows="3" placeholder="Ej.: titular más corto · mantener «startup» sin traducir · enfocar en el impacto para Colombia"></textarea></div>
+          <div class="field"><label for="sd-lea"><span id="sd-lea-l">«Lea también»</span> <span class="opt" id="sd-lea-d">· URL de forbes.co</span></label><input type="text" id="sd-lea" inputmode="url" autocomplete="off" placeholder="Si lo deja vacío, se propone una nota reciente relacionada"><div class="ferr" id="sd-e6">Tiene que ser una nota de la edición.</div></div>
+          <div class="field"><label for="sd-not">Indicaciones para la traducción</label><textarea id="sd-not" rows="3" placeholder="Ej.: titular más corto · mantener «startup» sin traducir · enfocar en el impacto para la región"></textarea></div>
         </div>
         <div class="pb" style="border-top:1px solid var(--line)">
           <div id="sd-msg"></div>
@@ -776,11 +776,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
         <div class="panel" id="sd-how"><div class="how">
           <h3>Qué hace</h3>
           <ul class="rules">
-            <li><span class="k">Traduce</span><span>Las notas de Forbes US, de forma periodística y fiel al original, con el estilo de Forbes Colombia. Las de las ediciones del grupo se adaptan sin traducir.</span></li>
+            <li><span class="k">Traduce</span><span>Las notas de Forbes US, de forma periodística y fiel al original, con el estilo de <span id="sd-how-ed">Forbes Colombia</span>. Las de las ediciones del grupo se adaptan sin traducir.</span></li>
             <li><span class="k">Cifras</span><span>US$ adelante y nunca «dólares» al final; <i>billion</i> pasa a mil millones (US$8.400 millones) y <i>trillion</i> a billones (US$4,07 billones); punto para miles y coma para decimales.</span></li>
             <li><span class="k">Conserva</span><span>Todos los enlaces, intertítulos, listas y bloques de datos clave.</span></li>
-            <li><span class="k">Cierre</span><span>«Este artículo fue publicado originalmente por…» con el enlace, y un «Lea también» de forbes.co.</span></li>
-            <li><span class="k">Avisa</span><span>Cifras que cambian en tiempo real, datos que conviene verificar al cierre y contexto que podría necesitar el lector colombiano.</span></li>
+            <li><span class="k">Cierre</span><span id="sd-how-cierre">«Este artículo fue publicado originalmente por…» con el enlace, y un «Lea también» de forbes.co.</span></li>
+            <li><span class="k">Avisa</span><span>Cifras que cambian en tiempo real, datos que conviene verificar al cierre y contexto que podría necesitar el lector <span id="sd-how-lector">colombiano</span>.</span></li>
             <li><span class="k">Entrega</span><span>Vista previa, HTML para el CMS, SEO y un Google Doc en la carpeta de la edición.</span></li>
           </ul>
         </div></div>
@@ -814,7 +814,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
   <section class="view" id="v-404"><div class="empty"><div class="ic">?</div><h3>No encontramos esa página</h3><p><a href="#/">Volver al inicio</a></p></div></section>
 </main>
 
-<div class="foot-note"><span>Forbes Tech Hub · v1.4 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
+<div class="foot-note"><span>Forbes Tech Hub · v1.5 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
 
 <!-- Acceso -->
 <div class="scrim" id="m-key" role="dialog" aria-modal="true" aria-labelledby="mk-t">
@@ -841,7 +841,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 const API = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-brandvoice';
 const API_ADM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-admin';
 const API_SD = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-sindicados';
-const VERSION = '1.4';
+const VERSION = '1.5';
 
 const PAISES = {
   pe: {code:'PE', nombre:'Perú', edicion:'Forbes Perú', activo:true, dominio:'forbes.pe', correo:'nombre@forbes.pe',
@@ -850,10 +850,12 @@ const PAISES = {
        cifras:'US$10 millones (sin espacio) y S/ 45 millones; punto para miles y coma para decimales',
        manual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit',
        urlBase:'forbes.pe/brand-voice/', idioma:'Español neutro, tercera persona, sin peruanismos coloquiales',
-       tools:['brand-voice','checker']},
+       sd:{lector:'peruano', lea:'Lee también', leaPos:'medio', cierre:'Este artículo se publicó originalmente en', pais:'Perú', locale:'es-PE', tz:'America/Lima'},
+       tools:['brand-voice','checker','sindicados']},
   mx: {code:'MX', nombre:'México', edicion:'Forbes México', activo:false},
   co: {code:'CO', nombre:'Colombia', edicion:'Forbes Colombia', activo:true, sdManual:'https://docs.google.com/document/d/1HIXu_mCdgW2BGe7nNk2JVkTbpR3uFE72V9s676_t2cg/edit', dominio:'forbes.co', correo:'nombre@forbes.co',
        cifras:'US$8.400 millones y US$4,07 billones; punto para miles y coma para decimales',
+       sd:{lector:'colombiano', lea:'Lea también', leaPos:'final', cierre:'Este artículo fue publicado originalmente por', pais:'Colombia', locale:'es-CO', tz:'America/Bogota'},
        tools:['sindicados'], verifica:'sindicados'},
   cl: {code:'CL', nombre:'Chile', edicion:'Forbes Chile', activo:false},
   rd: {code:'RD', nombre:'República Dominicana', edicion:'Forbes República Dominicana', activo:false},
@@ -1530,7 +1532,10 @@ const SD_STAGES = [
 ];
 const urlOk = u => /^https?:\/\/[^\s\/]+\.[^\s\/]+\/\S+/i.test(String(u||'').trim());
 /* Ediciones del grupo que el flujo lee solo con la URL (Forbes US va con «Enviar al Hub» o pegando el texto) */
-const SD_AUTO = /(^|\.)(forbes\.com\.mx|forbes\.pe|forbes\.cl|forbes\.do|forbescentroamerica\.com)$/;
+const SD_AUTO = /(^|\.)(forbes\.com\.mx|forbes\.pe|forbes\.co|forbes\.cl|forbes\.do|forbescentroamerica\.com)$/;
+const SD_EDS = [['forbes.com.mx','México'],['forbes.pe','Perú'],['forbes.co','Colombia'],['forbes.cl','Chile'],['forbes.do','República Dominicana'],['forbescentroamerica.com','Centroamérica']];
+const sdOtras = P => { const o = SD_EDS.filter(x => x[0] !== P.dominio).map(x => x[1]); return o.slice(0,-1).join(', ') + ' y ' + o.slice(-1); };
+const sdCfg = () => PAISES[S.pais].sd || PAISES.co.sd;
 const hostDe = u => (String(u||'').match(/^https?:\/\/([^\/?#:]+)/i) || [,''])[1].toLowerCase().replace(/^www\./,'');
 /* Se ejecuta en la página de la nota (forbes.com), en el navegador del redactor. Sin comentarios de línea: va dentro de un marcador. */
 function sdGrab(HUB){
@@ -1565,6 +1570,11 @@ function renderSD(){
   $('sd-eyebrow').textContent = P.edicion + ' · Equipo editorial';
   $('man-sd').hidden = !P.sdManual; if(P.sdManual) $('man-sd').href = P.sdManual;
   $('sd-mail').placeholder = P.correo || 'nombre@forbes.co';
+  const C = sdCfg();
+  $('sd-uhint-ed').textContent = sdOtras(P);
+  $('sd-lea-l').textContent = '«' + C.lea + '»'; $('sd-lea-d').textContent = '· URL de ' + P.dominio; $('sd-e6').textContent = 'Tiene que ser una nota de ' + P.dominio + '.';
+  $('sd-how-ed').textContent = P.edicion; $('sd-how-lector').textContent = C.lector;
+  $('sd-how-cierre').textContent = '«' + C.cierre + '…» con el enlace, y un «' + C.lea + '» de ' + P.dominio + (C.leaPos === 'medio' ? ' a mitad de la nota.' : ' al final.');
   const hub = location.origin + location.pathname + '#/' + S.pais + '/sindicados';
   $('sd-bm').href = 'javascript:' + encodeURIComponent('(' + sdGrab.toString() + ')(' + JSON.stringify(hub) + ')');
   $('sd-bm').textContent = '↗ Enviar al Hub · ' + P.edicion;
@@ -1594,7 +1604,7 @@ $('sd-bm').addEventListener('click', e => { e.preventDefault(); toast('No lo toq
 $('sd-ed').addEventListener('input', () => { $('sd-pw').hidden = !/subscribe to continue reading|already a member\?\s*sign in/i.test($('sd-ed').innerText); const n = $('sd-ed').innerText.trim().length; $('sd-pcnt').textContent = n ? fmtN(n) + ' caracteres' : ''; if(n >= 300) $('sd-e3').classList.remove('on'); });
 document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.addEventListener('click', () => sdTab(b.dataset.sdt)));
 function sdTab(t){ document.querySelectorAll('.sd-tabs [role=tab]').forEach(b => b.setAttribute('aria-selected', b.dataset.sdt === t)); document.querySelectorAll('#sd-res .tp').forEach(p => p.classList.toggle('on', p.id === 'sdp-'+t)); }
-function fechaSD(x){ x = String(x || '').trim(); if(!x) return ''; const sd = x.match(/^(\d{4})-(\d{2})-(\d{2})$/); if(sd) return new Date(+sd[1], +sd[2]-1, +sd[3]).toLocaleDateString('es-CO', {day:'numeric', month:'long', year:'numeric'}); const d = new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(x) ? x : x + 'Z'); return isNaN(d) ? '' : d.toLocaleDateString('es-CO', {timeZone:'America/Bogota', day:'numeric', month:'long', year:'numeric'}); }
+function fechaSD(x){ x = String(x || '').trim(); if(!x) return ''; const sd = x.match(/^(\d{4})-(\d{2})-(\d{2})$/); const C = sdCfg(); if(sd) return new Date(+sd[1], +sd[2]-1, +sd[3]).toLocaleDateString(C.locale, {day:'numeric', month:'long', year:'numeric'}); const d = new Date(/[zZ]|[+-]\d\d:?\d\d$/.test(x) ? x : x + 'Z'); return isNaN(d) ? '' : d.toLocaleDateString(C.locale, {timeZone:C.tz, day:'numeric', month:'long', year:'numeric'}); }
 async function enviarSD(){
   if(S.sdBusy) return;
   const P = PAISES[S.pais], nom = $('sd-red').value.trim(), mail = $('sd-mail').value.trim(), lea = $('sd-lea').value.trim();
@@ -1606,7 +1616,7 @@ async function enviarSD(){
     else if(urlOk(url) && !SD_AUTO.test(hostDe(url))){
       const hd = hostDe(url), propia = P.dominio && (hd === P.dominio || hd.endsWith('.' + P.dominio));
       if(/(^|\.)forbes\.com$/.test(hd)){ sdAvisoUS(url); scrollTo({top: $('sd-usu').getBoundingClientRect().top + scrollY - 120, behavior:'smooth'}); return; }
-      $('sd-e1').textContent = propia ? 'Esa nota ya es de ' + (P.edicion || 'esta edición') + '. Pegue la URL de la nota original.' : 'La URL no es de Forbes US ni de una edición del grupo (México, Perú, Chile, República Dominicana o Centroamérica).';
+      $('sd-e1').textContent = propia ? 'Esa nota ya es de ' + (P.edicion || 'esta edición') + '. Pegue la URL de la nota original.' : 'La URL no es de Forbes US ni de una edición del grupo (' + sdOtras(P).replace(/ y ([^,]+)$/, ' o $1') + ').';
       bad = err('sd-e1', true, 'sd-url') || bad;
     } else { $('sd-e1').textContent = 'Pegue la URL completa de la nota.'; bad = err('sd-e1', !urlOk(url), 'sd-url') || bad; }
   } else {
@@ -1619,7 +1629,7 @@ async function enviarSD(){
   }
   bad = err('sd-e4', !nom, 'sd-red') || bad;
   bad = err('sd-e5', !validEmail(mail), 'sd-mail') || bad;
-  bad = err('sd-e6', lea && !/^https?:\/\/(www\.)?forbes\.co\//i.test(lea), 'sd-lea') || bad;
+  bad = err('sd-e6', lea && !new RegExp('^https?:\\/\\/(www\\.)?' + P.dominio.replace(/\./g,'\\.') + '\\/', 'i').test(lea), 'sd-lea') || bad;
   if(bad){ const f = document.querySelector('#form-sd .ferr.on'); if(f) f.scrollIntoView({behavior:'smooth', block:'center'}); return; }
   localStorage.setItem('th_sd_who', JSON.stringify({nom, mail}));
   const body = {pais:S.pais.toUpperCase(), clave:keyOf(S.pais), url, redactor:nom, email:mail, lea_url:lea, notas:$('sd-not').value.trim()};
@@ -1645,10 +1655,11 @@ async function enviarSD(){
     $('sd-msg').innerHTML = '<div class="notice err" role="alert">'+esc(e.name === 'AbortError' ? 'La traducción tardó demasiado. Intente de nuevo en unos minutos.' : e instanceof TypeError ? 'No hay conexión con el servidor del Hub. Revise su conexión e intente de nuevo.' : e.message)+'</div>';
   }finally{ clearInterval(iv); clearTimeout(to); S.sdBusy = false; $('bsd').disabled = false; $('bsd').textContent = 'Traducir y adaptar'; }
 }
-function mdSD(md){
+function mdSD(md, ins){
   const lk = s => esc(s).replace(/\[([^\]]+)\]\((https?:\/\/[^)\s]+)\)/g, (m, a, u) => '<a href="'+u.replace(/"/g,'&quot;')+'" target="_blank" rel="noopener">'+a+'</a>');
   const out = []; let list = null;
-  String(md||'').split(/\n+/).map(x => x.trim()).filter(Boolean).forEach(l => {
+  String(md||'').split(/\n+/).map(x => x.trim()).filter(Boolean).forEach((l, i) => {
+    if(ins && i === ins.idx){ if(list){ out.push('<ul>'+list.map(x => '<li>'+lk(x)+'</li>').join('')+'</ul>'); list = null; } out.push(ins.html); }
     if(/^[-•*]\s+/.test(l)){ (list = list || []).push(l.replace(/^[-•*]\s+/,'')); return; }
     if(list){ out.push('<ul>'+list.map(i => '<li>'+lk(i)+'</li>').join('')+'</ul>'); list = null; }
     if(/^#{2,4}\s+/.test(l)) out.push('<h4>'+lk(l.replace(/^#{2,4}\s+/,''))+'</h4>');
@@ -1667,12 +1678,14 @@ function mostrarSD(){
   const al = (d.alertas||[]).filter(Boolean);
   $('sd-rmsg').innerHTML = (d.aviso ? '<div class="notice ok">'+esc(d.aviso)+'</div>' : '') +
     (al.length ? '<div class="alerta"><b>Verificar al cierre</b><ul>'+al.map(x => '<li>'+esc(x)+'</li>').join('')+'</ul></div>' : '');
+  const C = sdCfg(), lbl = d.lea_label || C.lea, medio = d.lea_tambien && d.lea_idx > 0;
+  const leaH = d.lea_tambien ? '<p class="lea"'+(medio?' style="margin:14px 0"':'')+'>'+esc(lbl)+': <a href="'+esc(d.lea_tambien.url)+'" target="_blank" rel="noopener">'+esc(d.lea_tambien.titulo)+'</a></p>' : '';
   $('sd-art').innerHTML = '<div class="sello">'+esc(PAISES[S.pais].edicion)+' · '+esc(d.categoria||'')+'</div><h2>'+esc(d.titular)+'</h2>'+(d.bajada ? '<p class="dek">'+esc(d.bajada)+'</p>' : '')+
-    '<div class="body">'+mdSD(d.cuerpo)+'</div>'+
-    '<p class="cierre"><a href="'+esc(d.url)+'" target="_blank" rel="noopener" style="color:inherit">'+esc(d.atribucion || 'Este artículo fue publicado originalmente por ' + d.origen)+'</a></p>'+
-    (d.lea_tambien ? '<p class="lea">Lea también: <a href="'+esc(d.lea_tambien.url)+'" target="_blank" rel="noopener">'+esc(d.lea_tambien.titulo)+'</a></p>' : '<p class="lea" style="color:#8A887F">Lea también: agregue una nota relacionada de forbes.co.</p>');
+    '<div class="body">'+mdSD(d.cuerpo, medio ? {idx:d.lea_idx, html:leaH} : null)+'</div>'+
+    '<p class="cierre"><a href="'+esc(d.url)+'" target="_blank" rel="noopener" style="color:inherit">'+esc(d.atribucion || C.cierre + ' ' + d.origen)+'</a></p>'+
+    (d.lea_tambien ? (medio ? '' : leaH) : '<p class="lea" style="color:#8A887F">'+esc(lbl)+': agregue una nota relacionada de '+esc(PAISES[S.pais].dominio)+(C.leaPos === 'medio' ? ', a mitad de la nota' : '')+'.</p>');
   const cx = (d.notas_contexto||[]).filter(Boolean);
-  $('sd-ctx').innerHTML = cx.length ? '<div class="lbl" style="margin-top:22px">Contexto que podría necesitar el lector colombiano</div><ul class="ctxlist">'+cx.map(x => '<li>'+esc(x)+'</li>').join('')+'</ul><p class="hint">Son sugerencias: el texto no las incluye. Agréguelas solo si aportan.</p>' : '';
+  $('sd-ctx').innerHTML = cx.length ? '<div class="lbl" style="margin-top:22px">Contexto que podría necesitar el lector '+esc(d.lector || C.lector)+'</div><ul class="ctxlist">'+cx.map(x => '<li>'+esc(x)+'</li>').join('')+'</ul><p class="hint">Son sugerencias: el texto no las incluye. Agréguelas solo si aportan.</p>' : '';
   const ch = d.checks || [], malos = ch.filter(c => !c.ok).length;
   $('sd-cnt').textContent = malos || '✓'; $('sd-cnt').classList.toggle('bad', malos > 0);
   $('sd-checks').innerHTML = ch.map(c => '<li class="'+(c.ok?'ok':'warn')+'"><span class="ic">'+(c.ok?'✓':'!')+'</span><div><div>'+esc(c.t)+'</div><div class="d">'+esc(c.d)+'</div></div></li>').join('');
@@ -1711,7 +1724,7 @@ function guardarSDHist(d){
 function renderSDHist(){
   let h = []; try{ h = JSON.parse(localStorage.getItem('th_sd_hist_'+S.pais)||'[]'); }catch(e){}
   $('sd-hist-p').hidden = !h.length;
-  $('sd-hist').innerHTML = h.map((x,i) => '<button class="hist" type="button" onclick="verSDHist('+i+')"><div class="tt" style="font-size:15px">'+esc(x.d.titular)+'</div><div class="mm">'+new Date(x.at).toLocaleString('es-CO',{dateStyle:'medium',timeStyle:'short'})+' · '+esc(x.d.origen||'')+'</div></button>').join('');
+  $('sd-hist').innerHTML = h.map((x,i) => '<button class="hist" type="button" onclick="verSDHist('+i+')"><div class="tt" style="font-size:15px">'+esc(x.d.titular)+'</div><div class="mm">'+new Date(x.at).toLocaleString(sdCfg().locale,{dateStyle:'medium',timeStyle:'short'})+' · '+esc(x.d.origen||'')+'</div></button>').join('');
 }
 function verSDHist(i){ let h = []; try{ h = JSON.parse(localStorage.getItem('th_sd_hist_'+S.pais)||'[]'); }catch(e){} if(!h[i]) return; S.sdRes = h[i].d; mostrarSD(); window.scrollTo({top:0, behavior:'smooth'}); }
 
