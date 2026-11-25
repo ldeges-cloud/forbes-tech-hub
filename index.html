@@ -359,6 +359,15 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .bm:hover{background:var(--red-bg)}
 .ctxlist{margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)}
 .ctxlist li{margin-bottom:6px}
+.sm-sel{width:100%}
+.sm-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:16px 0 4px}
+.sm-kpis>div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--field)}
+.sm-kpis .k{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-4)}
+.sm-kpis .v{font-family:var(--display);font-size:22px;margin-top:4px}
+.sm-list{list-style:none;margin:0;padding:0}
+.sm-list li{display:flex;justify-content:space-between;gap:10px;padding:8px 0;border-bottom:1px solid var(--line);font-size:13px;color:var(--ink-2)}
+.sm-list li:last-child{border-bottom:0}
+.sm-list a{color:var(--red);text-decoration:none;white-space:nowrap}
 @media (max-width:960px){.layout{grid-template-columns:minmax(0,1fr)}.sticky{position:static}.h1{font-size:32px}.crumbs{display:none}}
 @media (max-width:560px){.row,.cards,.cards.two{grid-template-columns:minmax(0,1fr)}.logo span{display:none}.meter{flex-wrap:wrap}.meter .lab{white-space:normal}.tool-head .actions{margin-left:0}.wrap{padding:22px 16px 60px}.top-in{padding:10px 16px}.article{padding:22px 18px}}
 </style>
@@ -644,7 +653,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
     <div class="kpis" id="adm-kpis"></div>
     <div class="adm-card" id="adm-semanas-card">
       <h2>Usos por semana</h2><p class="sub">Últimas 12 semanas, de lunes a domingo (hora de Lima)</p>
-      <div class="adm-legend"><span><i style="background:#EE1E23"></i>Notas nuevas</span><span><i style="background:#F2B544"></i>Ajustes</span><span><i style="background:#4CAF7D"></i>Correcciones</span><span><i style="background:#5B8DEF"></i>Revisiones del Checker</span></div>
+      <div class="adm-legend"><span><i style="background:#EE1E23"></i>Notas nuevas</span><span><i style="background:#F2B544"></i>Ajustes</span><span><i style="background:#4CAF7D"></i>Correcciones</span><span><i style="background:#5B8DEF"></i>Revisiones del Checker</span><span><i style="background:#3FC1C9"></i>Reportes de redes</span></div>
       <div class="adm-chart" id="adm-chart"></div>
     </div>
     <div class="adm-grid">
@@ -811,10 +820,63 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
     </div>
   </section>
 
+  <section class="view" id="v-sm" aria-labelledby="h-sm">
+    <div class="tool-head"><div><div class="eyebrow" id="sm-eyebrow"></div><h1 class="h1" id="h-sm">Social Media</h1></div></div>
+    <div class="layout">
+      <form class="panel" id="form-sm" novalidate onsubmit="event.preventDefault();exportarSM()">
+        <div class="ph"><span class="t">Reporte semanal de redes</span><span class="s">Instagram, Facebook, LinkedIn, TikTok, YouTube y audiencias</span></div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">1</span><span class="step-t">Semana</span></div>
+          <div class="field"><label for="sm-sem">Semana a exportar <span class="opt">· de lunes a domingo</span></label><select id="sm-sem" class="sm-sel" disabled><option>Cargando semanas…</option></select>
+            <div class="hint">Por defecto, la última semana cerrada. Si ya se exportó, se reemplaza el archivo con los datos de hoy.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">2</span><span class="step-t">Quién exporta</span></div>
+          <div class="field"><label for="sm-nom">Nombre <span class="opt">· opcional</span></label><input type="text" id="sm-nom" autocomplete="name" placeholder="Nombre y apellido"><div class="hint">Queda en el registro de uso del Hub.</div></div>
+        </div>
+        <div class="pb" style="border-top:1px solid var(--line)">
+          <div id="sm-msg"></div>
+          <button type="submit" class="btn primary big" id="bsm" disabled>Exportar reporte</button>
+          <div class="hint" style="text-align:center;margin-top:10px">Tarda entre 15 y 40 segundos. El Excel se descarga solo y queda guardado en Drive.</div>
+        </div>
+      </form>
+
+      <div class="sticky">
+        <div class="panel" id="sm-how"><div class="how">
+          <h3>Qué hace</h3>
+          <ul class="rules">
+            <li><span class="k">Completa</span><span>El Excel de siempre (<span id="sm-how-arch">ForbesMX_Reporte_Redes_Sociales</span>), con sus hojas, gráficas y Dashboard, sin cargar nada a mano.</span></li>
+            <li><span class="k">Redes</span><span>Seguidores, alcance, visualizaciones, engagement, likes, comentarios, guardados, compartidos, reels, stories y posts, desde Metricool.</span></li>
+            <li><span class="k">YouTube</span><span>Vistas, horas de reproducción, porcentaje visto, likes y comentarios, desde YouTube Analytics.</span></li>
+            <li><span class="k">Audiencias</span><span>Sesiones, usuarios nuevos y recurrentes que llegan al sitio desde redes, desde GA4.</span></li>
+            <li><span class="k">Guarda</span><span>Una copia por semana en la carpeta de reportes de redes de la edición, en Drive.</span></li>
+            <li><span class="k">A mano</span><span>Las columnas <b>Notas</b>, para explicar picos y caídas. El newsletter no se incluye.</span></li>
+          </ul>
+        </div></div>
+        <div class="panel" id="sm-load" hidden><div class="loading" aria-live="polite"><h3>Armando el reporte</h3><div class="sub" id="sm-ld-sub"></div><ul class="stages" id="sm-stages"></ul><div class="bar"><i id="sm-bar"></i></div><div class="elapsed num"><span id="sm-el">0 s</span><span></span></div></div></div>
+        <div class="panel" id="sm-res" hidden>
+          <div class="res-head"><span class="tag gold" id="sm-t1"></span><span class="tag live" id="sm-t2"></span></div>
+          <div class="pb">
+            <h3 style="margin:0 0 4px" id="sm-arch"></h3>
+            <p class="hint" style="margin:0" id="sm-sub"></p>
+            <div id="sm-avisos"></div>
+            <div class="sm-kpis" id="sm-kpis"></div>
+            <div class="res-actions">
+              <button class="btn primary" type="button" onclick="bajarSM()">Descargar de nuevo</button>
+              <a class="btn" id="sm-drive" href="#" target="_blank" rel="noopener">Abrir en Drive</a>
+              <a class="btn" id="sm-carp" href="#" target="_blank" rel="noopener">Carpeta de reportes</a>
+            </div>
+          </div>
+        </div>
+        <div class="panel" id="sm-hist-p" hidden><div class="pb"><div class="lbl">Reportes guardados en Drive</div><ul class="sm-list" id="sm-hist"></ul></div></div>
+      </div>
+    </div>
+  </section>
+
   <section class="view" id="v-404"><div class="empty"><div class="ic">?</div><h3>No encontramos esa página</h3><p><a href="#/">Volver al inicio</a></p></div></section>
 </main>
 
-<div class="foot-note"><span>Forbes Tech Hub · v1.5 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
+<div class="foot-note"><span>Forbes Tech Hub · v1.6 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
 
 <!-- Acceso -->
 <div class="scrim" id="m-key" role="dialog" aria-modal="true" aria-labelledby="mk-t">
@@ -841,7 +903,8 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 const API = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-brandvoice';
 const API_ADM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-admin';
 const API_SD = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-sindicados';
-const VERSION = '1.5';
+const API_SM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-social';
+const VERSION = '1.6';
 
 const PAISES = {
   pe: {code:'PE', nombre:'Perú', edicion:'Forbes Perú', activo:true, dominio:'forbes.pe', correo:'nombre@forbes.pe',
@@ -852,7 +915,8 @@ const PAISES = {
        urlBase:'forbes.pe/brand-voice/', idioma:'Español neutro, tercera persona, sin peruanismos coloquiales',
        sd:{lector:'peruano', lea:'Lee también', leaPos:'medio', cierre:'Este artículo se publicó originalmente en', pais:'Perú', locale:'es-PE', tz:'America/Lima'},
        tools:['brand-voice','checker','sindicados']},
-  mx: {code:'MX', nombre:'México', edicion:'Forbes México', activo:false},
+  mx: {code:'MX', nombre:'México', edicion:'Forbes México', activo:true, dominio:'forbes.com.mx', correo:'nombre@forbes.com.mx',
+       tools:['social-media'], verifica:'social'},
   co: {code:'CO', nombre:'Colombia', edicion:'Forbes Colombia', activo:true, sdManual:'https://docs.google.com/document/d/1HIXu_mCdgW2BGe7nNk2JVkTbpR3uFE72V9s676_t2cg/edit', dominio:'forbes.co', correo:'nombre@forbes.co',
        cifras:'US$8.400 millones y US$4,07 billones; punto para miles y coma para decimales',
        sd:{lector:'colombiano', lea:'Lea también', leaPos:'final', cierre:'Este artículo fue publicado originalmente por', pais:'Colombia', locale:'es-CO', tz:'America/Bogota'},
@@ -865,6 +929,7 @@ const TOOLS = [
   {id:'brand-voice', ic:'B', nombre:'Generador Brand Voice', desc:'Del brief del cliente a una nota patrocinada lista para revisión. Aprende del estilo de la edición con cada nota que corrigen los redactores.', equipo:'Comercial', activo:true},
   {id:'checker', ic:'C', nombre:'Checker editorial', desc:'Revisión del PDF de la revista antes de imprenta: ortografía, tipeo, gramática y nombres propios. El reporte llega por correo.', equipo:'Editorial', activo:true},
   {id:'sindicados', ic:'S', nombre:'Sindicados', desc:'De la URL de una nota de Forbes US o de otra edición del grupo a la versión de la edición: traducción, cifras, enlaces, SEO y «Lea también».', equipo:'Editorial', activo:true},
+  {id:'social-media', ic:'R', nombre:'Social Media', desc:'Reporte semanal de redes con un clic: el Excel de la edición completo con Metricool, YouTube Analytics y GA4, guardado en Drive.', equipo:'Social Media', activo:true},
   {id:'pre-diseno', ic:'P', nombre:'Checker pre-diseño', desc:'Revisión del texto en Google Docs antes de pasar a diseño, con comentarios en el documento.', equipo:'Editorial', activo:false}
 ];
 const FORMATOS = {
@@ -920,6 +985,7 @@ function route(){
   if(tool === 'sindicados'){ renderSD(); return show('v-sd', [[P.nombre,'#/'+p],['Sindicados']]); }
   if(tool === 'brand-voice'){ renderBV(); return show('v-bv', [[P.nombre,'#/'+p],['Brand Voice']]); }
   if(tool === 'checker'){ renderCK(); return show('v-ck', [[P.nombre,'#/'+p],['Checker editorial']]); }
+  if(tool === 'social-media'){ renderSM(); return show('v-sm', [[P.nombre,'#/'+p],['Social Media']]); }
   show('v-404', []);
 }
 function show(id, crumbs){
@@ -972,7 +1038,7 @@ async function submitKey(){
   try{
     const r = p === 'admin'
       ? await fetch(API_ADM, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', clave:k})})
-      : await fetch(PAISES[p].verifica === 'sindicados' ? API_SD : API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', pais:p.toUpperCase(), clave:k})});
+      : await fetch(({sindicados: API_SD, social: API_SM})[PAISES[p].verifica] || API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', pais:p.toUpperCase(), clave:k})});
     if(r.status === 401 || r.status === 403){ throw new Error('clave'); }
     const d = await r.json().catch(()=>({}));
     if(d.status !== 'ok') throw new Error(d.message || 'clave');
@@ -1728,9 +1794,96 @@ function renderSDHist(){
 }
 function verSDHist(i){ let h = []; try{ h = JSON.parse(localStorage.getItem('th_sd_hist_'+S.pais)||'[]'); }catch(e){} if(!h[i]) return; S.sdRes = h[i].d; mostrarSD(); window.scrollTo({top:0, behavior:'smooth'}); }
 
+/* ========= Social Media: reporte semanal de redes ========= */
+const SM_STAGES = [
+  {t:'Leyendo Metricool (Instagram, Facebook, LinkedIn, TikTok, YouTube)', s:6},
+  {t:'YouTube Analytics y GA4', s:3},
+  {t:'Copiando la plantilla y escribiendo los datos', s:5},
+  {t:'Exportando el Excel y guardándolo en Drive', s:5}
+];
+const fechaCorta = iso => iso.split('-').reverse().join('/');
+async function renderSM(){
+  const P = PAISES[S.pais];
+  $('sm-eyebrow').textContent = P.edicion + ' · Equipo de Social Media';
+  $('sm-how-arch').textContent = P.code === 'MX' ? 'ForbesMX_Reporte_Redes_Sociales' : 'reporte de redes de ' + P.edicion;
+  $('sm-res').hidden = true; $('sm-load').hidden = true; $('sm-how').hidden = false; $('sm-msg').innerHTML = '';
+  $('sm-nom').value = localStorage.getItem('th_sm_nom') || '';
+  const sel = $('sm-sem'); sel.innerHTML = '<option>Cargando semanas…</option>'; sel.disabled = true; $('bsm').disabled = true;
+  try{
+    const r = await fetch(API_SM, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'semanas', pais:P.code, clave:keyOf(S.pais)})});
+    if(r.status === 401){ localStorage.removeItem('th_key_'+S.pais); S.pendingRoute = location.hash; openKey(S.pais); return; }
+    const d = await r.json(); S.sm = d;
+    pintarSMHist();
+    if(!d.disponibles || !d.disponibles.length){
+      sel.innerHTML = '<option>Todavía no hay semanas para exportar</option>';
+      const prox = d.proxima;
+      $('sm-msg').innerHTML = '<div class="alerta">La primera semana que se completa sola es la del <b>'+esc(prox.etiqueta)+'</b>. Se puede exportar desde el lunes '+fechaCorta(new Date(new Date(prox.domingo+'T12:00:00Z').getTime()+864e5).toISOString().slice(0,10))+'.</div>';
+      return;
+    }
+    sel.innerHTML = d.disponibles.map(s => '<option value="'+s.lunes+'">S'+String(s.n).padStart(2,'0')+' · '+esc(s.etiqueta)+(s.drive_url ? ' · ya exportada' : '')+'</option>').join('');
+    sel.disabled = false; $('bsm').disabled = false;
+  }catch(e){
+    sel.innerHTML = '<option>No se pudieron cargar las semanas</option>';
+    $('sm-msg').innerHTML = '<div class="alerta">No hay conexión con el servidor del Hub. Intente en unos minutos.</div>';
+  }
+}
+function pintarSMHist(){
+  const d = S.sm || {}, g = (d.disponibles || []).filter(s => s.drive_url);
+  $('sm-hist-p').hidden = !g.length && !d.carpeta_url;
+  $('sm-hist').innerHTML = g.map(s => '<li><span>S'+String(s.n).padStart(2,'0')+' · '+esc(s.etiqueta)+'</span><a href="'+esc(s.drive_url)+'" target="_blank" rel="noopener">Abrir ↗</a></li>').join('') +
+    (d.carpeta_url ? '<li><span>Todas las semanas</span><a href="'+esc(d.carpeta_url)+'" target="_blank" rel="noopener">Carpeta en Drive ↗</a></li>' : '');
+}
+function bajarSM(){
+  const f = S.smFile; if(!f) return;
+  const bin = atob(f.b64), u8 = new Uint8Array(bin.length);
+  for(let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
+  const url = URL.createObjectURL(new Blob([u8], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
+  const a = document.createElement('a'); a.href = url; a.download = f.nombre; document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+}
+async function exportarSM(){
+  const P = PAISES[S.pais], sem = $('sm-sem').value, nom = $('sm-nom').value.trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(sem)) return;
+  localStorage.setItem('th_sm_nom', nom);
+  $('bsm').disabled = true; $('sm-how').hidden = true; $('sm-res').hidden = true; $('sm-load').hidden = false; $('sm-msg').innerHTML = '';
+  $('sm-ld-sub').textContent = $('sm-sem').selectedOptions[0].textContent.replace(' · ya exportada', '');
+  const t0 = Date.now(), total = SM_STAGES.reduce((a,x)=>a+x.s,0);
+  const tick = () => { const el = (Date.now()-t0)/1000; let acc = 0;
+    $('sm-stages').innerHTML = SM_STAGES.map((x,i) => { const st = el >= acc + x.s && i < SM_STAGES.length-1 ? 'done' : el >= acc ? 'on' : ''; acc += x.s; return '<li class="'+st+'"><span class="b">'+(st==='done'?'✓':'')+'</span>'+esc(x.t)+'</li>'; }).join('');
+    $('sm-bar').style.width = Math.min(95, el/total*100)+'%'; $('sm-el').textContent = Math.round(el)+' s'; };
+  tick(); const iv = setInterval(tick, 500);
+  try{
+    const r = await fetch(API_SM, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'exportar', pais:P.code, clave:keyOf(S.pais), semana:sem, nombre:nom})});
+    if(r.status === 401){ localStorage.removeItem('th_key_'+S.pais); S.pendingRoute = location.hash; openKey(S.pais); throw new Error('La clave venció. Vuelva a ingresarla.'); }
+    const d = await r.json().catch(() => ({}));
+    if(d.status !== 'success') throw new Error(d.message || 'No se pudo armar el reporte. Intente de nuevo en unos minutos; si sigue fallando, avísele a Lucas Deges.');
+    S.smFile = {b64: d.xlsx_b64, nombre: d.archivo};
+    bajarSM();
+    pintarSMRes(d);
+    // refrescar la lista de semanas guardadas
+    const s = (S.sm && S.sm.disponibles || []).find(x => x.lunes === d.semana.lunes); if(s && d.drive_url){ s.drive_url = d.drive_url; pintarSMHist(); }
+  }catch(e){
+    $('sm-msg').innerHTML = '<div class="alerta">'+esc(e instanceof TypeError ? 'No hay conexión con el servidor del Hub. Intente en unos minutos.' : e.message)+'</div>';
+    $('sm-how').hidden = false;
+  }finally{ clearInterval(iv); $('sm-load').hidden = true; $('bsm').disabled = false; }
+}
+function pintarSMRes(d){
+  const s = d.semana, k = d.resumen || {};
+  $('sm-t1').textContent = 'S' + String(s.n).padStart(2,'0') + ' · ' + s.etiqueta;
+  $('sm-t2').textContent = d.drive_url ? (d.reemplazo ? 'Actualizado en Drive' : 'Guardado en Drive') : 'Sin guardar en Drive';
+  $('sm-arch').textContent = d.archivo;
+  $('sm-sub').textContent = 'Se descargó en este equipo. Listo en ' + d.duracion_s + ' s. Las columnas Notas quedan para completar a mano.';
+  $('sm-avisos').innerHTML = (d.avisos||[]).length ? '<div class="alerta" style="margin-top:14px"><b>Revise antes de enviar:</b><ul>'+d.avisos.map(a => '<li>'+esc(a)+'</li>').join('')+'</ul></div>' : '';
+  const kp = [['Instagram', k.ig_seguidores, 'seguidores'], ['Facebook', k.fb_seguidores, 'seguidores'], ['LinkedIn', k.li_seguidores, 'seguidores'], ['TikTok', k.tk_seguidores, 'seguidores'], ['YouTube', k.yt_suscriptores, 'suscriptores'], ['Desde redes', k.sesiones_redes, 'sesiones en el sitio']];
+  $('sm-kpis').innerHTML = kp.filter(x => x[1] !== '' && x[1] != null).map(x => '<div><div class="k">'+x[0]+'</div><div class="v num">'+fmtN(x[1])+'</div><div class="hint" style="margin:0">'+x[2]+'</div></div>').join('');
+  const dr = $('sm-drive'); dr.hidden = !d.drive_url; dr.href = d.drive_url || '#';
+  $('sm-carp').href = d.carpeta_url || '#';
+  $('sm-res').hidden = false;
+}
+
 /* ========= Admin ========= */
-const COL = {nota:'#EE1E23', ajuste:'#F2B544', correccion:'#4CAF7D', checker:'#5B8DEF', sindicados:'#B58BE8'};
-const TIPO = {nota:'Nota nueva', ajuste:'Ajuste', correccion:'Corrección', checker:'Revisión del Checker', sindicados:'Sindicado'};
+const COL = {nota:'#EE1E23', ajuste:'#F2B544', correccion:'#4CAF7D', checker:'#5B8DEF', sindicados:'#B58BE8', social:'#3FC1C9'};
+const TIPO = {nota:'Nota nueva', ajuste:'Ajuste', correccion:'Corrección', checker:'Revisión del Checker', sindicados:'Sindicado', social:'Reporte de redes'};
 async function cargarAdmin(forzar){
   if(S.adm && !forzar && Date.now() - S.adm.at < 120000){ pintarAdmin(); return; }
   $('adm-msg').innerHTML = ''; $('adm-when').textContent = 'Cargando…'; $('adm-refresh').disabled = true;
@@ -1752,7 +1905,7 @@ async function cargarAdmin(forzar){
 }
 function nombreEd(c){ const P = PAISES[String(c).toLowerCase()]; return P ? P.edicion : c; }
 const tsLima = f => { const t = Date.parse(String(f||'').replace(' ', 'T') + ':00-05:00'); return isNaN(t) ? null : t; };
-const tipoDe = r => r.herramienta === 'checker' ? 'checker' : r.herramienta === 'sindicados' ? 'sindicados' : r.modo === 'correccion' ? 'correccion' : r.modo === 'regenerar' ? 'ajuste' : 'nota';
+const tipoDe = r => r.herramienta === 'social-media' ? 'social' : r.herramienta === 'checker' ? 'checker' : r.herramienta === 'sindicados' ? 'sindicados' : r.modo === 'correccion' ? 'correccion' : r.modo === 'regenerar' ? 'ajuste' : 'nota';
 const numOr = v => (v === '' || v == null || isNaN(Number(v))) ? null : Number(v);
 const prom = a => { const v = a.filter(x => x != null); return v.length ? v.reduce((s,x)=>s+x,0)/v.length : null; };
 function pintarAdmin(){
@@ -1812,7 +1965,8 @@ function pintarAdmin(){
 
   // Recientes
   const rec = act.slice().sort((a,b) => b.ts - a.ts).slice(0, 30);
-  const res = r => r.t === 'sindicados' ? (r.tipo ? r.tipo + ' · ' : '') + (r.score ? r.score + (r.score === 1 ? ' observación' : ' observaciones') + ' del control' : 'sin observaciones del control')
+  const res = r => r.t === 'social' ? (r.tipo || 'Reporte de redes') + (r.score ? ' · ' + r.score + (r.score === 1 ? ' aviso' : ' avisos') : ' · completo')
+    : r.t === 'sindicados' ? (r.tipo ? r.tipo + ' · ' : '') + (r.score ? r.score + (r.score === 1 ? ' observación' : ' observaciones') + ' del control' : 'sin observaciones del control')
     : r.t === 'checker' ? (r.score ?? '—') + ' observaciones · ' + (r.car ?? '—') + ' págs.' + (r.dentro_rango === 'incompleto' ? ' · incompleta' : '')
     : r.t === 'correccion' ? (r.score == null ? 'Cargada como referencia' : 'Cambió un ' + r.score + ' %') + (r.formato ? ' · ' + r.formato : '')
     : 'Calidad ' + (r.score ?? '—') + '/100 · ' + (r.dentro_rango === 'sí' ? 'dentro de la extensión' : 'fuera de la extensión');
@@ -1824,9 +1978,9 @@ function dibujarSemanas(todos){
   const el = $('adm-chart'), D = 864e5, L = 5*36e5;
   const lunes = ts => { const d = new Date(ts - L); const dow = (d.getUTCDay()+6)%7; return Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()-dow); };
   const hoy = lunes(Date.now()), sem = [];
-  for(let k = 11; k >= 0; k--){ const ini = hoy - k*7*D, d = new Date(ini); sem.push({ini, lab: String(d.getUTCDate()).padStart(2,'0')+'/'+String(d.getUTCMonth()+1).padStart(2,'0'), nota:0, ajuste:0, correccion:0, checker:0, sindicados:0}); }
+  for(let k = 11; k >= 0; k--){ const ini = hoy - k*7*D, d = new Date(ini); sem.push({ini, lab: String(d.getUTCDate()).padStart(2,'0')+'/'+String(d.getUTCMonth()+1).padStart(2,'0'), nota:0, ajuste:0, correccion:0, checker:0, sindicados:0, social:0}); }
   todos.forEach(r => { const w = sem.find(s => s.ini === lunes(r.ts)); if(w) w[r.t]++; });
-  const keys = ['nota','ajuste','correccion','checker','sindicados'], tot = s => keys.reduce((a,k)=>a+s[k],0), max = Math.max(1, ...sem.map(tot));
+  const keys = ['nota','ajuste','correccion','checker','sindicados','social'], tot = s => keys.reduce((a,k)=>a+s[k],0), max = Math.max(1, ...sem.map(tot));
   if(!sem.some(s => tot(s))){ el.innerHTML = '<p class="adm-empty">Todavía no hay usos registrados en las últimas 12 semanas.</p>'; return; }
   const W = Math.max(300, el.clientWidth || 700), H = 220, ml = 30, mb = 24, mt = 8, iw = W - ml - 6, bw = iw/12, ih = H - mb - mt;
   const top = Math.ceil(max / 4) * 4 || 4, y = v => mt + ih - v/top*ih;
