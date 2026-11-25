@@ -862,7 +862,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
           <ul class="rules">
             <li><span class="k">Completa</span><span>El Excel de siempre (<span id="sm-how-arch">ForbesMX_Reporte_Redes_Sociales</span>), con sus hojas, gráficas y Dashboard, sin cargar nada a mano.</span></li>
             <li><span class="k">Redes</span><span>Seguidores, alcance, visualizaciones, engagement, likes, comentarios, guardados, compartidos, reels, stories y posts, desde Metricool.</span></li>
-            <li><span class="k">YouTube</span><span>Vistas, horas de reproducción, porcentaje visto, likes y comentarios, desde YouTube Analytics.</span></li>
+            <li><span class="k">YouTube</span><span>Suscriptores, vistas, likes, comentarios y shorts. Donde el canal está vinculado (hoy, México) suma horas de reproducción y porcentaje visto, desde YouTube Analytics.</span></li>
             <li><span class="k">Audiencias</span><span>Sesiones, usuarios nuevos y recurrentes que llegan al sitio desde redes, desde GA4.</span></li>
             <li><span class="k">Guarda</span><span>Una copia por semana en la carpeta de reportes de redes de la edición, en Drive.</span></li>
             <li><span class="k">A mano</span><span>Las columnas <b>Notas</b>, para explicar picos y caídas. El newsletter no se incluye.</span></li>
@@ -891,7 +891,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
   <section class="view" id="v-404"><div class="empty"><div class="ic">?</div><h3>No encontramos esa página</h3><p><a href="#/">Volver al inicio</a></p></div></section>
 </main>
 
-<div class="foot-note"><span>Forbes Tech Hub · v1.6 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
+<div class="foot-note"><span>Forbes Tech Hub · v1.7 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
 
 <!-- Acceso -->
 <div class="scrim" id="m-key" role="dialog" aria-modal="true" aria-labelledby="mk-t">
@@ -919,7 +919,7 @@ const API = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-brandvoice';
 const API_ADM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-admin';
 const API_SD = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-sindicados';
 const API_SM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-social';
-const VERSION = '1.6';
+const VERSION = '1.7';
 
 const PAISES = {
   pe: {code:'PE', nombre:'Perú', edicion:'Forbes Perú', activo:true, dominio:'forbes.pe', correo:'nombre@forbes.pe',
@@ -929,16 +929,16 @@ const PAISES = {
        manual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit', sdManual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit',
        urlBase:'forbes.pe/brand-voice/', idioma:'Español neutro, tercera persona, sin peruanismos coloquiales',
        sd:{lector:'peruano', lea:'Lee también', leaPos:'medio', cierre:'Este artículo se publicó originalmente en', pais:'Perú', locale:'es-PE', tz:'America/Lima'},
-       tools:['brand-voice','checker','sindicados']},
+       tools:['brand-voice','checker','sindicados','social-media']},
   mx: {code:'MX', nombre:'México', edicion:'Forbes México', activo:true, dominio:'forbes.com.mx', correo:'nombre@forbes.com.mx',
        tools:['social-media'], verifica:'social'},
   co: {code:'CO', nombre:'Colombia', edicion:'Forbes Colombia', activo:true, sdManual:'https://docs.google.com/document/d/1HIXu_mCdgW2BGe7nNk2JVkTbpR3uFE72V9s676_t2cg/edit', dominio:'forbes.co', correo:'nombre@forbes.co',
        cifras:'US$8.400 millones y US$4,07 billones; punto para miles y coma para decimales',
        sd:{lector:'colombiano', lea:'Lea también', leaPos:'final', cierre:'Este artículo fue publicado originalmente por', pais:'Colombia', locale:'es-CO', tz:'America/Bogota'},
-       tools:['sindicados'], verifica:'sindicados'},
-  cl: {code:'CL', nombre:'Chile', edicion:'Forbes Chile', activo:false},
-  rd: {code:'RD', nombre:'República Dominicana', edicion:'Forbes República Dominicana', activo:false},
-  ca: {code:'CA', nombre:'Centroamérica', edicion:'Forbes Centroamérica', activo:false}
+       tools:['sindicados','social-media'], verifica:'sindicados'},
+  cl: {code:'CL', nombre:'Chile', edicion:'Forbes Chile', activo:true, dominio:'forbes.cl', tools:['social-media'], verifica:'social'},
+  rd: {code:'RD', nombre:'República Dominicana', edicion:'Forbes República Dominicana', activo:true, dominio:'forbes.do', tools:['social-media'], verifica:'social'},
+  ca: {code:'CA', nombre:'Centroamérica', edicion:'Forbes Centroamérica', activo:true, dominio:'forbescentroamerica.com', tools:['social-media'], verifica:'social'}
 };
 const TOOLS = [
   {id:'brand-voice', ic:'B', nombre:'Generador Brand Voice', desc:'Del brief del cliente a una nota patrocinada lista para revisión. Aprende del estilo de la edición con cada nota que corrigen los redactores.', equipo:'Comercial', activo:true},
@@ -1820,7 +1820,7 @@ const fechaCorta = iso => iso.split('-').reverse().join('/');
 async function renderSM(){
   const P = PAISES[S.pais];
   $('sm-eyebrow').textContent = P.edicion + ' · Equipo de Social Media';
-  $('sm-how-arch').textContent = P.code === 'MX' ? 'ForbesMX_Reporte_Redes_Sociales' : 'reporte de redes de ' + P.edicion;
+  $('sm-how-arch').textContent = 'Forbes' + P.code + '_Reporte_Redes_Sociales';
   $('sm-res').hidden = true; $('sm-load').hidden = true; $('sm-how').hidden = false; $('sm-msg').innerHTML = '';
   $('sm-nom').value = localStorage.getItem('th_sm_nom') || '';
   const sel = $('sm-sem'); sel.innerHTML = '<option>Cargando semanas…</option>'; sel.disabled = true; $('bsm').disabled = true;
