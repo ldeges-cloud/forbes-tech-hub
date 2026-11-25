@@ -394,7 +394,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
     <nav class="crumbs" id="crumbs" aria-label="Ubicación"></nav>
     <div class="spacer"></div>
     <button class="linkbtn" id="btn-hist" hidden onclick="openHist()">Historial</button>
-    <button class="chip" id="chip-pais" hidden onclick="logout()" title="Cerrar sesión de este país"><span class="dot"></span><span id="chip-txt"></span></button>
+    <button class="chip" id="chip-pais" hidden onclick="logout()" title="Cerrar la sesión de este equipo"><span class="dot"></span><span id="chip-txt"></span></button>
   </div>
 </header>
 
@@ -417,7 +417,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
   <section class="view" id="v-pais" aria-labelledby="h-pais">
     <div class="eyebrow" id="pais-eyebrow"></div>
     <h1 class="h1" id="h-pais"></h1>
-    <p class="lede">Elija una herramienta. Todo lo que genera es un borrador: siempre pasa por revisión editorial antes de publicarse.</p>
+    <p class="lede" id="pais-lede">Elija una herramienta. Todo lo que genera es un borrador: siempre pasa por revisión editorial antes de publicarse.</p>
     <div class="grid-tools" id="grid-tools"></div>
     <dl class="ctx" id="ctx-pais"></dl>
   </section>
@@ -891,15 +891,15 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
   <section class="view" id="v-404"><div class="empty"><div class="ic">?</div><h3>No encontramos esa página</h3><p><a href="#/">Volver al inicio</a></p></div></section>
 </main>
 
-<div class="foot-note"><span>Forbes Tech Hub · v1.7 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
+<div class="foot-note"><span>Forbes Tech Hub · v1.8 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
 
 <!-- Acceso -->
 <div class="scrim" id="m-key" role="dialog" aria-modal="true" aria-labelledby="mk-t">
   <form class="modal" onsubmit="event.preventDefault();submitKey()">
     <div class="eyebrow" id="mk-e"></div>
     <h2 id="mk-t">Clave de acceso</h2>
-    <p>Ingrese la clave de su edición. La pide una sola vez en este navegador.</p>
-    <div class="field"><label for="f-key">Clave</label><input type="password" id="f-key" autocomplete="current-password" placeholder="Clave de la edición"><div class="ferr" id="e-key"></div></div>
+    <p id="mk-p">Ingrese la clave de su equipo. Se pide una sola vez en este navegador.</p>
+    <div class="field"><label for="f-key">Clave</label><input type="password" id="f-key" autocomplete="current-password" placeholder="Clave del equipo"><div class="ferr" id="e-key"></div></div>
     <div style="display:flex;gap:8px;margin-top:18px"><button type="button" class="btn" onclick="closeKey()">Cancelar</button><button type="submit" class="btn primary" style="flex:1" id="bkey">Entrar</button></div>
   </form>
 </div>
@@ -919,7 +919,7 @@ const API = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-brandvoice';
 const API_ADM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-admin';
 const API_SD = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-sindicados';
 const API_SM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-social';
-const VERSION = '1.7';
+const VERSION = '1.8';
 
 const PAISES = {
   pe: {code:'PE', nombre:'Perú', edicion:'Forbes Perú', activo:true, dominio:'forbes.pe', correo:'nombre@forbes.pe',
@@ -944,9 +944,18 @@ const TOOLS = [
   {id:'brand-voice', ic:'B', nombre:'Generador Brand Voice', desc:'Del brief del cliente a una nota patrocinada lista para revisión. Aprende del estilo de la edición con cada nota que corrigen los redactores.', equipo:'Comercial', activo:true},
   {id:'checker', ic:'C', nombre:'Checker editorial', desc:'Revisión del PDF de la revista antes de imprenta: ortografía, tipeo, gramática y nombres propios. El reporte llega por correo.', equipo:'Editorial', activo:true},
   {id:'sindicados', ic:'S', nombre:'Sindicados', desc:'De la URL de una nota de Forbes US o de otra edición del grupo a la versión de la edición: traducción, cifras, enlaces, SEO y «Lea también».', equipo:'Editorial', activo:true},
-  {id:'social-media', ic:'R', nombre:'Social Media', desc:'Reporte semanal de redes con un clic: el Excel de la edición completo con Metricool, YouTube Analytics y GA4, guardado en Drive.', equipo:'Social Media', activo:true},
+  {id:'social-media', ic:'R', nombre:'Reporte semanal de redes', desc:'Reporte semanal de redes con un clic: el Excel de la edición completo con Metricool, YouTube Analytics y GA4, guardado en Drive.', equipo:'Social Media', activo:true},
   {id:'pre-diseno', ic:'P', nombre:'Checker pre-diseño', desc:'Revisión del texto en Google Docs antes de pasar a diseño, con comentarios en el documento.', equipo:'Editorial', activo:false}
 ];
+/* Equipos: cada edición tiene un acceso por equipo, con su propia clave (desde la v1.8) */
+const EQUIPOS = {
+  social:    {nombre:'Social Media', ic:'S', desc:'Reportes de redes y herramientas del equipo de redes sociales.'},
+  editorial: {nombre:'Editorial', ic:'E', desc:'Herramientas de la redacción: traducción de sindicados, revisión de la revista y edición.'},
+  comercial: {nombre:'Comercial', ic:'C', desc:'Herramientas del equipo comercial y de contenido patrocinado.'}
+};
+const EQ_ORDEN = ['social', 'editorial', 'comercial'];
+const eqDe = t => ({'Social Media':'social', 'Editorial':'editorial', 'Comercial':'comercial'})[t.equipo];
+const apiEquipo = e => e === 'social' ? API_SM : e === 'editorial' ? API_SD : API;   // flujo que valida la clave de cada equipo
 const FORMATOS = {
   print: {'1pag':{min:2500,max:3000,nombre:'Página completa'}, spread:{min:4500,max:5000,nombre:'Doble página'}},
   digital: {corta:{min:2000,max:2500,nombre:'Corta'}, media:{min:3000,max:3600,nombre:'Media'}, larga:{min:4500,max:5500,nombre:'Larga'}}
@@ -966,7 +975,14 @@ const S = {pais:null, tipo:'digital', print:'1pag', ext:'media', input:'texto', 
 const $ = id => document.getElementById(id);
 const esc = s => String(s==null?'':s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmtN = n => String(Math.round(Number(n)||0)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');
-const keyOf = p => localStorage.getItem('th_key_'+p) || '';
+const keyOf = (p, e) => p === 'admin' ? (localStorage.getItem('th_key_admin') || '')
+  : (localStorage.getItem('th_key_'+p+'_'+(e || S.equipo)) || localStorage.getItem('th_key_admin') || '');
+const borrarClave = (p, e) => localStorage.removeItem('th_key_'+p+'_'+(e || S.equipo));
+// Hasta la v1.7 había una clave por edición: en Perú y Colombia era la de Editorial; en las demás, la de Social Media
+(() => { try { Object.keys(PAISES).forEach(c => { const v = localStorage.getItem('th_key_'+c); if(!v) return;
+  const eq = (c === 'pe' || c === 'co') ? 'editorial' : 'social';
+  if(!localStorage.getItem('th_key_'+c+'_'+eq)) localStorage.setItem('th_key_'+c+'_'+eq, v);
+  localStorage.removeItem('th_key_'+c); }); } catch(e){} })();
 const toolOn = (p, t) => t.activo && (!PAISES[p].tools || PAISES[p].tools.includes(t.id));
 function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('on'),2200)}
 
@@ -986,21 +1002,27 @@ function route(){
   if(!p){ renderHome(); return show('v-home', []); }
   if(p === 'admin'){
     if(!keyOf('admin')){ S.pendingRoute = location.hash; openKey('admin'); if(!S.pais){ renderHome(); show('v-home', []); } return; }
-    S.pais = null; $('chip-pais').hidden = true;
+    S.pais = null; S.equipo = null; $('chip-pais').hidden = true;
     show('v-adm', [['Admin']]); cargarAdmin(false); return;
   }
   const P = PAISES[p];
   if(!P || !P.activo) return show('v-404', []);
-  if(!keyOf(p)){ S.pendingRoute = location.hash; openKey(p); if(!S.pais) { renderHome(); show('v-home', []); } return; }
-  S.pais = p;
+  // #/<país> = equipos · #/<país>/<equipo> = herramientas del equipo · #/<país>/<herramienta> = herramienta (rutas de siempre)
+  const t0 = TOOLS.find(x => x.id === tool);
+  const eq = EQUIPOS[tool] ? tool : (t0 ? eqDe(t0) : null);
+  if(tool && !eq) return show('v-404', []);
+  if(eq && !keyOf(p, eq)){ S.pendingRoute = location.hash; openKey(p, eq); if(!S.pais) { renderHome(); show('v-home', []); } return; }
+  S.pais = p; S.equipo = eq;
   if(S._draftFor !== p){ S._draftFor = p; loadDraft(); }
-  $('chip-pais').hidden = false; $('chip-txt').textContent = P.edicion;
+  $('chip-pais').hidden = !eq; $('chip-txt').textContent = P.edicion + (eq ? ' · ' + EQUIPOS[eq].nombre : '');
   if(!tool){ renderPais(p); return show('v-pais', [[P.nombre]]); }
-  if(!TOOLS.some(t => t.id === tool && toolOn(p, t))) return show('v-404', []);
-  if(tool === 'sindicados'){ renderSD(); return show('v-sd', [[P.nombre,'#/'+p],['Sindicados']]); }
-  if(tool === 'brand-voice'){ renderBV(); return show('v-bv', [[P.nombre,'#/'+p],['Brand Voice']]); }
-  if(tool === 'checker'){ renderCK(); return show('v-ck', [[P.nombre,'#/'+p],['Checker editorial']]); }
-  if(tool === 'social-media'){ renderSM(); return show('v-sm', [[P.nombre,'#/'+p],['Social Media']]); }
+  const cP = [P.nombre, '#/'+p], cE = [EQUIPOS[eq].nombre, '#/'+p+'/'+eq];
+  if(EQUIPOS[tool]){ renderEquipo(p, eq); return show('v-pais', [cP, [EQUIPOS[eq].nombre]]); }
+  if(!toolOn(p, t0)) return show('v-404', []);
+  if(tool === 'sindicados'){ renderSD(); return show('v-sd', [cP, cE, ['Sindicados']]); }
+  if(tool === 'brand-voice'){ renderBV(); return show('v-bv', [cP, cE, ['Brand Voice']]); }
+  if(tool === 'checker'){ renderCK(); return show('v-ck', [cP, cE, ['Checker editorial']]); }
+  if(tool === 'social-media'){ renderSM(); return show('v-sm', [cP, cE, ['Reporte semanal de redes']]); }
   show('v-404', []);
 }
 function show(id, crumbs){
@@ -1025,50 +1047,65 @@ function renderHome(){
 function renderMatriz(){
   const ps = Object.entries(PAISES);
   const head = '<thead><tr><th scope="col">Herramienta</th>' + ps.map(([k,P]) => '<th scope="col" title="'+esc(P.edicion)+'">'+P.code+'<small>'+esc(P.nombre)+'</small></th>').join('') + '</tr></thead>';
-  const filas = TOOLS.slice().sort((a,b) => b.activo - a.activo).map(t => '<tr'+(t.activo?'':' class="mt-prox"')+'><td><span class="mt-n">'+esc(t.nombre)+'</span><span class="mt-e">'+esc(t.equipo||'')+(t.activo?'':' · Próximamente')+'</span><span class="mt-d">'+esc(t.desc)+'</span></td>' +
+  const filas = TOOLS.slice().sort((a,b) => (b.activo - a.activo) || (EQ_ORDEN.indexOf(eqDe(a)) - EQ_ORDEN.indexOf(eqDe(b)))).map(t => '<tr'+(t.activo?'':' class="mt-prox"')+'><td><span class="mt-n">'+esc(t.nombre)+'</span><span class="mt-e">'+esc(t.equipo||'')+(t.activo?'':' · Próximamente')+'</span><span class="mt-d">'+esc(t.desc)+'</span></td>' +
     ps.map(([k,P]) => '<td>' + (P.activo && toolOn(k,t) ? '<a class="mt-si" href="#/'+k+'/'+t.id+'" title="'+esc(P.edicion)+' usa '+esc(t.nombre)+'" aria-label="'+esc(P.edicion)+': sí">✓</a>' : '<span class="mt-no" aria-label="'+esc(P.edicion)+': no">—</span>') + '</td>').join('') + '</tr>').join('');
   $('matriz').innerHTML = head + '<tbody>' + filas + '</tbody>';
 }
 function renderPais(p){
   const P = PAISES[p];
-  $('pais-eyebrow').textContent = P.edicion; $('h-pais').textContent = 'Herramientas de '+P.edicion;
-  const orden = TOOLS.slice().sort((a,b) => toolOn(p,b) - toolOn(p,a));
+  $('pais-eyebrow').textContent = P.edicion; $('h-pais').textContent = 'Equipos de '+P.edicion;
+  $('pais-lede').textContent = 'Cada equipo entra con su propia clave y ve solo sus herramientas. Todo lo que generan es un borrador: siempre pasa por revisión antes de publicarse.';
+  $('grid-tools').innerHTML = EQ_ORDEN.map(e => { const ts = TOOLS.filter(x => eqDe(x) === e && toolOn(p, x)), on = ts.length > 0, ses = on && !!localStorage.getItem('th_key_'+p+'_'+e);
+    return '<button class="tool" '+(on?'onclick="location.hash=\'#/'+p+'/'+e+'\'"':'disabled')+'>'+
+      '<span class="tag '+(on?'live':'')+'">'+(on ? (ses ? 'Sesión abierta' : 'Con clave') : 'Próximamente')+'</span>'+
+      '<span class="ic">'+EQUIPOS[e].ic+'</span><h3>'+esc(EQUIPOS[e].nombre)+'</h3><p>'+esc(EQUIPOS[e].desc)+'</p>'+
+      '<span class="foot">'+(on ? ts.map(x => esc(x.nombre)).join(' · ') : 'Sin herramientas todavía')+'</span></button>'; }).join('');
+  ctxPais(P);
+}
+function renderEquipo(p, e){
+  const P = PAISES[p];
+  $('pais-eyebrow').textContent = P.edicion + ' · Equipo ' + EQUIPOS[e].nombre; $('h-pais').textContent = 'Herramientas de ' + EQUIPOS[e].nombre;
+  $('pais-lede').textContent = 'Elija una herramienta. Todo lo que genera es un borrador: siempre pasa por revisión antes de publicarse.';
+  const orden = TOOLS.filter(x => eqDe(x) === e).sort((a,b) => toolOn(p,b) - toolOn(p,a));
   $('grid-tools').innerHTML = orden.map(t => (on => 
     '<button class="tool" '+(on?'onclick="location.hash=\'#/'+p+'/'+t.id+'\'"':'disabled')+'>'+
     '<span class="tag '+(on?'live':'')+'">'+(on?'Activa':'Próximamente')+'</span>'+
     '<span class="ic">'+t.ic+'</span><h3>'+esc(t.nombre)+'</h3><p>'+esc(t.desc)+'</p>'+
     '<span class="foot">Equipo '+esc(t.equipo)+'</span></button>')(toolOn(p,t))).join('');
+  ctxPais(P);
+}
+function ctxPais(P){
   const dd = (k, v) => v ? '<div><dt>'+k+'</dt><dd>'+esc(v)+'</dd></div>' : '';
   $('ctx-pais').innerHTML = dd('Sitio', P.dominio) + dd('Sello web', P.selloWeb) + dd('Sello impreso', P.selloPrint) + dd('Cifras y moneda', P.cifras) +
     (P.manual ? '<div><dt>Manual de uso</dt><dd><a href="'+P.manual+'" target="_blank" rel="noopener" style="color:var(--red)">Abrir el manual →</a></dd></div>' : '');
 }
 
 /* ========= Acceso ========= */
-function openKey(p){ S.keyPais = p; $('mk-e').textContent = p === 'admin' ? 'Admin · Forbes Tech Hub' : PAISES[p].edicion; $('f-key').value=''; $('e-key').classList.remove('on'); $('m-key').classList.add('on'); setTimeout(()=>$('f-key').focus(),50); }
-function closeKey(){ $('m-key').classList.remove('on'); if(!S.pais) location.hash = '#/'; }
+function openKey(p, e){ e = e || S.equipo; S.keyPais = p; S.keyEq = e; $('mk-e').textContent = p === 'admin' ? 'Admin · Forbes Tech Hub' : PAISES[p].edicion + ' · ' + EQUIPOS[e].nombre;
+  $('mk-p').textContent = p === 'admin' ? 'Ingrese la clave de administración.' : 'Ingrese la clave del equipo ' + EQUIPOS[e].nombre + ' de ' + PAISES[p].edicion + '. Se pide una sola vez en este navegador.'; $('f-key').value=''; $('e-key').classList.remove('on'); $('m-key').classList.add('on'); setTimeout(()=>$('f-key').focus(),50); }
+function closeKey(){ $('m-key').classList.remove('on'); const p = S.keyPais; location.hash = p && p !== 'admin' && PAISES[p] ? '#/'+p : '#/'; }
 async function submitKey(){
-  const k = $('f-key').value.trim(), p = S.keyPais, b = $('bkey');
+  const k = $('f-key').value.trim(), p = S.keyPais, e = S.keyEq, b = $('bkey');
   if(!k){ $('e-key').textContent='Ingrese la clave.'; $('e-key').classList.add('on'); return; }
   b.disabled = true; b.textContent = 'Verificando…';
   try{
     const r = p === 'admin'
       ? await fetch(API_ADM, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', clave:k})})
-      : await fetch(({sindicados: API_SD, social: API_SM})[PAISES[p].verifica] || API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', pais:p.toUpperCase(), clave:k})});
+      : await fetch(apiEquipo(e), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', pais:p.toUpperCase(), clave:k})});
     if(r.status === 401 || r.status === 403){ throw new Error('clave'); }
     const d = await r.json().catch(()=>({}));
     if(d.status !== 'ok') throw new Error(d.message || 'clave');
-    localStorage.setItem('th_key_'+p, k);
-    // La clave de administración también abre todas las ediciones activas
-    if(p === 'admin') Object.keys(PAISES).forEach(c => { if(PAISES[c].activo && !keyOf(c)) localStorage.setItem('th_key_'+c, k); });
+    // La clave de administración abre todos los equipos de todas las ediciones (keyOf la usa como respaldo)
+    localStorage.setItem(p === 'admin' ? 'th_key_admin' : 'th_key_'+p+'_'+e, k);
     $('m-key').classList.remove('on');
-    location.hash = S.pendingRoute || '#/'+p; route();
+    location.hash = S.pendingRoute || (p === 'admin' ? '#/admin' : '#/'+p+'/'+e); route();
   }catch(e){
-    $('e-key').textContent = e.message === 'clave' ? (p === 'admin' ? 'Esa no es la clave de administración.' : 'La clave no es correcta para esta edición.') : 'No se pudo verificar la clave. Revise su conexión e intente de nuevo.';
+    $('e-key').textContent = e.message === 'clave' ? (p === 'admin' ? 'Esa no es la clave de administración.' : 'Esa no es la clave del equipo ' + EQUIPOS[e].nombre + ' de esta edición.') : 'No se pudo verificar la clave. Revise su conexión e intente de nuevo.';
     if(e instanceof TypeError) $('e-key').textContent = 'No hay conexión con el servidor del Hub. Intente en unos minutos.';
     $('e-key').classList.add('on');
   }finally{ b.disabled=false; b.textContent='Entrar'; }
 }
-function logout(){ if(!S.pais) return; if(!confirmSoft('¿Cerrar la sesión de '+PAISES[S.pais].edicion+'?')) return; localStorage.removeItem('th_key_'+S.pais); S.pais=null; $('chip-pais').hidden=true; location.hash='#/'; }
+function logout(){ if(!S.pais || !S.equipo) return; if(!confirmSoft('¿Cerrar la sesión?')) return; borrarClave(S.pais); const p = S.pais; S.equipo = null; $('chip-pais').hidden = true; location.hash = '#/'+p; }
 function confirmSoft(m){ const el=$('chip-txt'); if(el.dataset.c==='1'){ el.dataset.c=''; return true; } el.dataset.c='1'; const prev=el.textContent; el.textContent='Clic de nuevo para salir'; setTimeout(()=>{ if(el.dataset.c==='1'){el.dataset.c='';el.textContent=prev;} },2500); return false; }
 
 /* ========= Brand Voice: formulario ========= */
@@ -1246,7 +1283,7 @@ async function generar(regen){
     const ctrl = new AbortController(); const to = setTimeout(()=>ctrl.abort(), 240000);
     const r = await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload), signal:ctrl.signal});
     clearTimeout(to);
-    if(r.status === 401 || r.status === 403){ localStorage.removeItem('th_key_'+S.pais); throw new Error('Su clave ya no es válida. Vuelva a ingresarla.'); }
+    if(r.status === 401 || r.status === 403){ borrarClave(S.pais); throw new Error('Su clave ya no es válida. Vuelva a ingresarla.'); }
     const d = await r.json().catch(()=>null);
     if(!r.ok || !d || d.status !== 'success') throw new Error((d && d.message) || 'El servidor no pudo completar la nota (código '+r.status+').');
     d._seg = Math.round((Date.now()-t0)/1000);
@@ -1505,7 +1542,7 @@ async function cargarFinal(){
   S._fx = setInterval(() => { const el = (Date.now()-t0)/1000; $('fx-el').textContent = Math.floor(el)+' s'; $('fx-bar').style.width = Math.min(92, el/35*92)+'%'; }, 400);
   try{
     const r = await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)});
-    if(r.status === 401){ localStorage.removeItem('th_key_'+S.pais); throw new Error('Su clave ya no es válida. Vuelva a ingresarla.'); }
+    if(r.status === 401){ borrarClave(S.pais); throw new Error('Su clave ya no es válida. Vuelva a ingresarla.'); }
     const d = await r.json().catch(()=>null);
     if(!d || d.status !== 'success') throw new Error((d && d.message) || 'No se pudo procesar la versión final (código '+r.status+').');
     mostrarAprendizaje(d);
@@ -1589,7 +1626,7 @@ function enviarCK(){
   };
   xhr.onload = () => {
     let d = null; try{ d = JSON.parse(xhr.responseText); }catch(e){}
-    if(xhr.status === 401){ localStorage.removeItem('th_key_'+S.pais); fin(false, 'Su clave ya no es válida. Vuelva a ingresarla.'); openKey(S.pais); return; }
+    if(xhr.status === 401){ borrarClave(S.pais); fin(false, 'Su clave ya no es válida. Vuelva a ingresarla.'); openKey(S.pais); return; }
     if(xhr.status === 413) return fin(false, 'El PDF es demasiado pesado para subirlo. Exporte una versión comprimida (calidad para pantalla) e intente de nuevo.');
     if(xhr.status !== 200 || !d || d.status !== 'recibido') return fin(false, (d && d.message) || 'No se pudo enviar el PDF (código '+xhr.status+').');
     fin(true, '', d);
@@ -1727,7 +1764,7 @@ async function enviarSD(){
   try{
     const r = await fetch(API_SD, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body), signal:ctrl.signal});
     const d = await r.json().catch(() => null);
-    if(r.status === 401){ localStorage.removeItem('th_key_'+S.pais); S.pendingRoute = location.hash; openKey(S.pais); throw new Error('Su clave ya no es válida. Vuelva a ingresarla.'); }
+    if(r.status === 401){ borrarClave(S.pais); S.pendingRoute = location.hash; openKey(S.pais); throw new Error('Su clave ya no es válida. Vuelva a ingresarla.'); }
     if(!d || d.status !== 'success') throw new Error((d && d.message) || 'El servidor no pudo completar la traducción (código '+r.status+'). Intente de nuevo; si se repite, Lucas ya recibió el aviso.');
     S.sdRes = d; guardarSDHist(d); mostrarSD();
     toast('Nota lista');
@@ -1826,7 +1863,7 @@ async function renderSM(){
   const sel = $('sm-sem'); sel.innerHTML = '<option>Cargando semanas…</option>'; sel.disabled = true; $('bsm').disabled = true;
   try{
     const r = await fetch(API_SM, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'semanas', pais:P.code, clave:keyOf(S.pais)})});
-    if(r.status === 401){ localStorage.removeItem('th_key_'+S.pais); S.pendingRoute = location.hash; openKey(S.pais); return; }
+    if(r.status === 401){ borrarClave(S.pais); S.pendingRoute = location.hash; openKey(S.pais); return; }
     const d = await r.json(); S.sm = d;
     pintarSMHist();
     if(!d.disponibles || !d.disponibles.length){
@@ -1869,7 +1906,7 @@ async function exportarSM(){
   tick(); const iv = setInterval(tick, 500);
   try{
     const r = await fetch(API_SM, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'exportar', pais:P.code, clave:keyOf(S.pais), semana:sem, nombre:nom})});
-    if(r.status === 401){ localStorage.removeItem('th_key_'+S.pais); S.pendingRoute = location.hash; openKey(S.pais); throw new Error('La clave venció. Vuelva a ingresarla.'); }
+    if(r.status === 401){ borrarClave(S.pais); S.pendingRoute = location.hash; openKey(S.pais); throw new Error('La clave venció. Vuelva a ingresarla.'); }
     const d = await r.json().catch(() => ({}));
     if(d.status !== 'success') throw new Error(d.message || 'No se pudo armar el reporte. Intente de nuevo en unos minutos; si sigue fallando, avísele a Lucas Deges.');
     S.smFile = {b64: d.xlsx_b64, nombre: d.archivo};
