@@ -891,7 +891,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
   <section class="view" id="v-404"><div class="empty"><div class="ic">?</div><h3>No encontramos esa página</h3><p><a href="#/">Volver al inicio</a></p></div></section>
 </main>
 
-<div class="foot-note"><span>Forbes Tech Hub · v1.8 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
+<div class="foot-note"><span>Forbes Tech Hub · v1.9 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
 
 <!-- Acceso -->
 <div class="scrim" id="m-key" role="dialog" aria-modal="true" aria-labelledby="mk-t">
@@ -919,7 +919,7 @@ const API = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-brandvoice';
 const API_ADM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-admin';
 const API_SD = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-sindicados';
 const API_SM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-social';
-const VERSION = '1.8';
+const VERSION = '1.9';
 
 const PAISES = {
   pe: {code:'PE', nombre:'Perú', edicion:'Forbes Perú', activo:true, dominio:'forbes.pe', correo:'nombre@forbes.pe',
@@ -1084,24 +1084,31 @@ function ctxPais(P){
 function openKey(p, e){ e = e || S.equipo; S.keyPais = p; S.keyEq = e; $('mk-e').textContent = p === 'admin' ? 'Admin · Forbes Tech Hub' : PAISES[p].edicion + ' · ' + EQUIPOS[e].nombre;
   $('mk-p').textContent = p === 'admin' ? 'Ingrese la clave de administración.' : 'Ingrese la clave del equipo ' + EQUIPOS[e].nombre + ' de ' + PAISES[p].edicion + '. Se pide una sola vez en este navegador.'; $('f-key').value=''; $('e-key').classList.remove('on'); $('m-key').classList.add('on'); setTimeout(()=>$('f-key').focus(),50); }
 function closeKey(){ $('m-key').classList.remove('on'); const p = S.keyPais; location.hash = p && p !== 'admin' && PAISES[p] ? '#/'+p : '#/'; }
+// Claves simples (país + equipo): se aceptan con mayúsculas, tildes, espacios o guiones («Perú SM» = perusm)
+const claveSimple = s => s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]/g, '').replace(/^republica(?=dominicana)/, '');
 async function submitKey(){
-  const k = $('f-key').value.trim(), p = S.keyPais, e = S.keyEq, b = $('bkey');
-  if(!k){ $('e-key').textContent='Ingrese la clave.'; $('e-key').classList.add('on'); return; }
+  const k0 = $('f-key').value.trim(), p = S.keyPais, e = S.keyEq, b = $('bkey');
+  if(!k0){ $('e-key').textContent='Ingrese la clave.'; $('e-key').classList.add('on'); return; }
   b.disabled = true; b.textContent = 'Verificando…';
-  try{
+  const probar = async k => {
     const r = p === 'admin'
       ? await fetch(API_ADM, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', clave:k})})
       : await fetch(apiEquipo(e), {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'verificar', pais:p.toUpperCase(), clave:k})});
-    if(r.status === 401 || r.status === 403){ throw new Error('clave'); }
+    if(r.status === 401 || r.status === 403) return false;
     const d = await r.json().catch(()=>({}));
     if(d.status !== 'ok') throw new Error(d.message || 'clave');
+    return true;
+  };
+  try{
+    let k = k0;
+    if(!(await probar(k))){ k = claveSimple(k0); if(k === k0 || !k || !(await probar(k))) throw new Error('clave'); }
     // La clave de administración abre todos los equipos de todas las ediciones (keyOf la usa como respaldo)
     localStorage.setItem(p === 'admin' ? 'th_key_admin' : 'th_key_'+p+'_'+e, k);
     $('m-key').classList.remove('on');
     location.hash = S.pendingRoute || (p === 'admin' ? '#/admin' : '#/'+p+'/'+e); route();
-  }catch(e){
-    $('e-key').textContent = e.message === 'clave' ? (p === 'admin' ? 'Esa no es la clave de administración.' : 'Esa no es la clave del equipo ' + EQUIPOS[e].nombre + ' de esta edición.') : 'No se pudo verificar la clave. Revise su conexión e intente de nuevo.';
-    if(e instanceof TypeError) $('e-key').textContent = 'No hay conexión con el servidor del Hub. Intente en unos minutos.';
+  }catch(err){
+    $('e-key').textContent = err.message === 'clave' ? (p === 'admin' ? 'Esa no es la clave de administración.' : 'Esa no es la clave del equipo ' + EQUIPOS[e].nombre + ' de esta edición.') : 'No se pudo verificar la clave. Revise su conexión e intente de nuevo.';
+    if(err instanceof TypeError) $('e-key').textContent = 'No hay conexión con el servidor del Hub. Intente en unos minutos.';
     $('e-key').classList.add('on');
   }finally{ b.disabled=false; b.textContent='Entrar'; }
 }
