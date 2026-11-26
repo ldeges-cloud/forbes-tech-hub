@@ -397,6 +397,11 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .bc-n b{color:var(--ink);font-weight:600}
 .bc-tools{display:flex;gap:8px;justify-content:space-between;align-items:center;margin:14px 0 8px}
 .bc-tools .lbl{margin:0}
+.bc-eds{display:flex;flex-wrap:wrap;gap:8px}
+.bc-ed{border:1px solid var(--line-2);border-radius:999px;padding:7px 14px;font:inherit;font-size:13px;color:var(--ink-3);background:transparent;cursor:pointer}
+.bc-ed:hover{border-color:var(--ink-4);color:var(--ink)}
+.bc-ed[aria-pressed="true"]{border-color:var(--red);background:rgba(238,30,35,.12);color:var(--ink)}
+.bc-ed[aria-pressed="true"]::before{content:'✓ ';color:var(--red)}
 @media (max-width:960px){.layout{grid-template-columns:minmax(0,1fr)}.sticky{position:static}.h1{font-size:32px}.crumbs{display:none}}
 @media (max-width:560px){.row,.cards,.cards.two{grid-template-columns:minmax(0,1fr)}.logo span{display:none}.meter{flex-wrap:wrap}.meter .lab{white-space:normal}.tool-head .actions{margin-left:0}.wrap{padding:22px 16px 60px}.top-in{padding:10px 16px}.article{padding:22px 18px}}
 </style>
@@ -916,12 +921,13 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
             <div class="field"><label for="bc-desde">Desde <span class="req">*</span></label><input type="date" id="bc-desde"></div>
             <div class="field"><label for="bc-hasta">Hasta <span class="req">*</span></label><input type="date" id="bc-hasta"></div>
           </div>
-          <div class="field"><label for="bc-alc">Dónde buscar</label><select id="bc-alc" class="sm-sel"><option value="edicion" id="bc-alc-ed">Solo en esta edición</option><option value="regional">En las seis ediciones (campaña regional)</option></select></div>
+          <div class="field"><label id="bc-eds-l">Dónde buscar <span class="opt">· una o varias ediciones</span></label><div class="bc-eds" id="bc-eds" role="group" aria-labelledby="bc-eds-l"></div>
+            <div class="hint"><a href="#" onclick="event.preventDefault();edsBC('todas')">Las seis</a> · <a href="#" onclick="event.preventDefault();edsBC('mia')">Solo la mía</a></div><div class="ferr" id="bc-e2">Elija al menos una edición.</div></div>
         </div>
         <div class="pb" style="border-top:1px solid var(--line)">
           <div id="bc-msg"></div>
           <button type="submit" class="btn primary big" id="bbc">Buscar</button>
-          <div class="hint" style="text-align:center;margin-top:10px">Tarda entre 5 y 30 segundos (más si es regional).</div>
+          <div class="hint" style="text-align:center;margin-top:10px">Tarda entre 5 y 30 segundos (más si busca en varias ediciones).</div>
         </div>
       </form>
 
@@ -932,7 +938,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
             <li><span class="k">Busca</span><span>Las palabras en Instagram (posts y reels), Facebook (posts y reels), LinkedIn, TikTok, YouTube y X, y en los nombres de campaña de Meta Ads.</span></li>
             <li><span class="k">Revisás</span><span>Destildá lo que apareció pero no es de la campaña antes de armar el informe.</span></li>
             <li><span class="k">Pauta</span><span>Separada por la plataforma donde se entregó: Facebook, Instagram, Threads, WhatsApp, Audience Network o Messenger.</span></li>
-            <li><span class="k">Entrega</span><span>Una presentación de Google Slides con la marca Forbes y la imagen de cada post, más el PDF para mandar al cliente.</span></li>
+            <li><span class="k">Entrega</span><span>Una presentación de Google Slides con la marca Forbes y la imagen de cada post, una planilla de Google Sheets con una fila por pieza para hacer sus cuentas y el PDF. Le llega todo por correo.</span></li>
             <li><span class="k">No incluye</span><span>Historias de Instagram (no traen texto para buscarlas) ni pauta fuera de Meta.</span></li>
           </ul>
         </div></div>
@@ -945,7 +951,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
           <div class="field" style="margin-top:16px"><label for="bc-camp">Nombre de la campaña en el informe</label><input type="text" id="bc-camp" autocomplete="off" placeholder="Ej.: Banamex · Inversión inteligente"></div>
           <div class="bc-row">
             <div class="field"><label for="bc-nom">Su nombre <span class="opt">· opcional</span></label><input type="text" id="bc-nom" autocomplete="name"></div>
-            <div class="field"><label for="bc-mail">Su correo <span class="opt">· opcional</span></label><input type="email" id="bc-mail" autocomplete="email" placeholder="Para editar la presentación"></div>
+            <div class="field"><label for="bc-mail">Su correo <span class="req">*</span></label><input type="email" id="bc-mail" autocomplete="email" placeholder="Ahí le llegan los links y el PDF"></div>
           </div>
           <div id="bc-msg2"></div>
           <button type="button" class="btn primary big" id="bpres" onclick="presentarBC()">Armar presentación</button>
@@ -958,7 +964,7 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
   <section class="view" id="v-404"><div class="empty"><div class="ic">?</div><h3>No encontramos esa página</h3><p><a href="#/">Volver al inicio</a></p></div></section>
 </main>
 
-<div class="foot-note"><span>Forbes Tech Hub · v2.0 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
+<div class="foot-note"><span>Forbes Tech Hub · v2.1 · noviembre 2026</span><span>Todo contenido generado es un borrador y requiere revisión editorial.</span></div>
 
 <!-- Acceso -->
 <div class="scrim" id="m-key" role="dialog" aria-modal="true" aria-labelledby="mk-t">
@@ -1013,7 +1019,7 @@ const TOOLS = [
   {id:'checker', ic:'C', nombre:'Checker editorial', desc:'Revisión del PDF de la revista antes de imprenta: ortografía, tipeo, gramática y nombres propios. El reporte llega por correo.', equipo:'Editorial', activo:true},
   {id:'sindicados', ic:'S', nombre:'Sindicados', desc:'De la URL de una nota de Forbes US o de otra edición del grupo a la versión de la edición: traducción, cifras, enlaces, SEO y «Lea también».', equipo:'Editorial', activo:true},
   {id:'social-media', ic:'R', nombre:'Reporte semanal de redes', desc:'Reporte semanal de redes con un clic: el Excel de la edición completo con Metricool, YouTube Analytics y GA4, guardado en Drive.', equipo:'Social Media', activo:true},
-  {id:'buscador-campanas', ic:'B', nombre:'Buscador de campañas', desc:'Busca una campaña por palabras clave en todas las redes y en la pauta de Meta, y arma el informe en Slides con la marca Forbes y la imagen de cada post.', equipo:'Social Media', activo:true},
+  {id:'buscador-campanas', ic:'B', nombre:'Buscador de campañas', desc:'Busca una campaña por palabras clave en todas las redes y en la pauta de Meta, y arma el informe en Slides con la marca Forbes, más una planilla por pieza en Sheets. Llega por correo.', equipo:'Social Media', activo:true},
   {id:'pre-diseno', ic:'P', nombre:'Checker pre-diseño', desc:'Revisión del texto en Google Docs antes de pasar a diseño, con comentarios en el documento.', equipo:'Editorial', activo:false}
 ];
 /* Equipos: cada edición tiene un acceso por equipo, con su propia clave (desde la v1.8) */
@@ -2016,7 +2022,8 @@ const bcIso = d => d.toISOString().slice(0, 10);
 function renderBC(){
   const P = PAISES[S.pais];
   $('bc-eyebrow').textContent = P.edicion + ' · Equipo de Social Media';
-  $('bc-alc-ed').textContent = 'Solo en ' + P.edicion;
+  if(!S.bcEds || S.bcEdsPais !== P.code){ S.bcEds = new Set([P.code]); S.bcEdsPais = P.code; }
+  pintarEds();
   if(!$('bc-desde').value){ const h = new Date(); $('bc-hasta').value = bcIso(new Date(h.getTime() - 864e5)); $('bc-desde').value = bcIso(new Date(h.getTime() - 31 * 864e5)); }
   $('bc-nom').value = $('bc-nom').value || localStorage.getItem('th_sm_nom') || '';
   $('bc-mail').value = $('bc-mail').value || localStorage.getItem('th_bc_mail') || '';
@@ -2027,19 +2034,32 @@ function bcCarga(titulo, sub, seg){
   const t0 = Date.now(); const iv = setInterval(() => { const el = (Date.now() - t0) / 1000; $('bc-el').textContent = Math.round(el) + ' s'; $('bc-bar').style.width = Math.min(95, el / seg * 100) + '%'; }, 400);
   return () => { clearInterval(iv); $('bc-load').hidden = true; };
 }
+const BC_ED = [['MX','México'],['CO','Colombia'],['PE','Perú'],['CL','Chile'],['RD','República Dominicana'],['CA','Centroamérica']];
+function pintarEds(){
+  $('bc-eds').innerHTML = BC_ED.map(([c, n]) => '<button type="button" class="bc-ed" aria-pressed="'+S.bcEds.has(c)+'" onclick="edsBC(\''+c+'\')">'+esc(n)+'</button>').join('');
+  $('bc-e2').classList.remove('on');
+}
+function edsBC(c){
+  if(c === 'todas') S.bcEds = new Set(BC_ED.map(x => x[0]));
+  else if(c === 'mia') S.bcEds = new Set([PAISES[S.pais].code]);
+  else S.bcEds.has(c) ? S.bcEds.delete(c) : S.bcEds.add(c);
+  pintarEds();
+}
+const edsTxt = eds => eds.length === 6 ? 'En las seis ediciones' : 'En ' + BC_ED.filter(x => eds.includes(x[0])).map(x => x[1]).join(', ').replace(/, ([^,]*)$/, ' y $1');
 async function buscarBC(){
   const P = PAISES[S.pais], pal = $('bc-pal').value.trim();
   $('bc-e1').classList.toggle('on', pal.replace(/[^\p{L}\p{N}]/gu, '').length < 3); if(pal.replace(/[^\p{L}\p{N}]/gu, '').length < 3) return;
+  const eds = BC_ED.map(x => x[0]).filter(c => S.bcEds.has(c));
+  $('bc-e2').classList.toggle('on', !eds.length); if(!eds.length) return;
   $('bc-msg').innerHTML = ''; $('bbc').disabled = true;
-  const reg = $('bc-alc').value === 'regional';
-  const fin = bcCarga('Buscando «' + pal + '»', (reg ? 'En las seis ediciones' : 'En ' + P.edicion) + ' · ' + $('bc-desde').value.split('-').reverse().join('/') + ' al ' + $('bc-hasta').value.split('-').reverse().join('/'), reg ? 40 : 12);
+  const fin = bcCarga('Buscando «' + pal + '»', edsTxt(eds) + ' · ' + $('bc-desde').value.split('-').reverse().join('/') + ' al ' + $('bc-hasta').value.split('-').reverse().join('/'), 6 + eds.length * 6);
   try{
-    const r = await fetch(API_BC, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'buscar', pais:P.code, clave:keyOf(S.pais), palabras:pal, desde:$('bc-desde').value, hasta:$('bc-hasta').value, alcance: reg ? 'regional' : 'edicion'})});
+    const r = await fetch(API_BC, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'buscar', pais:P.code, clave:keyOf(S.pais), palabras:pal, desde:$('bc-desde').value, hasta:$('bc-hasta').value, ediciones: eds})});
     if(r.status === 401){ borrarClave(S.pais); S.pendingRoute = location.hash; openKey(S.pais); throw new Error('La clave venció. Vuelva a ingresarla.'); }
     const d = await r.json().catch(() => ({}));
     if(d.status !== 'ok') throw new Error(d.message || 'No se pudo buscar. Intente de nuevo en unos minutos.');
     d.pauta = (d.pauta || []).filter(x => x.impresiones > 0 || x.inversion > 0);
-    S.bc = d; S.bc.sel = new Set([...d.contenidos.map(c => c.id), ...d.pauta.map(x => x.id)]);
+    S.bc = d; S.bc.eds = eds; S.bc.sel = new Set([...d.contenidos.map(c => c.id), ...d.pauta.map(x => x.id)]);
     if(!$('bc-camp').value) $('bc-camp').value = pal.split(',')[0].replace(/^[#@]/, '').trim().replace(/^./, c => c.toUpperCase());
     pintarBC();
   }catch(e){
@@ -2070,12 +2090,12 @@ function toggleBC(id){ const s = S.bc.sel; s.has(id) ? s.delete(id) : s.add(id);
 function marcarBC(v){ const d = S.bc; d.sel = new Set(v ? [...d.contenidos.map(c => c.id), ...d.pauta.map(x => x.id)] : []); pintarBC(); }
 async function presentarBC(){
   const P = PAISES[S.pais], d = S.bc, mail = $('bc-mail').value.trim(), nom = $('bc-nom').value.trim();
-  if(mail && !/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)){ $('bc-msg2').innerHTML = '<div class="alerta">Revise el correo.</div>'; return; }
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(mail)){ $('bc-msg2').innerHTML = '<div class="alerta">Escriba su correo: ahí le llegan la presentación, la planilla y el PDF.</div>'; $('bc-mail').focus(); return; }
   localStorage.setItem('th_bc_mail', mail); if(nom) localStorage.setItem('th_sm_nom', nom);
   $('bc-msg2').innerHTML = ''; $('bpres').disabled = true; $('bpres').textContent = 'Armando la presentación…';
   const t0 = Date.now(); const iv = setInterval(() => { $('bpres').textContent = 'Armando la presentación… ' + Math.round((Date.now() - t0) / 1000) + ' s'; }, 500);
   try{
-    const body = {modo:'presentacion', pais:P.code, clave:keyOf(S.pais), alcance: d.regional ? 'regional' : 'edicion', campana:$('bc-camp').value.trim(), palabras:d.palabras.join(', '), desde:d.desde, hasta:d.hasta,
+    const body = {modo:'presentacion', pais:P.code, clave:keyOf(S.pais), ediciones: d.eds, campana:$('bc-camp').value.trim(), palabras:d.palabras.join(', '), desde:d.desde, hasta:d.hasta,
       contenidos:d.contenidos.filter(c => d.sel.has(c.id)), pauta:d.pauta.filter(x => d.sel.has(x.id)), total_encontrados:d.total, nombre:nom, email:mail};
     const r = await fetch(API_BC, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body)});
     if(r.status === 401){ borrarClave(S.pais); S.pendingRoute = location.hash; openKey(S.pais); throw new Error('La clave venció. Vuelva a ingresarla.'); }
@@ -2083,9 +2103,9 @@ async function presentarBC(){
     if(x.status !== 'success') throw new Error(x.message || 'No se pudo armar la presentación. Intente de nuevo; si sigue fallando, avísele a Lucas Deges.');
     if(x.pdf_b64){ const bin = atob(x.pdf_b64), u8 = new Uint8Array(bin.length); for(let i = 0; i < bin.length; i++) u8[i] = bin.charCodeAt(i);
       S.bcPdf = URL.createObjectURL(new Blob([u8], {type:'application/pdf'})); const a = document.createElement('a'); a.href = S.bcPdf; a.download = x.nombre + '.pdf'; document.body.appendChild(a); a.click(); a.remove(); }
-    $('bc-fin').innerHTML = '<div class="alerta" style="background:rgba(76,175,125,.08);border-color:rgba(76,175,125,.35);color:var(--ink)"><b>Listo en '+x.duracion_s+' s.</b> '+(x.pdf_b64 ? 'El PDF se descargó en este equipo. ' : '')+(x.compartido ? 'La presentación quedó compartida con '+esc(x.compartido)+' para editarla.' : 'Para editar la presentación, pídale acceso a Lucas Deges o deje su correo la próxima vez.')+
+    $('bc-fin').innerHTML = '<div class="alerta" style="background:rgba(76,175,125,.08);border-color:rgba(76,175,125,.35);color:var(--ink)"><b>Listo en '+x.duracion_s+' s.</b> '+(x.pdf_b64 ? 'El PDF se descargó en este equipo. ' : '')+(x.enviado ? 'Le mandamos un correo a '+esc(x.enviado)+' con la presentación, la planilla y el PDF.' : 'No pudimos mandar el correo: use los botones de abajo.')+(x.compartido ? ' Puede editar los dos archivos.' : ' Para editarlos, pídale acceso a Lucas Deges.')+
       ((x.avisos||[]).length ? '<ul>'+x.avisos.map(a => '<li>'+esc(a)+'</li>').join('')+'</ul>' : '')+'</div><div class="res-actions">'+
-      '<a class="btn primary" href="'+esc(x.slides_url)+'" target="_blank" rel="noopener">Abrir en Google Slides</a>'+(S.bcPdf ? '<a class="btn" href="'+S.bcPdf+'" download="'+esc(x.nombre)+'.pdf">Descargar PDF</a>' : '')+'</div>';
+      '<a class="btn primary" href="'+esc(x.slides_url)+'" target="_blank" rel="noopener">Abrir en Google Slides</a>'+(x.sheet_url ? '<a class="btn" href="'+esc(x.sheet_url)+'" target="_blank" rel="noopener">Abrir la planilla</a>' : '')+(S.bcPdf ? '<a class="btn" href="'+S.bcPdf+'" download="'+esc(x.nombre)+'.pdf">Descargar PDF</a>' : '')+'</div>';
     $('bc-fin').hidden = false;
   }catch(e){ $('bc-msg2').innerHTML = '<div class="alerta">'+esc(e instanceof TypeError ? 'No hay conexión con el servidor del Hub. Intente en unos minutos.' : e.message)+'</div>'; }
   finally{ clearInterval(iv); $('bpres').textContent = 'Armar presentación'; contarBC(); }
