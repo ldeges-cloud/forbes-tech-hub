@@ -393,9 +393,15 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .bc-sum{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 12px}
 .bc-sum span{font-size:11px;border:1px solid var(--line-2);border-radius:999px;padding:3px 9px;color:var(--ink-2)}
 .bc-list{list-style:none;margin:0;padding:0;max-height:560px;overflow:auto;border-top:1px solid var(--line)}
-.bc-it{display:grid;grid-template-columns:22px 64px 1fr;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);align-items:start;cursor:pointer}
+.bc-it{display:grid;grid-template-columns:22px 64px 1fr;gap:10px;padding:10px 4px;border-bottom:1px solid var(--line);align-items:start}
+.bc-ck{display:block;cursor:pointer;padding-top:2px}
+.bc-go{color:inherit;text-decoration:none;display:block}
+.bc-go:hover .bc-tx{color:var(--ink);text-decoration:underline}
+.bc-go:hover .bc-th{outline:2px solid var(--red);outline-offset:1px}
+.bc-ver{color:var(--ink-3);text-transform:none;letter-spacing:0;font-weight:500;text-decoration:underline}
+.bc-ver:hover{color:var(--red)}
 .bc-it.off{opacity:.45}
-.bc-it input{margin-top:4px;accent-color:var(--red)}
+.bc-it input{margin-top:4px;accent-color:var(--red);cursor:pointer;width:16px;height:16px}
 .bc-th{width:64px;height:64px;border-radius:8px;background:var(--field);object-fit:cover;display:block}
 .bc-th.vacio{display:grid;place-items:center;font-size:10px;color:var(--ink-4)}
 .bc-m{font-size:10px;letter-spacing:.8px;text-transform:uppercase;color:var(--red);font-weight:600}
@@ -2216,12 +2222,16 @@ function pintarBC(){
   const camp = new Set(d.pauta.map(x => x.campana_id));
   $('bc-sum').innerHTML = Object.entries(porCanal).map(([k, n]) => '<span>'+esc(k)+' · '+n+'</span>').join('') + (camp.size ? '<span style="border-color:var(--red-dim);color:var(--red)">Pauta en Meta · '+camp.size+(camp.size === 1 ? ' campaña' : ' campañas')+'</span>' : '');
   $('bc-avisos').innerHTML = (d.avisos || []).length ? '<div class="alerta"><ul>'+d.avisos.map(a => '<li>'+esc(a)+'</li>').join('')+'</ul></div>' : '';
-  const it = (id, img, meta, tx, nums) => '<li class="bc-it'+(S.bc.sel.has(id) ? '' : ' off')+'" onclick="toggleBC(\''+id+'\')"><input type="checkbox" '+(S.bc.sel.has(id) ? 'checked' : '')+' tabindex="-1" aria-hidden="true">'+
-    (img ? '<img class="bc-th" loading="lazy" src="'+esc(img)+'" alt="" onerror="this.outerHTML=\'<span class=&quot;bc-th vacio&quot;>sin imagen</span>\'">' : '<span class="bc-th vacio">'+(id[0] === 'p' ? 'pauta' : 'sin imagen')+'</span>')+
-    '<div><div class="bc-m">'+meta+'</div><div class="bc-tx">'+tx+'</div><div class="bc-n">'+nums+'</div></div></li>';
+  // La casilla elige qué va al informe; la miniatura y el texto abren la publicación en su red
+  const it = (id, img, meta, tx, nums, url, red) => {
+    const sel = S.bc.sel.has(id), abre = h => url ? '<a class="bc-go" href="'+esc(url)+'" target="_blank" rel="noopener" title="Abrir en '+esc(red||'la red')+'">'+h+'</a>' : h;
+    const th = img ? '<img class="bc-th" loading="lazy" src="'+esc(img)+'" alt="" onerror="this.outerHTML=\'<span class=&quot;bc-th vacio&quot;>sin imagen</span>\'">' : '<span class="bc-th vacio">'+(id[0] === 'p' ? 'pauta' : 'sin imagen')+'</span>';
+    return '<li class="bc-it'+(sel ? '' : ' off')+'"><label class="bc-ck" title="Incluir en el informe"><input type="checkbox" '+(sel ? 'checked' : '')+' onchange="toggleBC(\''+id+'\')" aria-label="Incluir en el informe"></label>'+
+      abre(th)+'<div><div class="bc-m">'+meta+(url ? ' · <a class="bc-ver" href="'+esc(url)+'" target="_blank" rel="noopener">Abrir en '+esc(red)+' ↗</a>' : '')+'</div>'+abre('<div class="bc-tx">'+tx+'</div>')+'<div class="bc-n">'+nums+'</div></div></li>';
+  };
   const html = d.contenidos.map(c => it(c.id, c.imagen, esc(c.canal+' · '+(c.formato||'')+' · '+(c.fecha||'').split('-').reverse().join('/')+(d.regional ? ' · '+c.edicion.replace('Forbes ', '') : '')),
-      esc(c.texto) + (c.url ? ' <a href="'+esc(c.url)+'" target="_blank" rel="noopener" onclick="event.stopPropagation()" style="color:var(--red)">ver ↗</a>' : ''),
-      (c.alcance ? '<b>'+bcN(c.alcance)+'</b> alcance · ' : '') + '<b>'+bcN(c.vistas)+'</b> vistas · <b>'+bcN(c.interacciones)+'</b> interacciones' + (c.clics ? ' · <b>'+bcN(c.clics)+'</b> clics' : '')))
+      esc(c.texto),
+      (c.alcance ? '<b>'+bcN(c.alcance)+'</b> alcance · ' : '') + '<b>'+bcN(c.vistas)+'</b> vistas · <b>'+bcN(c.interacciones)+'</b> interacciones' + (c.clics ? ' · <b>'+bcN(c.clics)+'</b> clics' : ''), c.url, c.canal))
     .concat(d.pauta.map(x => it(x.id, '', esc(x.canal), esc(x.campana) + ' <span style="color:var(--ink-4)">· '+esc(x.cuenta || '')+'</span>',
       '<b>'+esc(x.moneda)+' '+bcN(x.inversion)+'</b> · <b>'+bcN(x.impresiones)+'</b> impresiones · <b>'+bcN(x.alcance)+'</b> alcance · <b>'+bcN(x.clics)+'</b> clics')));
   $('bc-list').innerHTML = html.join('') || '<li class="adm-empty" style="padding:16px 4px">No encontramos contenidos ni campañas con esas palabras en el período. Pruebe con otra forma del nombre (sin tildes, el hashtag o la cuenta).</li>';
