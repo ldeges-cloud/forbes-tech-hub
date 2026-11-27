@@ -374,6 +374,13 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
 .ctxlist{margin:0;padding-left:18px;font-size:13px;color:var(--ink-2)}
 .ctxlist li{margin-bottom:6px}
 .sm-sel{width:100%}
+.ps-pend{margin-top:14px;border:1px solid #E9D98A;background:#FFF9DD;border-radius:10px;padding:12px 14px;color:var(--ink,#231F20)}
+.ps-pend-h{font-weight:600;font-size:14px;margin-bottom:6px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.ps-sw{display:inline-block;width:14px;height:14px;border-radius:3px;background:#FFF4C2;border:1px solid #D9C66A}
+.ps-pend ol{margin:0;padding-left:20px;font-size:13px;line-height:1.5}
+.ps-wa{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.ps-wa label{display:block;font-size:11px;color:var(--ink-4);text-align:center;margin-bottom:4px}
+.ps-wa input{width:100%;text-align:center;padding-left:4px;padding-right:4px}
 .sm-kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin:16px 0 4px}
 .sm-kpis>div{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--field)}
 .sm-kpis .k{font-size:10px;letter-spacing:1px;text-transform:uppercase;color:var(--ink-4)}
@@ -908,6 +915,65 @@ input:focus,textarea:focus,select:focus{border-color:var(--red-dim)}
     </div>
   </section>
 
+  <section class="view" id="v-ps" aria-labelledby="h-ps">
+    <div class="tool-head"><div><div class="eyebrow" id="ps-eyebrow"></div><h1 class="h1" id="h-ps">Presentación semanal de redes</h1></div></div>
+    <div class="layout">
+      <form class="panel" id="form-ps" novalidate onsubmit="event.preventDefault();generarPS()">
+        <div class="ph"><span class="t">Presentación semanal</span><span class="s">Google Slides con el formato regional del reporte</span></div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">1</span><span class="step-t">Semana</span></div>
+          <div class="field"><label for="ps-sem">Semana <span class="opt">· de lunes a domingo</span></label><select id="ps-sem" class="sm-sel" disabled><option>Cargando semanas…</option></select>
+            <div class="hint">Por defecto, la última semana cerrada. Si ya se generó, la anterior va a la papelera y se crea de nuevo con los datos de hoy.</div></div>
+        </div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">2</span><span class="step-t">Canal de WhatsApp</span></div>
+          <div class="field"><label>Envíos por día <span class="opt">· WhatsApp no tiene conexión automática</span></label>
+            <div class="ps-wa" id="ps-wa"></div>
+            <div class="hint">Cuántos mensajes salieron por el canal cada día. Si lo deja vacío, la fila de WhatsApp queda «s/d».</div></div>
+        </div>
+        <div class="step">
+          <div class="step-h"><span class="step-n">3</span><span class="step-t">Quién la genera</span></div>
+          <div class="field"><label for="ps-nom">Nombre <span class="opt">· opcional</span></label><input type="text" id="ps-nom" autocomplete="name" placeholder="Nombre y apellido"></div>
+          <div class="field"><label for="ps-mail">Correo <span class="opt">· para darle permiso de edición</span></label><input type="email" id="ps-mail" autocomplete="email" placeholder="nombre@forbes…"></div>
+        </div>
+        <div class="pb" style="border-top:1px solid var(--line)">
+          <div id="ps-msg"></div>
+          <button type="submit" class="btn primary big" id="bps" disabled>Generar presentación</button>
+          <div class="hint" style="text-align:center;margin-top:10px">Tarda entre 15 y 40 segundos. Queda guardada en la carpeta de reportes de redes de la edición, en Drive.</div>
+        </div>
+      </form>
+
+      <div class="sticky">
+        <div class="panel" id="ps-how"><div class="how">
+          <h3>Qué hace</h3>
+          <ul class="rules">
+            <li><span class="k">Delivery</span><span>Lo publicado contra el calendario, por red y por día: Instagram, Facebook, LinkedIn, TikTok, YouTube, Stories y WhatsApp.</span></li>
+            <li><span class="k">Resultados</span><span>Seguidores, alcance, engagement, posts y clics de cada red, comparados con el promedio de las 4 semanas previas, con semáforo.</span></li>
+            <li><span class="k">Salud</span><span>La métrica que manda en cada red contra su meta, y las 3 publicaciones que mejor y peor funcionaron.</span></li>
+            <li><span class="k">Audiencias</span><span>Audiencia total en redes y lo que llega al sitio desde redes, desde GA4.</span></li>
+            <li><span class="k">A mano</span><span>Todo lo que queda en <b style="background:#FFF4C2;padding:0 4px;border-radius:3px">amarillo</b> con «✍ Completar»: qué pasó, qué funcionó y qué ajustamos, la causa de cada desvío, el programa y el porqué de cada contenido, y los aprendizajes. Lo que dice «Opcional» se completa si suma. El newsletter queda pendiente.</span></li>
+          </ul>
+        </div></div>
+        <div class="panel" id="ps-load" hidden><div class="loading" aria-live="polite"><h3>Armando la presentación</h3><div class="sub" id="ps-ld-sub"></div><ul class="stages" id="ps-stages"></ul><div class="bar"><i id="ps-bar"></i></div><div class="elapsed num"><span id="ps-el">0 s</span><span></span></div></div></div>
+        <div class="panel" id="ps-res" hidden>
+          <div class="res-head"><span class="tag gold" id="ps-t1"></span><span class="tag live" id="ps-t2"></span></div>
+          <div class="pb">
+            <h3 style="margin:0 0 4px" id="ps-arch"></h3>
+            <p class="hint" style="margin:0" id="ps-sub"></p>
+            <div id="ps-pend"></div>
+            <div id="ps-avisos"></div>
+            <div class="sm-kpis" id="ps-kpis"></div>
+            <div class="res-actions">
+              <a class="btn primary" id="ps-abrir" href="#" target="_blank" rel="noopener">Abrir la presentación</a>
+              <a class="btn" id="ps-carp" href="#" target="_blank" rel="noopener">Carpeta de reportes</a>
+            </div>
+          </div>
+        </div>
+        <div class="panel" id="ps-hist-p" hidden><div class="pb"><div class="lbl">Presentaciones guardadas en Drive</div><ul class="sm-list" id="ps-hist"></ul></div></div>
+      </div>
+    </div>
+  </section>
+
   <section class="view" id="v-bc" aria-labelledby="h-bc">
     <div class="tool-head"><div><div class="eyebrow" id="bc-eyebrow"></div><h1 class="h1" id="h-bc">Buscador de campañas</h1></div></div>
     <div class="layout">
@@ -992,6 +1058,7 @@ const API = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-brandvoice';
 const API_ADM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-admin';
 const API_SD = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-sindicados';
 const API_SM = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-social';
+const API_PS = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-social-presentacion';
 const API_BC = 'https://forbesmexico.app.n8n.cloud/webhook/techhub-campanas';
 const VERSION = '2.0';
 
@@ -1003,22 +1070,23 @@ const PAISES = {
        manual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit', sdManual:'https://docs.google.com/document/d/1WjA1WaAioxbNPAfeLeN1NMRRbvu37JHZTpU3N9kq6lI/edit',
        urlBase:'forbes.pe/brand-voice/', idioma:'Español neutro, tercera persona, sin peruanismos coloquiales',
        sd:{lector:'peruano', lea:'Lee también', leaPos:'medio', cierre:'Este artículo se publicó originalmente en', pais:'Perú', locale:'es-PE', tz:'America/Lima'},
-       tools:['brand-voice','checker','sindicados','social-media','buscador-campanas']},
+       tools:['brand-voice','checker','sindicados','social-media','presentacion-semanal','buscador-campanas']},
   mx: {code:'MX', nombre:'México', edicion:'Forbes México', activo:true, dominio:'forbes.com.mx', correo:'nombre@forbes.com.mx',
-       tools:['social-media','buscador-campanas'], verifica:'social'},
+       tools:['social-media','presentacion-semanal','buscador-campanas'], verifica:'social'},
   co: {code:'CO', nombre:'Colombia', edicion:'Forbes Colombia', activo:true, sdManual:'https://docs.google.com/document/d/1HIXu_mCdgW2BGe7nNk2JVkTbpR3uFE72V9s676_t2cg/edit', dominio:'forbes.co', correo:'nombre@forbes.co',
        cifras:'US$8.400 millones y US$4,07 billones; punto para miles y coma para decimales',
        sd:{lector:'colombiano', lea:'Lea también', leaPos:'final', cierre:'Este artículo fue publicado originalmente por', pais:'Colombia', locale:'es-CO', tz:'America/Bogota'},
-       tools:['sindicados','social-media','buscador-campanas'], verifica:'sindicados'},
-  cl: {code:'CL', nombre:'Chile', edicion:'Forbes Chile', activo:true, dominio:'forbes.cl', tools:['social-media','buscador-campanas'], verifica:'social'},
-  rd: {code:'RD', nombre:'República Dominicana', edicion:'Forbes República Dominicana', activo:true, dominio:'forbes.do', tools:['social-media','buscador-campanas'], verifica:'social'},
-  ca: {code:'CA', nombre:'Centroamérica', edicion:'Forbes Centroamérica', activo:true, dominio:'forbescentroamerica.com', tools:['social-media','buscador-campanas'], verifica:'social'}
+       tools:['sindicados','social-media','presentacion-semanal','buscador-campanas'], verifica:'sindicados'},
+  cl: {code:'CL', nombre:'Chile', edicion:'Forbes Chile', activo:true, dominio:'forbes.cl', tools:['social-media','presentacion-semanal','buscador-campanas'], verifica:'social'},
+  rd: {code:'RD', nombre:'República Dominicana', edicion:'Forbes República Dominicana', activo:true, dominio:'forbes.do', tools:['social-media','presentacion-semanal','buscador-campanas'], verifica:'social'},
+  ca: {code:'CA', nombre:'Centroamérica', edicion:'Forbes Centroamérica', activo:true, dominio:'forbescentroamerica.com', tools:['social-media','presentacion-semanal','buscador-campanas'], verifica:'social'}
 };
 const TOOLS = [
   {id:'brand-voice', ic:'B', nombre:'Generador Brand Voice', desc:'Del brief del cliente a una nota patrocinada lista para revisión. Aprende del estilo de la edición con cada nota que corrigen los redactores.', equipo:'Comercial', activo:true},
   {id:'checker', ic:'C', nombre:'Checker editorial', desc:'Revisión del PDF de la revista antes de imprenta: ortografía, tipeo, gramática y nombres propios. El reporte llega por correo.', equipo:'Editorial', activo:true},
   {id:'sindicados', ic:'S', nombre:'Sindicados', desc:'De la URL de una nota de Forbes US o de otra edición del grupo a la versión de la edición: traducción, cifras, enlaces, SEO y «Lea también».', equipo:'Editorial', activo:true},
   {id:'social-media', ic:'R', nombre:'Reporte semanal de redes', desc:'Reporte semanal de redes con un clic: el Excel de la edición completo con Metricool, YouTube Analytics y GA4, guardado en Drive.', equipo:'Social Media', activo:true},
+  {id:'presentacion-semanal', ic:'P', nombre:'Presentación semanal de redes', desc:'La presentación del reporte semanal lista en Slides: delivery contra el calendario, resultados contra las 4 semanas previas, semáforo, mejores y peores contenidos y audiencias. El CM solo escribe el análisis.', equipo:'Social Media', activo:true},
   {id:'buscador-campanas', ic:'B', nombre:'Buscador de campañas', desc:'Busca una campaña por palabras clave en todas las redes y en la pauta de Meta, y arma el informe en Slides con la marca Forbes, más una planilla por pieza en Sheets. Llega por correo.', equipo:'Social Media', activo:true},
   {id:'pre-diseno', ic:'P', nombre:'Checker pre-diseño', desc:'Revisión del texto en Google Docs antes de pasar a diseño, con comentarios en el documento.', equipo:'Editorial', activo:false}
 ];
@@ -1098,6 +1166,7 @@ function route(){
   if(tool === 'brand-voice'){ renderBV(); return show('v-bv', [cP, cE, ['Brand Voice']]); }
   if(tool === 'checker'){ renderCK(); return show('v-ck', [cP, cE, ['Checker editorial']]); }
   if(tool === 'social-media'){ renderSM(); return show('v-sm', [cP, cE, ['Reporte semanal de redes']]); }
+  if(tool === 'presentacion-semanal'){ renderPS(); return show('v-ps', [cP, cE, ['Presentación semanal de redes']]); }
   if(tool === 'buscador-campanas'){ renderBC(); return show('v-bc', [cP, cE, ['Buscador de campañas']]); }
   show('v-404', []);
 }
@@ -1955,7 +2024,7 @@ async function renderSM(){
       $('sm-msg').innerHTML = '<div class="alerta">La primera semana que se completa sola es la del <b>'+esc(prox.etiqueta)+'</b>. Se puede exportar desde el lunes '+fechaCorta(new Date(new Date(prox.domingo+'T12:00:00Z').getTime()+864e5).toISOString().slice(0,10))+'.</div>';
       return;
     }
-    sel.innerHTML = d.disponibles.map(s => '<option value="'+s.lunes+'">S'+String(s.n).padStart(2,'0')+' · '+esc(s.etiqueta)+(s.drive_url ? ' · ya exportada' : '')+'</option>').join('');
+    sel.innerHTML = d.disponibles.map(s => '<option value="'+s.lunes+'">S'+String(s.n).padStart(2,'0')+' · '+esc(s.etiqueta)+'</option>').join('');
     sel.disabled = false; $('bsm').disabled = false;
   }catch(e){
     sel.innerHTML = '<option>No se pudieron cargar las semanas</option>';
@@ -1981,7 +2050,7 @@ async function exportarSM(){
   if(!/^\d{4}-\d{2}-\d{2}$/.test(sem)) return;
   localStorage.setItem('th_sm_nom', nom);
   $('bsm').disabled = true; $('sm-how').hidden = true; $('sm-res').hidden = true; $('sm-load').hidden = false; $('sm-msg').innerHTML = '';
-  $('sm-ld-sub').textContent = $('sm-sem').selectedOptions[0].textContent.replace(' · ya exportada', '');
+  $('sm-ld-sub').textContent = $('sm-sem').selectedOptions[0].textContent;
   const t0 = Date.now(), total = SM_STAGES.reduce((a,x)=>a+x.s,0);
   const tick = () => { const el = (Date.now()-t0)/1000; let acc = 0;
     $('sm-stages').innerHTML = SM_STAGES.map((x,i) => { const st = el >= acc + x.s && i < SM_STAGES.length-1 ? 'done' : el >= acc ? 'on' : ''; acc += x.s; return '<li class="'+st+'"><span class="b">'+(st==='done'?'✓':'')+'</span>'+esc(x.t)+'</li>'; }).join('');
@@ -2014,6 +2083,81 @@ function pintarSMRes(d){
   const dr = $('sm-drive'); dr.hidden = !d.drive_url; dr.href = d.drive_url || '#';
   $('sm-carp').href = d.carpeta_url || '#';
   $('sm-res').hidden = false;
+}
+
+/* ========= Social Media: presentación semanal ========= */
+const PS_STAGES = [
+  {t:'Leyendo Metricool: 5 semanas por red', s:5},
+  {t:'Historias de Instagram, GA4 y YouTube', s:3},
+  {t:'Copiando la plantilla en Drive', s:3},
+  {t:'Completando las láminas', s:4}
+];
+const PS_DIAS = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+async function renderPS(){
+  const P = PAISES[S.pais];
+  $('ps-eyebrow').textContent = P.edicion + ' · Equipo de Social Media';
+  $('ps-res').hidden = true; $('ps-load').hidden = true; $('ps-how').hidden = false; $('ps-msg').innerHTML = '';
+  $('ps-nom').value = $('ps-nom').value || localStorage.getItem('th_sm_nom') || '';
+  $('ps-mail').value = $('ps-mail').value || localStorage.getItem('th_bc_mail') || '';
+  $('ps-wa').innerHTML = PS_DIAS.map((d,i) => '<div><label for="ps-wa'+i+'">'+d+'</label><input type="number" min="0" max="99" inputmode="numeric" id="ps-wa'+i+'"></div>').join('');
+  const sel = $('ps-sem'); sel.innerHTML = '<option>Cargando semanas…</option>'; sel.disabled = true; $('bps').disabled = true;
+  try{
+    const r = await fetch(API_PS, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'semanas', pais:P.code, clave:keyOf(S.pais)})});
+    if(r.status === 401){ borrarClave(S.pais); S.pendingRoute = location.hash; openKey(S.pais); return; }
+    const d = await r.json(); S.ps = d;
+    pintarPSHist();
+    if(!d.disponibles || !d.disponibles.length){ sel.innerHTML = '<option>Todavía no hay semanas cerradas</option>'; return; }
+    sel.innerHTML = d.disponibles.map(s => '<option value="'+s.lunes+'">S'+String(s.n).padStart(2,'0')+' · '+esc(s.etiqueta)+'</option>').join('');
+    sel.disabled = false; $('bps').disabled = false;
+  }catch(e){
+    sel.innerHTML = '<option>No se pudieron cargar las semanas</option>';
+    $('ps-msg').innerHTML = '<div class="alerta">No hay conexión con el servidor del Hub. Intente en unos minutos.</div>';
+  }
+}
+function pintarPSHist(){
+  const d = S.ps || {}, g = (d.disponibles || []).filter(s => s.url);
+  $('ps-hist-p').hidden = !g.length && !d.carpeta_url;
+  $('ps-hist').innerHTML = g.map(s => '<li><span>S'+String(s.n).padStart(2,'0')+' · '+esc(s.etiqueta)+'</span><a href="'+esc(s.url)+'" target="_blank" rel="noopener">Abrir ↗</a></li>').join('') +
+    (d.carpeta_url ? '<li><span>Todas las semanas</span><a href="'+esc(d.carpeta_url)+'" target="_blank" rel="noopener">Carpeta en Drive ↗</a></li>' : '');
+}
+async function generarPS(){
+  const P = PAISES[S.pais], sem = $('ps-sem').value, nom = $('ps-nom').value.trim(), mail = $('ps-mail').value.trim();
+  if(!/^\d{4}-\d{2}-\d{2}$/.test(sem)) return;
+  const wa = PS_DIAS.map((_,i) => { const v = $('ps-wa'+i).value.trim(); return v === '' ? null : Math.max(0, parseInt(v, 10) || 0); });
+  localStorage.setItem('th_sm_nom', nom); if(mail) localStorage.setItem('th_bc_mail', mail);
+  $('bps').disabled = true; $('ps-how').hidden = true; $('ps-res').hidden = true; $('ps-load').hidden = false; $('ps-msg').innerHTML = '';
+  $('ps-ld-sub').textContent = $('ps-sem').selectedOptions[0].textContent;
+  const t0 = Date.now(), total = PS_STAGES.reduce((a,x)=>a+x.s,0);
+  const tick = () => { const el = (Date.now()-t0)/1000; let acc = 0;
+    $('ps-stages').innerHTML = PS_STAGES.map((x,i) => { const st = el >= acc + x.s && i < PS_STAGES.length-1 ? 'done' : el >= acc ? 'on' : ''; acc += x.s; return '<li class="'+st+'"><span class="b">'+(st==='done'?'✓':'')+'</span>'+esc(x.t)+'</li>'; }).join('');
+    $('ps-bar').style.width = Math.min(95, el/total*100)+'%'; $('ps-el').textContent = Math.round(el)+' s'; };
+  tick(); const iv = setInterval(tick, 500);
+  try{
+    const r = await fetch(API_PS, {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({modo:'generar', pais:P.code, clave:keyOf(S.pais), semana:sem, whatsapp:wa, nombre:nom, email:mail})});
+    if(r.status === 401){ borrarClave(S.pais); S.pendingRoute = location.hash; openKey(S.pais); throw new Error('La clave venció. Vuelva a ingresarla.'); }
+    const d = await r.json().catch(() => ({}));
+    if(d.status !== 'success') throw new Error(d.message || 'No se pudo armar la presentación. Intente de nuevo en unos minutos; si sigue fallando, avísele a Lucas Deges.');
+    pintarPSRes(d);
+    const s = (S.ps && S.ps.disponibles || []).find(x => x.lunes === d.semana.lunes); if(s){ s.url = d.url; pintarPSHist(); }
+  }catch(e){
+    $('ps-msg').innerHTML = '<div class="alerta">'+esc(e instanceof TypeError ? 'No hay conexión con el servidor del Hub. Intente en unos minutos.' : e.message)+'</div>';
+    $('ps-how').hidden = false;
+  }finally{ clearInterval(iv); $('ps-load').hidden = true; $('bps').disabled = false; }
+}
+function pintarPSRes(d){
+  const s = d.semana, k = d.resumen || {};
+  $('ps-t1').textContent = 'S' + String(s.n).padStart(2,'0') + ' · ' + s.etiqueta;
+  $('ps-t2').textContent = d.reemplazo ? 'Generada de nuevo' : 'Guardada en Drive';
+  $('ps-arch').textContent = d.archivo;
+  $('ps-sub').textContent = 'Lista en ' + d.duracion_s + ' s. Los números ya están; falta el análisis del equipo.';
+  const pend = d.pendientes || [];
+  $('ps-pend').innerHTML = pend.length ? '<div class="ps-pend"><div class="ps-pend-h"><span class="ps-sw"></span>Para completar antes de enviar <span class="hint" style="margin:0">· las celdas amarillas con «✍ Completar»</span></div><ol>'
+    + pend.map(x => '<li><b>Lámina ' + x.lamina + ' · ' + esc(x.titulo) + ':</b> ' + esc(x.que) + '</li>').join('') + '</ol></div>' : '';
+  $('ps-avisos').innerHTML = (d.avisos||[]).length ? '<div class="alerta" style="margin-top:14px"><b>Revise antes de enviar:</b><ul>'+d.avisos.map(a => '<li>'+esc(a)+'</li>').join('')+'</ul></div>' : '';
+  const kp = [['Publicaciones', k.publicado + ' de ' + k.plan, 'planeadas'], ['Alcance orgánico', k.alcance, 'vs. 4 semanas: ' + k.alcance_vs], ['Engagement', k.engagement, 'vs. 4 semanas: ' + k.engagement_vs]];
+  $('ps-kpis').innerHTML = kp.map(x => '<div><div class="k">'+x[0]+'</div><div class="v num">'+esc(x[1])+'</div><div class="hint" style="margin:0">'+esc(x[2])+'</div></div>').join('');
+  $('ps-abrir').href = d.url; $('ps-carp').href = d.carpeta_url || '#';
+  $('ps-res').hidden = false;
 }
 
 /* ========= Social Media: buscador de campañas ========= */
