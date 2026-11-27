@@ -2027,7 +2027,7 @@ async function renderSM(){
     if(!d.disponibles || !d.disponibles.length){
       sel.innerHTML = '<option>Todavía no hay semanas para exportar</option>';
       const prox = d.proxima;
-      $('sm-msg').innerHTML = '<div class="alerta">La primera semana que se completa sola es la del <b>'+esc(prox.etiqueta)+'</b>. Se puede exportar desde el lunes '+fechaCorta(new Date(new Date(prox.domingo+'T12:00:00Z').getTime()+864e5).toISOString().slice(0,10))+'.</div>';
+      $('sm-msg').innerHTML = '<div class="alerta">La primera semana que se completa sola es la del <b>'+esc(prox.etiqueta)+'</b>. Se puede exportar desde el lunes '+fechaCorta(new Date(new Date(prox.domingo+'T12:00:00Z').getTime()+864e5).toISOString().slice(0,10))+'.'+((d.guardados||[]).length ? ' Los reportes ya guardados se abren desde <b>Reportes guardados en Drive</b>, acá abajo.' : '')+'</div>';
       return;
     }
     sel.innerHTML = d.disponibles.map(s => '<option value="'+s.lunes+'">S'+String(s.n).padStart(2,'0')+' · '+esc(s.etiqueta)+'</option>').join('');
@@ -2038,7 +2038,7 @@ async function renderSM(){
   }
 }
 function pintarSMHist(){
-  const d = S.sm || {}, g = (d.disponibles || []).filter(s => s.drive_url);
+  const d = S.sm || {}, g = d.guardados || (d.disponibles || []).filter(s => s.drive_url);
   $('sm-hist-p').hidden = !g.length && !d.carpeta_url;
   $('sm-hist').innerHTML = g.map(s => '<li><span>S'+String(s.n).padStart(2,'0')+' · '+esc(s.etiqueta)+'</span><a href="'+esc(s.drive_url)+'" target="_blank" rel="noopener">Abrir ↗</a></li>').join('') +
     (d.carpeta_url ? '<li><span>Todas las semanas</span><a href="'+esc(d.carpeta_url)+'" target="_blank" rel="noopener">Carpeta en Drive ↗</a></li>' : '');
